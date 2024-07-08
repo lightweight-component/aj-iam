@@ -3,13 +3,12 @@ package com.ajaxjs.iam.server.config;
 import com.ajaxjs.base.Sdk;
 import com.ajaxjs.data.jdbc_helper.JdbcConn;
 import com.ajaxjs.data.jdbc_helper.JdbcWriter;
-import com.ajaxjs.framework.spring.filter.google_captcha.GoogleCaptchaInterceptor;
-import com.ajaxjs.iam.model.SimpleUser;
+
+import com.ajaxjs.framework.filter.google_captcha.GoogleCaptchaInterceptor;
 import com.ajaxjs.iam.resource_server.UserInterceptor;
 import com.ajaxjs.iam.server.service.OidcService;
 import com.ajaxjs.iam.user.common.session.ServletUserSession;
 import com.ajaxjs.iam.user.common.session.UserSession;
-import com.ajaxjs.iam.user.service.UserService;
 import com.ajaxjs.util.cache.Cache;
 import com.ajaxjs.util.cache.expiry.ExpiryCache;
 import com.ajaxjs.util.convert.ConvertToJson;
