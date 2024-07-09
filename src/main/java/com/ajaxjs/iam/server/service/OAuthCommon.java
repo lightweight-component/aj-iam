@@ -1,6 +1,6 @@
 package com.ajaxjs.iam.server.service;
 
-import com.ajaxjs.data.CRUD;
+import com.ajaxjs.framework.CRUD;
 import com.ajaxjs.framework.BusinessException;
 import com.ajaxjs.iam.server.common.IamConstants;
 import com.ajaxjs.iam.server.common.IamUtils;

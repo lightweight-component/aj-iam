@@ -1,10 +1,13 @@
 package com.ajaxjs.iam.permission;
 
-import com.ajaxjs.data.CRUD;
-import com.ajaxjs.framework.entity.tree.FlatArrayToTree;
+import com.ajaxjs.data.jdbc_helper.JdbcWriter;
+import com.ajaxjs.data.tree.FlatArrayToTree;
+import com.ajaxjs.framework.CRUD;
+
 import com.ajaxjs.iam.server.controller.PermissionController;
 import com.ajaxjs.util.ObjectHelper;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
@@ -24,6 +27,9 @@ public class PermissionService implements PermissionController {
         return transformToTreeStructure(data);
     }
 
+    @Autowired
+    private JdbcWriter writer;
+
     @Override
     public boolean deleteRole(Integer id) {
         String sql = "WITH RECURSIVE sub_roles AS (" +
@@ -33,7 +39,7 @@ public class PermissionService implements PermissionController {
                 ")" +
                 "UPDATE per_role SET stat = 1 WHERE id IN (SELECT id FROM sub_roles);";
 
-        return CRUD.jdbcWriterFactory().write(sql, id) > 0;
+        return writer.write(sql, id) > 0;
     }
 
     @Override

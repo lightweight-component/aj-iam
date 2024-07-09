@@ -1,8 +1,8 @@
 package com.ajaxjs.iam.server.service;
 
-import com.ajaxjs.data.CRUD;
+import com.ajaxjs.framework.CRUD;
 import com.ajaxjs.framework.BusinessException;
-import com.ajaxjs.framework.spring.filter.dbconnection.EnableTransaction;
+import com.ajaxjs.framework.filter.dbconnection.EnableTransaction;
 import com.ajaxjs.iam.server.controller.OAuthController;
 import com.ajaxjs.iam.server.model.AccessToken;
 import com.ajaxjs.iam.server.model.po.AccessTokenPo;

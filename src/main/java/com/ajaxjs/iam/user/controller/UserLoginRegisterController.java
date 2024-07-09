@@ -1,6 +1,6 @@
 package com.ajaxjs.iam.user.controller;
 
-import com.ajaxjs.framework.spring.filter.google_captcha.GoogleCaptchaCheck;
+import com.ajaxjs.framework.filter.google_captcha.GoogleCaptchaCheck;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 

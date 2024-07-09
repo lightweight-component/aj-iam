@@ -1,9 +1,10 @@
 package com.ajaxjs.iam.user.service;
 
-import com.ajaxjs.data.CRUD;
+import com.ajaxjs.framework.CRUD;
 import com.ajaxjs.framework.BusinessException;
-import com.ajaxjs.framework.spring.DiContextUtil;
-import com.ajaxjs.framework.spring.filter.google_captcha.GoogleCaptchaCheck;
+import com.ajaxjs.framework.DiContextUtil;
+import com.ajaxjs.framework.WebHelper;
+import com.ajaxjs.framework.filter.google_captcha.GoogleCaptchaCheck;
 import com.ajaxjs.iam.server.common.IamUtils;
 import com.ajaxjs.iam.user.common.UserConstants;
 import com.ajaxjs.iam.user.common.UserUtils;
@@ -13,7 +14,6 @@ import com.ajaxjs.iam.user.controller.UserLoginRegisterController;
 import com.ajaxjs.iam.user.model.User;
 import com.ajaxjs.iam.user.model.UserAccount;
 import com.ajaxjs.util.StrUtil;
-import com.ajaxjs.util.WebHelper;
 import com.ajaxjs.util.logger.LogHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;

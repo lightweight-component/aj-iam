@@ -1,6 +1,6 @@
 package com.ajaxjs.iam.server.service;
 
-import com.ajaxjs.data.CRUD;
+import com.ajaxjs.framework.CRUD;
 import com.ajaxjs.iam.server.model.po.App;
 import com.ajaxjs.util.StrUtil;
 import org.springframework.stereotype.Service;

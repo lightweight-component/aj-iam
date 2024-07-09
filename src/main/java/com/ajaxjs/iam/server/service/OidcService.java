@@ -1,6 +1,6 @@
 package com.ajaxjs.iam.server.service;
 
-import com.ajaxjs.framework.spring.response.Result;
+import com.ajaxjs.framework.response.Result;
 import com.ajaxjs.iam.jwt.JWebTokenMgr;
 import com.ajaxjs.iam.jwt.Utils;
 import com.ajaxjs.iam.server.controller.OidcController;

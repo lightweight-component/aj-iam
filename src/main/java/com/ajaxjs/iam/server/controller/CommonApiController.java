@@ -1,13 +1,10 @@
 package com.ajaxjs.iam.server.controller;
 
-import com.ajaxjs.framework.entity.BaseCRUDController;
+import com.ajaxjs.data.data_service.DataServiceController;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-/**
- * 通用万能型 API 接口
- */
 @RestController
 @RequestMapping("/common_api")
-public interface CommonApiController extends BaseCRUDController {
+public interface CommonApiController extends DataServiceController {
 }

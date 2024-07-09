@@ -1,6 +1,6 @@
 package com.ajaxjs.iam.user.service;
 
-import com.ajaxjs.data.CRUD;
+import com.ajaxjs.framework.CRUD;
 import com.ajaxjs.iam.user.common.UserUtils;
 import com.ajaxjs.iam.user.common.util.CheckStrength;
 import com.ajaxjs.iam.user.common.util.SendEmail;

@@ -1,6 +1,6 @@
 package com.ajaxjs.iam.permission;
 
-import com.ajaxjs.data.CRUD;
+import com.ajaxjs.framework.CRUD;
 
 import java.lang.reflect.Field;
 import java.util.List;
