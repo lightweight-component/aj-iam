@@ -2,14 +2,15 @@ package com.ajaxjs.iam.user.service;
 
 import com.ajaxjs.iam.server.BaseTest;
 import com.ajaxjs.iam.user.common.util.SendEmail;
-import org.junit.Test;
+
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 
 public class TestResetPassword extends BaseTest {

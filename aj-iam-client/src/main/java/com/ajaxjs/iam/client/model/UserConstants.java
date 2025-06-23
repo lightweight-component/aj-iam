@@ -1,4 +1,4 @@
-package com.ajaxjs.iam.resource_server;
+package com.ajaxjs.iam.client.model;
 
 public interface UserConstants {
     String REDIS_PREFIX = "USER:";

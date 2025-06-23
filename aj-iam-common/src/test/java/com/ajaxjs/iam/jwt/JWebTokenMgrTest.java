@@ -1,8 +1,9 @@
 package com.ajaxjs.iam.jwt;
 
-import com.ajaxjs.iam.resource_server.Utils;
-import org.junit.Test;
-import org.junit.Assert;
+import com.ajaxjs.util.JsonUtil;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class JWebTokenMgrTest {
     private JWebTokenMgr jWebTokenMgr = new JWebTokenMgr();
@@ -15,13 +16,13 @@ public class JWebTokenMgrTest {
                 "C1Qc0RwN1V1S1V5T0VSWnBtR0VSWkFRT1lYUzRqT1V6T0VSVk1qWmhiR1V5T0VSVk1qWmhiR1U9";
         JWebToken token = jWebTokenMgr.parse(tokenStr);
 
-        Assert.assertNotNull(token);
-        Assert.assertEquals("user", token.getPayload().getSub());
-        Assert.assertEquals("John Doe", token.getPayload().getName());
-        Assert.assertEquals("image", token.getPayload().getAud());
-        Assert.assertEquals("foo@bar.com", token.getPayload().getIss());
-//        Assert.assertEquals(1614468034L, token.getPayload().getExp().longValue());
-//        Assert.assertEquals(1614464034L, token.getPayload().getIat().longValue());
+        assertNotNull(token);
+        assertEquals("user", token.getPayload().getSub());
+        assertEquals("John Doe", token.getPayload().getName());
+        assertEquals("image", token.getPayload().getAud());
+        assertEquals("foo@bar.com", token.getPayload().getIss());
+//        assertEquals(1614468034L, token.getPayload().getExp().longValue());
+//        assertEquals(1614464034L, token.getPayload().getIat().longValue());
     }
 
     @Test
@@ -36,19 +37,19 @@ public class JWebTokenMgrTest {
         JWebToken token = jWebTokenMgr.tokenFactory(payload);
 
         // Validate the token's structure and contents
-        Assert.assertNotNull(token);
-        Assert.assertNotNull(token.getPayload());
-        Assert.assertNotNull(token.getPayloadJson());
-        Assert.assertNotNull(token.getSignature());
-        Assert.assertEquals(jWebTokenMgr.getIssuer(), token.getPayload().getIss());
+        assertNotNull(token);
+        assertNotNull(token.getPayload());
+        assertNotNull(token.getPayloadJson());
+        assertNotNull(token.getSignature());
+        assertEquals(jWebTokenMgr.getIssuer(), token.getPayload().getIss());
 
-        Assert.assertEquals(payload.getSub(), token.getPayload().getSub());
-        Assert.assertEquals(payload.getName(), token.getPayload().getName());
-        Assert.assertEquals(payload.getAud(), token.getPayload().getAud());
+        assertEquals(payload.getSub(), token.getPayload().getSub());
+        assertEquals(payload.getName(), token.getPayload().getName());
+        assertEquals(payload.getAud(), token.getPayload().getAud());
 
         // JSON payload comparison
-        String expectedJson = Utils.bean2json(payload);
-        Assert.assertEquals(expectedJson, token.getPayloadJson());
+        String expectedJson = JsonUtil.toJson(payload);
+        assertEquals(expectedJson, token.getPayloadJson());
     }
 
     @Test
@@ -61,7 +62,7 @@ public class JWebTokenMgrTest {
         payload.setExp(expires);
 
         JWebToken token = jWebTokenMgr.tokenFactory(payload);
-        Assert.assertTrue(jWebTokenMgr.isValid(token));
+        assertTrue(jWebTokenMgr.isValid(token));
     }
 
     @Test
@@ -73,10 +74,27 @@ public class JWebTokenMgrTest {
 
         JWebToken token = jWebTokenMgr.tokenFactory(sub, name, aud, expires);
 
-        Assert.assertNotNull("Token should not be null", token);
-        Assert.assertNotNull("Payload should not be null", token.getPayload());
-        Assert.assertEquals("Subject mismatch", sub, token.getPayload().getSub());
-        Assert.assertEquals("Name mismatch", name, token.getPayload().getName());
-        Assert.assertEquals("Audience mismatch", aud, token.getPayload().getAud());
+        assertNotNull(token, "Token should not be null");
+        assertNotNull(token.getPayload(), "Payload should not be null");
+        assertEquals("Subject mismatch", sub, token.getPayload().getSub());
+        assertEquals("Name mismatch", name, token.getPayload().getName());
+        assertEquals("Audience mismatch", aud, token.getPayload().getAud());
+    }
+
+    final static String token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiIiLCJleHAiOjAsImlhdCI6MTcwMDk0OTEzMSwiaXNzIjoiZm9vQGJhci5uZXQiLCJuYW1lIjoi6JeP57uP6ZiB572R56uZIiwic3ViIjoiNCJ9.m0A-ykfjcZsUYIIYsHqE8vEySisKztN2IhQMvbUfqZI";
+
+    @Test
+    public void test() {
+        JWebTokenMgr mgr = new JWebTokenMgr();
+        mgr.setSecretKey("aEsc65643vb3");
+        JWebToken jwt = mgr.parse(token);
+
+        boolean valid = mgr.isValid(jwt);
+        System.out.println(valid);
+
+        String jsonUser = "{\"id\": %s, \"name\": \"%s\"}";
+        jsonUser = String.format(jsonUser, jwt.getPayload().getSub(), jwt.getPayload().getName());
+
+        System.out.println(jsonUser);
     }
 }

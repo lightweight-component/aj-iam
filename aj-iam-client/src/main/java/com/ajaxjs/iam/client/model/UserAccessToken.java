@@ -13,6 +13,6 @@ public class UserAccessToken {
     private String name;
 
     private AccessToken accessToken;
-    
+
     private String idToken;
 }

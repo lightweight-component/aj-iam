@@ -1,7 +1,7 @@
 package com.ajaxjs.iam.jwt;
 
+import com.ajaxjs.util.StrUtil;
 import lombok.Data;
-import org.springframework.util.StringUtils;
 
 /**
  * JWT Token
@@ -46,7 +46,7 @@ public class JWebToken {
      * @return 头部 + Payload
      */
     public String headerPayload() {
-        if (!StringUtils.hasText(payloadJson))
+        if (StrUtil.isEmptyText(payloadJson))
             throw new IllegalArgumentException("头 Payload 参数有问题");
 
         String p = JwtUtils.encode(payloadJson);

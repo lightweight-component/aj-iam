@@ -1,8 +1,6 @@
 package com.ajaxjs.iam.jwt;
 
-import org.junit.Test;
-
-import static org.junit.Assert.assertTrue;
+import org.junit.jupiter.api.Test;
 
 public class TestJWT {
     JWebTokenMgr mgr = new JWebTokenMgr();
@@ -15,7 +13,6 @@ public class TestJWT {
 
     @Test
     public void testValid() {
-
         JWebTokenMgr mgr = new JWebTokenMgr();
         mgr.setSecretKey("aEsD65643vb3");
         JWebToken jwt = mgr.parse("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJERUZBVUxUX1NDT1BFIiwiZXhwIjoxNzA5MjkwOTM2LCJpYXQiOjE3MDkyMDQ1MzYsImlzcyI6ImZvb0BiYXIubmV0IiwibmFtZSI6ImFkbWluIiwic3ViIjoiMSJ9.HZF89-4j2B5y22AbuB47ID0GCFuMxxbVur5zAdHFrOk");

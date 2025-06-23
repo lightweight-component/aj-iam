@@ -75,7 +75,8 @@ public class SkipSSL {
             kmf.init(ks, pwd.toCharArray());
 
             return kmf.getKeyManagers();
-        } catch (KeyStoreException | NoSuchAlgorithmException | CertificateException | IOException | UnrecoverableKeyException e) {
+        } catch (KeyStoreException | NoSuchAlgorithmException | CertificateException | IOException |
+                 UnrecoverableKeyException e) {
             e.printStackTrace();
             return null;
         }

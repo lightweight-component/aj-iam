@@ -1,13 +1,13 @@
 package com.ajaxjs.iam.client;
 
 
+import com.ajaxjs.iam.jwt.JwtUtils;
+import com.ajaxjs.util.EncodeTools;
 import lombok.Data;
 import org.springframework.http.*;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
-
-import com.ajaxjs.iam.jwt.JwtUtils;
 
 /**
  * OAuth 2.0 中的客户端凭证（Client Credentials）授权模式请求
@@ -44,7 +44,7 @@ public class ClientCredentials {
     public static String encodeClient(String clientId, String clientSecret) {
         String clientAndSecret = clientId + ":" + clientSecret;
 
-        return "Basic " + JwtUtils.encodeBase64(clientAndSecret);
+        return "Basic " + EncodeTools.base64EncodeToString(clientAndSecret);
     }
 
     /**

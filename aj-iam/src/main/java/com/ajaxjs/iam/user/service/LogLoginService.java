@@ -1,27 +1,24 @@
 package com.ajaxjs.iam.user.service;
 
 
-import com.ajaxjs.data.PageResult;
-import com.ajaxjs.framework.CRUD;
-import com.ajaxjs.framework.WebHelper;
 import com.ajaxjs.iam.user.common.UserConstants;
 import com.ajaxjs.iam.user.controller.LogLoginController;
 import com.ajaxjs.iam.user.model.LogLogin;
 import com.ajaxjs.iam.user.model.User;
-import com.ajaxjs.net.http.Get;
-
-import com.ajaxjs.util.logger.LogHelper;
+import com.ajaxjs.sqlman.crud.Entity;
+import com.ajaxjs.sqlman.model.CreateResult;
+import com.ajaxjs.sqlman.model.PageResult;
+import com.ajaxjs.util.http_request.Get;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
-
 import java.util.List;
 import java.util.Map;
 
 @Service
+@Slf4j
 public class LogLoginService implements LogLoginController, UserConstants {
-    private static final LogHelper LOGGER = LogHelper.getLog(LogLoginService.class);
-
     /**
      * 用户登录日志
      */
@@ -32,17 +29,17 @@ public class LogLoginService implements LogLoginController, UserConstants {
         userLoginLog.setUserName(user.getLoginId());
         saveIp(userLoginLog, req);
 
-        Long id = CRUD.create(userLoginLog);
+        CreateResult<Long> result = Entity.newInstance().input(userLoginLog).create(Long.class);
 
-        if (CRUD.create(userLoginLog) == null)
-            LOGGER.warning("更新会员登录日志出错");
+        if (!result.isOk())
+            log.warn("更新会员登录日志出错");
     }
 
     void saveIp(LogLogin bean, HttpServletRequest req) {
         if (req == null)
             return;
 
-        String ip = WebHelper.getIp(req);
+        String ip = getClientIp(req);
 
         if ("127.0.0.1".equals(ip) || "0:0:0:0:0:0:0:1".equals(ip)) {
             ip = "localhost";
@@ -58,12 +55,31 @@ public class LogLoginService implements LogLoginController, UserConstants {
                 } else
                     throw new Exception("接口返回不成功 " + map.get("errMsg"));
             } catch (Exception e) {
-                LOGGER.warning(e);
+                log.warn("saveIp wrong.", e);
             }
         }
 
         bean.setIp(ip);
         bean.setUserAgent(req.getHeader("user-agent"));
+    }
+
+    public static String getClientIp(HttpServletRequest request) {
+        String ip = request.getHeader("X-Forwarded-For");
+
+        if (ip != null && ip.length() != 0 && !"unknown".equalsIgnoreCase(ip)) {
+            // 多级代理会有逗号, 取第一个
+            ip = ip.split(",")[0].trim();
+        } else {
+            ip = request.getHeader("Proxy-Client-IP");
+            if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+                ip = request.getHeader("WL-Proxy-Client-IP");
+                if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+                    ip = request.getRemoteAddr();
+                }
+            }
+        }
+
+        return ip;
     }
 
     @Override

@@ -1,13 +1,10 @@
 package com.ajaxjs.iam.permission;
 
-import com.ajaxjs.data.jdbc_helper.JdbcWriter;
 import com.ajaxjs.data.tree.FlatArrayToTree;
-import com.ajaxjs.framework.CRUD;
-
 import com.ajaxjs.iam.server.controller.PermissionController;
+import com.ajaxjs.sqlman.Sql;
 import com.ajaxjs.util.ObjectHelper;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
@@ -19,16 +16,12 @@ import java.util.stream.Collectors;
 public class PermissionService implements PermissionController {
     @Override
     public List<Map<String, Object>> getRoleTree() {
-        List<Map<String, Object>> nodes = CRUD.listMap("SELECT * FROM per_role WHERE stat != 1");
-
+        List<Map<String, Object>> nodes = Sql.newInstance().input("SELECT * FROM per_role WHERE stat != 1").queryList();
         // 扁平化的列表转换为 tree 结构
         List<Map<String, Object>> data = new FlatArrayToTree().mapAsTree(Integer.class, nodes);
 
         return transformToTreeStructure(data);
     }
-
-    @Autowired
-    private JdbcWriter writer;
 
     @Override
     public boolean deleteRole(Integer id) {
@@ -39,12 +32,12 @@ public class PermissionService implements PermissionController {
                 ")" +
                 "UPDATE per_role SET stat = 1 WHERE id IN (SELECT id FROM sub_roles);";
 
-        return writer.write(sql, id) > 0;
+        return Sql.newInstance().input(sql, id).update().isOk();
     }
 
     @Override
     public List<Permission> getPermissionListByRole(Integer roleId) {
-        Role role = CRUD.info(Role.class, "SELECT * FROM per_role WHERE id = ?", roleId);
+        Role role = Sql.newInstance().input("SELECT * FROM per_role WHERE id = ?", roleId).queryOne(Role.class);
         List<Permission> result = new ArrayList<>();
         // get all permission list
         List<Permission> allPermissionList = getAllPermissionList();
@@ -55,7 +48,7 @@ public class PermissionService implements PermissionController {
 
         // find parents
         if (role.getIsInheritedParent()) {
-            List<Role> parentRoles = CRUD.list(Role.class, "WITH RECURSIVE parent_cte AS (\n" +
+            List<Role> parentRoles = Sql.newInstance().input("WITH RECURSIVE parent_cte AS (\n" +
                     "  SELECT id, name, parent_id, permission_value FROM per_role\n" +
                     "  WHERE id = ?  -- 用您要查询的节点的ID替换 <your_node_id>\n" +
                     "  UNION ALL\n" +
@@ -63,7 +56,7 @@ public class PermissionService implements PermissionController {
                     "  INNER JOIN parent_cte pc ON pr.id = pc.parent_id\n" +
                     ")\n" +
                     "SELECT id, name, parent_id, permission_value\n" +
-                    "FROM parent_cte WHERE id != ? -- 不包含自己", roleId, roleId);
+                    "FROM parent_cte WHERE id != ? -- 不包含自己", roleId, roleId).queryList(Role.class);
 
             if (!CollectionUtils.isEmpty(parentRoles)) {
                 for (Role r : parentRoles)
@@ -75,13 +68,12 @@ public class PermissionService implements PermissionController {
     }
 
     private List<Permission> getAllPermissionList() {
-        return CRUD.list(Permission.class, "SELECT * FROM per_permission WHERE stat = 0 ORDER BY id ASC");
+        return Sql.newInstance().input("SELECT * FROM per_permission WHERE stat = 0 ORDER BY id ASC").queryList(Permission.class);
     }
 
     @Override
     public boolean addPermissionsToRole(Integer roleId, List<Integer> permissionIds) {
-        List<Integer> allPermissionIIdList = CRUD.list(Integer.class,
-                "SELECT id FROM per_permission WHERE stat = 0 ORDER BY id ASC");
+        List<Integer> allPermissionIIdList = Sql.newInstance().input("SELECT id FROM per_permission WHERE stat = 0 ORDER BY id ASC").queryList(Integer.class);
         int[] indexes = findIndexes(permissionIds, allPermissionIIdList);
 //        System.out.println(allPermissionIIdList);
 //        System.out.println(Arrays.toString(indexes));
@@ -92,9 +84,10 @@ public class PermissionService implements PermissionController {
 
             num = PermissionControl.set(num, index, true);//设置[权限项 index]为true
         }
+
         log.info("permissionValue: " + num);
 
-        return CRUD.update("per_role", ObjectHelper.hashMap("id", roleId, "permission_value", num), "id");
+        return CRUD.update("per_role", ObjectHelper.mapOf("id", roleId, "permission_value", num), "id");
     }
 
     /**
@@ -132,8 +125,7 @@ public class PermissionService implements PermissionController {
      * @param isInherited       是否继承
      * @param roleName          父角色名称
      */
-    private void getPermissionList(List<Permission> result, List<Permission> allPermissionList,
-                                   Long permissionValue, boolean isInherited, String roleName) {
+    private void getPermissionList(List<Permission> result, List<Permission> allPermissionList, Long permissionValue, boolean isInherited, String roleName) {
         int i = 0;
 
         for (Permission p : allPermissionList) {

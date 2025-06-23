@@ -1,13 +1,13 @@
-package com.ajaxjs.iam.client;
+package com.ajaxjs.iam.client.filter;
 
-import java.lang.reflect.Method;
+import com.ajaxjs.iam.client.NeedsUserLogined;
+import org.springframework.web.method.HandlerMethod;
+import org.springframework.web.servlet.HandlerInterceptor;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-
-import org.springframework.web.method.HandlerMethod;
-import org.springframework.web.servlet.HandlerInterceptor;
+import java.lang.reflect.Method;
 
 /**
  * 检查用户是否已登录的拦截器

@@ -1,9 +1,10 @@
 package com.ajaxjs.iam.client;
 
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-
+import com.ajaxjs.iam.jwt.JwtAccessToken;
 import com.ajaxjs.iam.jwt.JwtUtils;
+import com.ajaxjs.util.RandomTools;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -14,14 +15,11 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
-
-import com.ajaxjs.iam.jwt.JwtAccessToken;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import lombok.Data;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.view.RedirectView;
 
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.Objects;
@@ -59,7 +57,7 @@ public abstract class BaseOidcClientUserController {
      * @return RedirectView 返回一个重定向视图对象，包含了构造的重定向URL。
      */
     public RedirectView loginPageUrl(HttpSession session, String userLoginCode, String clientId, String websiteUrl, String webUrl) {
-        String state = JwtUtils.getRandomString(5);
+        String state = RandomTools.generateRandomString(5);
         session.setAttribute(ClientUtils.OAUTH_STATE, state);// 将 state 值保存到会话中
         log.info("set state code:" + state);
 

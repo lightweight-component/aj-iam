@@ -1,17 +1,17 @@
 package com.ajaxjs.iam.server.service;
 
-import com.ajaxjs.framework.CRUD;
 import com.ajaxjs.framework.BusinessException;
-import com.ajaxjs.framework.filter.dbconnection.EnableTransaction;
+import com.ajaxjs.framework.spring.database.EnableTransaction;
 import com.ajaxjs.iam.server.controller.OAuthController;
 import com.ajaxjs.iam.server.model.AccessToken;
 import com.ajaxjs.iam.server.model.po.AccessTokenPo;
 import com.ajaxjs.iam.server.model.po.App;
 import com.ajaxjs.iam.user.model.User;
-import com.ajaxjs.util.StrUtil;
+import com.ajaxjs.sqlman.Sql;
+import com.ajaxjs.util.RandomTools;
 import com.ajaxjs.util.cache.Cache;
-import com.ajaxjs.util.logger.LogHelper;
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -21,9 +21,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 @Service
+@Slf4j
 public class OAuthService extends OAuthCommon implements OAuthController {
-    private static final LogHelper LOGGER = LogHelper.getLog(OAuthService.class);
-
     @Autowired(required = false)
     private Cache<String, Object> cache;
 
@@ -83,13 +82,14 @@ public class OAuthService extends OAuthCommon implements OAuthController {
 
         App app = getAppByAuthHeader(authorization);
 
-        AccessTokenPo accessTokenPO = CRUD.info(AccessTokenPo.class, "SELECT * FROM access_token WHERE refresh_token = ?", refreshToken);
+        AccessTokenPo accessTokenPO = Sql.newInstance().input("SELECT * FROM access_token WHERE refresh_token = ?", refreshToken).query(AccessTokenPo.class);
 
-        if (accessTokenPO == null) throw new BusinessException("找不到 RefreshToken " + refreshToken);
+        if (accessTokenPO == null)
+            throw new BusinessException("找不到 RefreshToken " + refreshToken);
 
         AccessToken accessToken = new AccessToken();
-        accessToken.setAccess_token(StrUtil.uuid(false));
-        accessToken.setRefresh_token(StrUtil.uuid(false));
+        accessToken.setAccess_token(RandomTools.uuid(false));
+        accessToken.setRefresh_token(RandomTools.uuid(false));
 
         // 获取超时
         Integer minutes;

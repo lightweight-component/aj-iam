@@ -3,16 +3,14 @@ package com.ajaxjs.iam.user.service;
 import com.ajaxjs.iam.server.BaseTest;
 import com.ajaxjs.iam.user.common.UserConstants;
 import com.ajaxjs.iam.user.model.User;
-import com.ajaxjs.util.TestHelper;
-
-
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Date;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 
 public class TestUserService extends BaseTest {
     @Autowired
@@ -22,10 +20,10 @@ public class TestUserService extends BaseTest {
     public void testInfo() {
         assertNotNull(userService);
         User user = userService.info(1L);
-        TestHelper.print(user);
+        System.out.println(user);
 
         user = userService.info(1L);
-        TestHelper.print(user);
+        System.out.println(user);
     }
 
     @Test

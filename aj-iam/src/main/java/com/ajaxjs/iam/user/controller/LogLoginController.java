@@ -1,11 +1,11 @@
 package com.ajaxjs.iam.user.controller;
 
-import com.ajaxjs.data.PageResult;
 import com.ajaxjs.iam.user.model.LogLogin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import com.ajaxjs.sqlman.model.PageResult;
 
 import java.util.List;
 

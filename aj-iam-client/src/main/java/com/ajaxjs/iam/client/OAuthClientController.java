@@ -1,16 +1,11 @@
 package com.ajaxjs.iam.client;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-
+import com.ajaxjs.iam.client.model.UserAccessToken;
+import com.ajaxjs.iam.jwt.JwtUtils;
+import com.ajaxjs.util.RandomTools;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,8 +16,9 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.view.RedirectView;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import com.ajaxjs.iam.jwt.JwtUtils;
-import com.ajaxjs.iam.client.model.UserAccessToken;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 /**
  * OAuth 授权客户端控制器
@@ -53,7 +49,7 @@ public class OAuthClientController {
     public RedirectView redirectToLogin(HttpSession session) {
         String redirectUri = "http://your-callback-url.com/oauth/callback";
         String scope = "openid profile email address phone"; // 定义需要获取的权限范围
-        String state = JwtUtils.getRandomString(5);
+        String state = RandomTools.generateRandomString(5);
         session.setAttribute(ClientUtils.OAUTH_STATE, state);// 将 state 值保存到会话中
 
         String authorizationUrl = UriComponentsBuilder.fromHttpUrl(authorizeUrl)

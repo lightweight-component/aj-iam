@@ -3,21 +3,9 @@ package com.ajaxjs.iam.server.service;
 import com.ajaxjs.iam.server.BaseTest;
 import com.ajaxjs.iam.server.common.IamConstants;
 import com.ajaxjs.iam.server.model.AccessToken;
-import com.ajaxjs.util.TestHelper;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.mock.web.MockHttpSession;
-import org.springframework.test.web.servlet.MockMvc;
-
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-
-import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.servlet.ModelAndView;
-
-import java.util.Objects;
-
-import static org.junit.Assert.assertNotNull;
 
 public class TestOAuthService extends BaseTest {
     @Autowired

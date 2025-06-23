@@ -1,25 +1,20 @@
 package com.ajaxjs.iam.server;
 
-import com.ajaxjs.data.jdbc_helper.JdbcConn;
-import com.ajaxjs.framework.spring.filter.dbconnection.DataBaseConnection;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.runner.RunWith;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.web.WebAppConfiguration;
+import com.ajaxjs.framework.spring.database.DataBaseConnection;
+import com.ajaxjs.sqlman.JdbcConnection;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.springframework.boot.test.context.SpringBootTest;
 
-@ContextConfiguration(classes = TestConfig.class)
-@RunWith(SpringJUnit4ClassRunner.class)
-@WebAppConfiguration
+@SpringBootTest
 public abstract class BaseTest {
-    @Before
-    public void initDb() {
+    @BeforeEach
+    void initAll() {
         DataBaseConnection.initDb();
     }
 
-    @After
-    public void closeDb() {
-        JdbcConn.closeDb();
+    @AfterEach
+    void closeDb() {
+        JdbcConnection.closeDb();
     }
 }

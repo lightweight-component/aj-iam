@@ -1,25 +1,20 @@
 package com.ajaxjs.iam.server.config;
 
 import com.ajaxjs.base.Sdk;
-import com.ajaxjs.data.jdbc_helper.JdbcConn;
-import com.ajaxjs.data.jdbc_helper.JdbcWriter;
-
 import com.ajaxjs.framework.filter.google_captcha.GoogleCaptchaInterceptor;
-import com.ajaxjs.iam.resource_server.UserInterceptor;
+import com.ajaxjs.framework.spring.database.ConnectionMgr;
 import com.ajaxjs.iam.server.service.OidcService;
 import com.ajaxjs.iam.user.common.session.ServletUserSession;
 import com.ajaxjs.iam.user.common.session.UserSession;
+import com.ajaxjs.util.JsonUtil;
 import com.ajaxjs.util.cache.Cache;
 import com.ajaxjs.util.cache.expiry.ExpiryCache;
-import com.ajaxjs.util.convert.ConvertToJson;
-import com.ajaxjs.util.logger.LogHelper;
+
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Scope;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
@@ -27,7 +22,6 @@ import org.springframework.web.servlet.config.annotation.InterceptorRegistration
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.sql.DataSource;
 import java.util.function.Function;
 
@@ -47,17 +41,7 @@ public class IamConfig implements WebMvcConfigurer {
 
     @Bean(value = "dataSource", destroyMethod = "close")
     DataSource getDs() {
-        return JdbcConn.setupJdbcPool("com.mysql.cj.jdbc.Driver", url, user, psw);
-    }
-
-    @Bean
-    @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-    public JdbcWriter jdbcWriter() {
-        JdbcWriter jdbcWriter = new JdbcWriter();
-        jdbcWriter.setIdField("id");
-        jdbcWriter.setIsAutoIns(true);
-
-        return jdbcWriter;
+        return ConnectionMgr.setupJdbcPool("com.mysql.cj.jdbc.Driver", url, user, psw);
     }
 
     /**
@@ -79,7 +63,7 @@ public class IamConfig implements WebMvcConfigurer {
             if (tokenUser == null)
                 throw new SecurityException("找不到用户信息");
 
-            return ConvertToJson.toJson(tokenUser.getAccessToken());
+            return JsonUtil.toJson(tokenUser.getAccessToken());
         };
     }
 
@@ -108,7 +92,7 @@ public class IamConfig implements WebMvcConfigurer {
      */
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        LogHelper.p("初始化 SSO 拦截器");
+        log.info("初始化 SSO 拦截器");
         InterceptorRegistration interceptorRegistration = registry.addInterceptor(authInterceptor());
         registry.addInterceptor(googleCaptchaMvcInterceptor());
         interceptorRegistration.addPathPatterns("/**"); // 拦截所有

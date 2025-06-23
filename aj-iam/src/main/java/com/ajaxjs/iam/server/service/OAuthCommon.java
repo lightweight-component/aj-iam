@@ -1,6 +1,5 @@
 package com.ajaxjs.iam.server.service;
 
-import com.ajaxjs.framework.CRUD;
 import com.ajaxjs.framework.BusinessException;
 import com.ajaxjs.iam.server.common.IamConstants;
 import com.ajaxjs.iam.server.common.IamUtils;
@@ -9,7 +8,9 @@ import com.ajaxjs.iam.server.model.po.AccessTokenPo;
 import com.ajaxjs.iam.server.model.po.App;
 import com.ajaxjs.iam.user.common.session.UserSession;
 import com.ajaxjs.iam.user.model.User;
+import com.ajaxjs.sqlman.Sql;
 import com.ajaxjs.util.MessageDigestHelper;
+import com.ajaxjs.util.RandomTools;
 import com.ajaxjs.util.StrUtil;
 import com.ajaxjs.util.cache.Cache;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,7 +45,7 @@ public abstract class OAuthCommon implements IamConstants {
             StringBuilder sb = new StringBuilder();
             sb.append("?state=").append(state);
             // 生成授权码（Authorization Code）
-            String code = MessageDigestHelper.getSHA1(clientId + StrUtil.getRandomString(6));
+            String code = MessageDigestHelper.getSHA1(clientId + RandomTools.generateRandomString(6));
             sb.append("&code=").append(code);
 
             if (StringUtils.hasText(webUrl)) sb.append("&web_url=").append(webUrl);
@@ -71,9 +72,10 @@ public abstract class OAuthCommon implements IamConstants {
      */
     public App getApp(String clientId, String clientSecret) {
         // 通过 CRUD 操作，查询应用信息，条件是状态为0、客户端 ID 和密钥匹配
-        App app = CRUD.info(App.class, "SELECT * FROM app WHERE stat = 0 AND client_id = ? AND client_secret = ?", clientId, clientSecret);
+        App app = Sql.newInstance().input("SELECT * FROM app WHERE stat = 0 AND client_id = ? AND client_secret = ?", clientId, clientSecret).query(App.class);
 
-        if (app == null) throw new BusinessException("应用不存在或非法密钥"); // 如果查询结果为空，表示没有找到对应的应用或密钥不正确，抛出业务异常
+        if (app == null)
+            throw new BusinessException("应用不存在或非法密钥"); // 如果查询结果为空，表示没有找到对应的应用或密钥不正确，抛出业务异常
 
         return app;
     }

@@ -14,13 +14,16 @@
     <packaging>jar</packaging>
 
     <dependencies>
+        <dependency>
+            <groupId>com.ajaxjs</groupId>
+            <artifactId>ajaxjs-util</artifactId>
+            <version>1.2.4</version>
+        </dependency>
 
         <!-- 编译为 jar 包时依赖的 -->
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
-            <version>3.1.0</version>
-            <scope>provided</scope>
         </dependency>
 
         <dependency>

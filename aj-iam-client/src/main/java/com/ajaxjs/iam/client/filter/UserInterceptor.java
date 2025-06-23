@@ -1,8 +1,10 @@
-package com.ajaxjs.iam.resource_server;
+package com.ajaxjs.iam.client.filter;
 
+import com.ajaxjs.iam.client.model.UserConstants;
 import com.ajaxjs.iam.jwt.JWebToken;
 import com.ajaxjs.iam.jwt.JWebTokenMgr;
 import com.ajaxjs.iam.model.SimpleUser;
+import com.ajaxjs.util.JsonUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -140,14 +142,13 @@ public class UserInterceptor implements HandlerInterceptor {
             if (StringUtils.hasText(jsonUser)) {
                 log.debug(jsonUser);
                 log.debug(new SimpleUser().toString());
-                SimpleUser user = Utils.jsonStr2Bean(jsonUser, SimpleUser.class);
+                SimpleUser user = JsonUtil.fromJson(jsonUser, SimpleUser.class);
                 request.setAttribute(UserConstants.USER_KEY_IN_REQUEST, user);
 
                 return true;
             } else return returnErrorMsg(401, response);
         } else return true; // 关掉了认证
     }
-
 
 
     /**

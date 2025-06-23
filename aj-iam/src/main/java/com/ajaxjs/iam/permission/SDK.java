@@ -1,13 +1,13 @@
 package com.ajaxjs.iam.permission;
 
-import com.ajaxjs.framework.CRUD;
+import com.ajaxjs.sqlman.Sql;
 
 import java.lang.reflect.Field;
 import java.util.List;
 
 public class SDK {
     public static void init(Class<?> permissionListClz) {
-        List<String> allPermissionIIdList = CRUD.list(String.class, "SELECT code FROM per_permission WHERE stat = 0 ORDER BY id ASC");
+        List<String> allPermissionIIdList = Sql.newInstance().input("SELECT code FROM per_permission WHERE stat = 0 ORDER BY id ASC").queryList(String.class);
         Field[] fields = permissionListClz.getDeclaredFields();
 
         for (Field field : fields) {

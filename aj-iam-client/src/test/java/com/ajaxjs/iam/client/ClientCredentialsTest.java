@@ -1,8 +1,10 @@
 package com.ajaxjs.iam.client;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 
 public class ClientCredentialsTest {
     @Test
@@ -17,8 +19,7 @@ public class ClientCredentialsTest {
         String actualEncoded = ClientCredentials.encodeClient(clientId, clientSecret);
 
         // Assert
-        assertTrue("The returned string should start with 'Basic '",
-                actualEncoded.startsWith(expectedPrefix));
+        assertTrue(actualEncoded.startsWith(expectedPrefix), "The returned string should start with 'Basic '");
         String actualEncodedWithoutPrefix = actualEncoded.substring(expectedPrefix.length());
         assertEquals("The actual encoded string does not match the expected", expectedEncoded, actualEncodedWithoutPrefix);
     }
@@ -34,7 +35,7 @@ public class ClientCredentialsTest {
         String actualEncoded = ClientCredentials.encodeClient(clientId, clientSecret);
 
         // Assert
-        assertTrue("The returned string should start with 'Basic '", actualEncoded.startsWith("Basic "));
+        assertTrue(actualEncoded.startsWith("Basic "), "The returned string should start with 'Basic '");
         String actualEncodedWithoutPrefix = actualEncoded.substring("Basic ".length());
         assertEquals("The actual encoded string with empty clientId does not match the expected", expectedEncoded, actualEncodedWithoutPrefix);
     }
@@ -50,7 +51,7 @@ public class ClientCredentialsTest {
         String actualEncoded = ClientCredentials.encodeClient(clientId, clientSecret);
 
         // Assert
-        assertTrue("The returned string should start with 'Basic '", actualEncoded.startsWith("Basic "));
+        assertTrue(actualEncoded.startsWith("Basic "), "The returned string should start with 'Basic '");
         String actualEncodedWithoutPrefix = actualEncoded.substring("Basic ".length());
         assertEquals("The actual encoded string with empty clientSecret does not match the expected", expectedEncoded, actualEncodedWithoutPrefix);
     }
@@ -67,7 +68,7 @@ public class ClientCredentialsTest {
         String actualEncoded = ClientCredentials.encodeClient(clientId, clientSecret);
 
         // Assert
-        assertTrue("The returned string should start with 'Basic '", actualEncoded.startsWith("Basic "));
+        assertTrue(actualEncoded.startsWith("Basic "), "The returned string should start with 'Basic '");
         String actualEncodedWithoutPrefix = actualEncoded.substring("Basic ".length());
         assertEquals("The actual encoded string with null clientId does not match the expected", expectedEncoded, actualEncodedWithoutPrefix);
     }
@@ -84,8 +85,7 @@ public class ClientCredentialsTest {
         String actualEncoded = ClientCredentials.encodeClient(clientId, clientSecret);
 
         // Assert
-        assertTrue("The returned string should start with 'Basic '",
-                actualEncoded.startsWith("Basic "));
+        assertTrue(actualEncoded.startsWith("Basic "), "The returned string should start with 'Basic '");
         String actualEncodedWithoutPrefix = actualEncoded.substring("Basic ".length());
         assertEquals("The actual encoded string with null clientSecret does not match the expected", expectedEncoded, actualEncodedWithoutPrefix);
     }

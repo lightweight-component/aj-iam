@@ -6,13 +6,14 @@
 
 # aj-iam-client
 
-OAuth  的 客户端 Client
+OAuth 的 客户端 Client
 
 Tutorial: https://framework.ajaxjs.com/docs/aj/?section=json.
 
 Java Documents: https://dev.ajaxjs.com/docs/javadoc/aj-json/.
 
 # Install
+
 Requires Java 1.8+, Maven Snippets:
 
 ```xml

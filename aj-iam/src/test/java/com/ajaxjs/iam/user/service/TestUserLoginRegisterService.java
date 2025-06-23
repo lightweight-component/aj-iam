@@ -2,21 +2,22 @@ package com.ajaxjs.iam.user.service;
 
 import com.ajaxjs.iam.server.BaseTest;
 import com.ajaxjs.iam.user.model.User;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
 
 public class TestUserLoginRegisterService extends BaseTest {
     @Autowired

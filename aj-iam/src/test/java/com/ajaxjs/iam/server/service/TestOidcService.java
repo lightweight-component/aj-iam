@@ -1,15 +1,13 @@
 package com.ajaxjs.iam.server.service;
 
-
 import com.ajaxjs.framework.spring.response.Result;
 import com.ajaxjs.iam.jwt.JWebTokenMgr;
-import com.ajaxjs.iam.jwt.JwtUtils;
 import com.ajaxjs.iam.server.BaseTest;
 import com.ajaxjs.iam.server.common.IamConstants;
 import com.ajaxjs.iam.server.model.JwtAccessToken;
 import com.ajaxjs.iam.user.model.User;
-import com.ajaxjs.util.StrUtil;
-import org.junit.Test;
+import com.ajaxjs.util.EncodeTools;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class TestOidcService extends BaseTest {
@@ -29,7 +27,7 @@ public class TestOidcService extends BaseTest {
     public static String encodeClient(String clientId, String clientSecret) {
         String clientAndSecret = clientId + ":" + clientSecret;
 
-        return "Basic " + JwtUtils.encodeBase64(clientAndSecret);
+        return "Basic " + EncodeTools.base64EncodeToString(clientAndSecret);
     }
 
     @Test

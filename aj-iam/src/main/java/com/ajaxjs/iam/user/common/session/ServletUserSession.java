@@ -1,12 +1,11 @@
 package com.ajaxjs.iam.user.common.session;
 
+import com.ajaxjs.framework.spring.DiContextUtil;
 import com.ajaxjs.iam.user.model.User;
 
 import javax.servlet.http.HttpSession;
 import java.util.Enumeration;
 import java.util.Objects;
-
-import com.ajaxjs.framework.DiContextUtil;
 
 /**
  * 基于 Servlet Session 最简单的用户会话，适合单机，不支持集群

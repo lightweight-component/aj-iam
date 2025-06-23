@@ -1,7 +1,8 @@
 package com.ajaxjs.iam.client;
 
-import org.junit.Before;
-import org.junit.Test;
+import com.ajaxjs.iam.client.filter.UserAccessHandlerInterceptor;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.http.HttpStatus;
 import org.springframework.mock.web.MockHttpServletRequest;
@@ -11,7 +12,8 @@ import org.springframework.web.method.HandlerMethod;
 import javax.servlet.http.HttpSession;
 import java.lang.reflect.Method;
 
-import static org.junit.Assert.*;
+
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
 public class TestUserAccessHandlerInterceptor {
@@ -23,7 +25,7 @@ public class TestUserAccessHandlerInterceptor {
     private MockHttpServletResponse response;
     private HttpSession session;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         request = new MockHttpServletRequest();
         response = new MockHttpServletResponse();

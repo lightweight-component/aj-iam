@@ -1,12 +1,12 @@
 package com.ajaxjs.iam.user.model;
 
-import com.ajaxjs.data.jdbc_helper.common.TableName;
 import com.ajaxjs.framework.BaseModel;
+import com.ajaxjs.sqlman.annotation.Table;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 @Data
-@TableName("user_login_log")
+@Table("user_login_log")
 @EqualsAndHashCode(callSuper = true)
 public class LogLogin extends BaseModel {
     /**

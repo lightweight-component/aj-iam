@@ -1,10 +1,12 @@
 package com.ajaxjs.iam.jwt;
 
 
-import com.ajaxjs.iam.resource_server.Utils;
+
+import com.ajaxjs.util.EncodeTools;
+import com.ajaxjs.util.JsonUtil;
+import com.ajaxjs.util.StrUtil;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.util.StringUtils;
 
 /**
  * JWT 管理器
@@ -35,8 +37,8 @@ public class JWebTokenMgr {
         if (!JWebToken.encodedHeader.equals(parts[0]))
             throw new IllegalArgumentException("非法的 JWT Header: " + parts[0]);
 
-        String json = JwtUtils.decode(parts[1]);
-        Payload payload = Utils.jsonStr2Bean(json, Payload.class);
+        String json = EncodeTools.base64DecodeToStringUtf8(parts[1]);
+        Payload payload = JsonUtil.fromJson(json, Payload.class);
 
         if (payload == null)
             throw new RuntimeException("Payload is Empty: ");
@@ -95,7 +97,7 @@ public class JWebTokenMgr {
     public String signature(JWebToken token) {
         String headerPayload = token.headerPayload();
 
-        if (!StringUtils.hasText(headerPayload))
+        if (StrUtil.isEmptyText(headerPayload))
             throw new IllegalArgumentException("头 Payload 参数有问题");
 
         return JwtUtils.hmacSha256(headerPayload, secretKey);
@@ -112,7 +114,7 @@ public class JWebTokenMgr {
         payload.setIss(issuer);
 
         JWebToken token = new JWebToken(payload);
-        token.setPayloadJson(Utils.bean2json(payload));
+        token.setPayloadJson(JsonUtil.toJson(payload));
         token.setSignature(signature(token));
 
         return token;

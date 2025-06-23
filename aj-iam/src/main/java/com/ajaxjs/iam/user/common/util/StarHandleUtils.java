@@ -1,6 +1,6 @@
 package com.ajaxjs.iam.user.common.util;
 
-import com.ajaxjs.util.logger.LogHelper;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.StringUtils;
 
 import java.util.StringJoiner;
@@ -11,6 +11,7 @@ import java.util.StringJoiner;
  * @author Erwin Feng
  * @since 2020/8/23 1:57 上午
  */
+@Slf4j
 public class StarHandleUtils {
     /**
      * 空的字符串（""）
@@ -69,7 +70,7 @@ public class StarHandleUtils {
             String right = getRight(email, email.length() - index);
             String left = getLeft(email, indexLeft);
             String star = generateStar(index - indexLeft);
-            
+
             return left + star + right;
         }
 
@@ -184,7 +185,7 @@ public class StarHandleUtils {
      */
     public static String getLeft(String source, int length) {
         if (length > source.length()) {
-            LogHelper.p("length(" + length + ") > source's length(" + source.length() + ")");
+            log.info("length(" + length + ") > source's length(" + source.length() + ")");
             length = source.length();
         }
 
@@ -206,7 +207,7 @@ public class StarHandleUtils {
      */
     public static String getRight(String source, int length) {
         if (length > source.length()) {
-            LogHelper.p("length(" + length + ") > source's length(" + source.length() + ")");
+            log.info("length(" + length + ") > source's length(" + source.length() + ")");
             length = source.length();
         }
 
