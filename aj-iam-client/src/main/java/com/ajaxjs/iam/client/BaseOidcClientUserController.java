@@ -1,8 +1,8 @@
 package com.ajaxjs.iam.client;
 
 import com.ajaxjs.iam.jwt.JwtAccessToken;
-import com.ajaxjs.iam.jwt.JwtUtils;
 import com.ajaxjs.util.RandomTools;
+import com.ajaxjs.util.http_request.SkipSSL;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;

@@ -1,8 +1,11 @@
 package com.ajaxjs.iam.permission;
 
-import com.ajaxjs.data.tree.FlatArrayToTree;
+
+import com.ajaxjs.business.tree.FlatArrayToTree;
 import com.ajaxjs.iam.server.controller.PermissionController;
 import com.ajaxjs.sqlman.Sql;
+import com.ajaxjs.sqlman.crud.Entity;
+import com.ajaxjs.sqlman.model.UpdateResult;
 import com.ajaxjs.util.ObjectHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -86,8 +89,10 @@ public class PermissionService implements PermissionController {
         }
 
         log.info("permissionValue: " + num);
+        Map<String, Object> map = ObjectHelper.mapOf("id", roleId, "permission_value", num);
+        UpdateResult updateResult = Entity.newInstance().setTableName("per_role").input(map).update();
 
-        return CRUD.update("per_role", ObjectHelper.mapOf("id", roleId, "permission_value", num), "id");
+        return updateResult.isOk();
     }
 
     /**
@@ -195,9 +200,8 @@ public class PermissionService implements PermissionController {
             if (_children != null) {
                 List<Map<String, Object>> children = (List<Map<String, Object>>) _children;
 
-                if (children.size() > 0) {
+                if (children.size() > 0)
                     iViewMap.put("children", transformToTreeStructure(children));
-                }
             }
 
             iView.add(iViewMap);

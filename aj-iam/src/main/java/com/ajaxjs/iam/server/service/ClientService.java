@@ -1,9 +1,12 @@
 package com.ajaxjs.iam.server.service;
 
-import com.ajaxjs.framework.CRUD;
+
 import com.ajaxjs.iam.server.model.po.App;
-import com.ajaxjs.util.StrUtil;
+import com.ajaxjs.util.RandomTools;
+
+import org.springframework.cache.Cache;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ConcurrentLruCache;
 import org.springframework.util.StringUtils;
 
 @Service
@@ -12,7 +15,7 @@ public class ClientService {
         if (!StringUtils.hasText(app.getName()))
             throw new IllegalArgumentException("客户端的名称和回调地址不能为空");
 
-        String clientId = StrUtil.getRandomString(24);// 生成24位随机的 clientId
+        String clientId = RandomTools.generateRandomString(24);// 生成24位随机的 clientId
         App savedClientDetails = findClientDetailsByClientId(clientId);
 
         // 生成的 clientId 必须是唯一的，尝试十次避免有重复的 clientId
@@ -20,13 +23,17 @@ public class ClientService {
             if (savedClientDetails == null)
                 break;
             else {
-                clientId = StrUtil.getRandomString(24);
+                clientId = RandomTools.generateRandomString(24);
                 savedClientDetails = findClientDetailsByClientId(clientId);
             }
         }
 
         app.setClientId(clientId);
-        app.setClientSecret(StrUtil.getRandomString(32));
+        app.setClientSecret(RandomTools.generateRandomString(32));
+
+        Cache cache;
+
+        ConcurrentLruCache s;
 
         // 保存到数据库
         return CRUD.create(app) == null;

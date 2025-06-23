@@ -8,6 +8,7 @@ import com.ajaxjs.iam.server.model.po.AccessTokenPo;
 import com.ajaxjs.iam.server.model.po.App;
 import com.ajaxjs.iam.user.model.User;
 import com.ajaxjs.sqlman.Sql;
+import com.ajaxjs.sqlman.crud.Entity;
 import com.ajaxjs.util.RandomTools;
 import com.ajaxjs.util.cache.Cache;
 import lombok.Data;
@@ -112,7 +113,7 @@ public class OAuthService extends OAuthCommon implements OAuthController {
         updated.setRefreshToken(accessToken.getRefresh_token());
         updated.setExpiresDate(calculateExpirationDate(minutes));
 
-        CRUD.updateWithIdField(updated);
+        Entity.newInstance().input(updated).update();
 
         return accessToken;
     }

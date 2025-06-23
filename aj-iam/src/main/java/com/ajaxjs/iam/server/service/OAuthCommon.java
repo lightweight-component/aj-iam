@@ -9,6 +9,8 @@ import com.ajaxjs.iam.server.model.po.App;
 import com.ajaxjs.iam.user.common.session.UserSession;
 import com.ajaxjs.iam.user.model.User;
 import com.ajaxjs.sqlman.Sql;
+import com.ajaxjs.sqlman.crud.Entity;
+import com.ajaxjs.util.EncodeTools;
 import com.ajaxjs.util.MessageDigestHelper;
 import com.ajaxjs.util.RandomTools;
 import com.ajaxjs.util.StrUtil;
@@ -32,7 +34,8 @@ public abstract class OAuthCommon implements IamConstants {
      * @param webUrl 前端页面地址，用于跳到这里以便获取 Token
      */
     public void sendAuthCode(String responseType, String clientId, String redirectUri, String scope, String state, String webUrl, HttpServletRequest req, HttpServletResponse resp, Cache<String, Object> cache) {
-        if (!"code".equals(responseType)) throw new IllegalArgumentException("参数 response_type 只能是 code");
+        if (!"code".equals(responseType))
+            throw new IllegalArgumentException("参数 response_type 只能是 code");
 
         User user = userSession.getUserFromSession();
 
@@ -85,9 +88,10 @@ public abstract class OAuthCommon implements IamConstants {
      */
     public App getAppByAuthHeader(String authorization) {
         authorization = authorization.replaceAll("Basic ", "");
-        String base64Str = StrUtil.base64Decode(authorization);
+        String base64Str = EncodeTools.base64EncodeToStringUtf8(authorization);
 
-        if (!base64Str.contains(":")) throw new IllegalArgumentException("非法 Token");
+        if (!base64Str.contains(":"))
+            throw new IllegalArgumentException("非法 Token");
 
         String[] arr = base64Str.split(":");
         String clientId = arr[0], clientSecret = arr[1];
@@ -122,8 +126,8 @@ public abstract class OAuthCommon implements IamConstants {
      * 创建 Token
      */
     public void createToken(AccessToken accessToken, App app, String grantType) {
-        accessToken.setAccess_token(StrUtil.uuid(false));
-        accessToken.setRefresh_token(StrUtil.uuid(false));
+        accessToken.setAccess_token(RandomTools.uuid(false));
+        accessToken.setRefresh_token(RandomTools.uuid(false));
 
         Integer minutes = app.getExpires() == null ? clientExpires : app.getExpires();
         accessToken.setExpires_in(minutes * 60);
@@ -137,7 +141,7 @@ public abstract class OAuthCommon implements IamConstants {
         save.setClientId(app.getClientId());
         save.setCreateDate(new Date());
 
-        CRUD.create(save);
+        Entity.newInstance().input(save).create(Long.class);
     }
 
     /**

@@ -1,6 +1,5 @@
 package com.ajaxjs.iam.server.service;
 
-import com.ajaxjs.framework.response.Result;
 import com.ajaxjs.iam.jwt.JWebTokenMgr;
 import com.ajaxjs.iam.jwt.Utils;
 import com.ajaxjs.iam.server.controller.OidcController;
@@ -51,7 +50,7 @@ public class OidcService extends OAuthCommon implements OidcController {
     }
 
     @Override
-    public Result<JwtAccessToken> token(String authorization, String grantType, String code, String state, String webUrl) {
+    public JwtAccessToken token(String authorization, String grantType, String code, String state, String webUrl) {
         if (!"authorization_code".equals(grantType))
             throw new IllegalArgumentException("参数 grant_type 只能是 authorization_code");
 
@@ -84,13 +83,13 @@ public class OidcService extends OAuthCommon implements OidcController {
             cache.remove(code + ":scope");
             cache.remove(code + ":user");
 
-            return new Result<>(accessToken, true);
+            return accessToken;
         } else
             throw new IllegalArgumentException("非法 code：" + code);
     }
 
     @Override
-    public Result<JwtAccessToken> clientCredentials(String grantType, String authorization) {
+    public JwtAccessToken clientCredentials(String grantType, String authorization) {
         if (!GrantType.CLIENT_CREDENTIALS.equals(grantType))
             throw new IllegalArgumentException("grantType must be 'clientCredentials'");
 
@@ -104,6 +103,6 @@ public class OidcService extends OAuthCommon implements OidcController {
         String jWebToken = jWebTokenMgr.tokenFactory(String.valueOf(app.getId()), app.getName(), "", 0L /* 0 表示不过期*/).toString();
         accessToken.setId_token(jWebToken);
 
-        return new Result<>(accessToken, true);
+        return accessToken;
     }
 }

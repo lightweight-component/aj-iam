@@ -1,7 +1,7 @@
 package com.ajaxjs.iam.server.config;
 
 import com.ajaxjs.base.Sdk;
-import com.ajaxjs.framework.filter.google_captcha.GoogleCaptchaInterceptor;
+//import com.ajaxjs.framework.filter.google_captcha.GoogleCaptchaInterceptor;
 import com.ajaxjs.framework.spring.database.ConnectionMgr;
 import com.ajaxjs.iam.server.service.OidcService;
 import com.ajaxjs.iam.user.common.session.ServletUserSession;
@@ -79,13 +79,13 @@ public class IamConfig implements WebMvcConfigurer {
     /**
      * 拦截器
      */
-    @Bean
-    GoogleCaptchaInterceptor googleCaptchaMvcInterceptor() {
-        GoogleCaptchaInterceptor g = new GoogleCaptchaInterceptor();
-        g.setAccessSecret(googleCaptchaAccessSecret);
-
-        return g;
-    }
+//    @Bean
+//    GoogleCaptchaInterceptor googleCaptchaMvcInterceptor() {
+//        GoogleCaptchaInterceptor g = new GoogleCaptchaInterceptor();
+//        g.setAccessSecret(googleCaptchaAccessSecret);
+//
+//        return g;
+//    }
 
     /**
      * 加入认证拦截器
@@ -94,7 +94,7 @@ public class IamConfig implements WebMvcConfigurer {
     public void addInterceptors(InterceptorRegistry registry) {
         log.info("初始化 SSO 拦截器");
         InterceptorRegistration interceptorRegistration = registry.addInterceptor(authInterceptor());
-        registry.addInterceptor(googleCaptchaMvcInterceptor());
+//        registry.addInterceptor(googleCaptchaMvcInterceptor());
         interceptorRegistration.addPathPatterns("/**"); // 拦截所有
 
         // 不需要的拦截路径
