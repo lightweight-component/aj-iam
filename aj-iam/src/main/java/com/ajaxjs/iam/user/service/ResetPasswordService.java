@@ -1,15 +1,16 @@
 package com.ajaxjs.iam.user.service;
 
-import com.ajaxjs.framework.CRUD;
 import com.ajaxjs.iam.user.common.UserUtils;
 import com.ajaxjs.iam.user.common.util.CheckStrength;
 import com.ajaxjs.iam.user.common.util.SendEmail;
 import com.ajaxjs.iam.user.controller.ResetPasswordController;
 import com.ajaxjs.iam.user.model.User;
 import com.ajaxjs.iam.user.model.UserAccount;
-import com.ajaxjs.util.EncryptUtil;
+import com.ajaxjs.sqlman.Sql;
+import com.ajaxjs.sqlman.crud.Entity;
+import com.ajaxjs.util.EncodeTools;
 import com.ajaxjs.util.MessageDigestHelper;
-import com.ajaxjs.util.StrUtil;
+import com.ajaxjs.util.cryptography.AesCrypto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -53,7 +54,7 @@ public class ResetPasswordService implements ResetPasswordController {
         if (tenantId != null && tenantId != 0)
             sql += " AND tenant_id = " + tenantId;
 
-        User user = CRUD.info(User.class, sql, value);
+        User user = Sql.newInstance().input(sql, value).query(User.class);
 
         if (user == null)
             throw new IllegalAccessError("该 " + type + ": " + value + " 的用户不存在！");
@@ -69,7 +70,7 @@ public class ResetPasswordService implements ResetPasswordController {
         Integer tenantId = TenantService.getTenantId();
         User user = findUserBy("email", email, tenantId);
         String token = makeEmailToken(email, tenantId);
-        String url = websiteBasePath + FIND_BY_EMAIL + String.format("?email=%s&token=%s", StrUtil.urlEncode(email), StrUtil.urlEncode(token));
+        String url = websiteBasePath + FIND_BY_EMAIL + String.format("?email=%s&token=%s", EncodeTools.urlEncode(email), EncodeTools.urlEncode(token));
 
         String title = "重置密码";
         Map<String, String> map = new HashMap<>();
@@ -129,7 +130,7 @@ public class ResetPasswordService implements ResetPasswordController {
      */
     public String makeEmailToken(String email, Integer tenantId) {
         String expireHex = Long.toHexString(System.currentTimeMillis());
-        String emailToken = MessageDigestHelper.getSHA1(encryptKey + email), timeToken = EncryptUtil.getInstance().AES_encode(expireHex, encryptKey);
+        String emailToken = MessageDigestHelper.getSHA1(encryptKey + email), timeToken = AesCrypto.getInstance().AES_encode(expireHex, encryptKey);
 
         return emailToken + timeToken;
     }
@@ -147,7 +148,7 @@ public class ResetPasswordService implements ResetPasswordController {
         if (!MessageDigestHelper.getSHA1(encryptKey + email).equals(emailToken))
             throw new SecurityException("非法 email 账号！ " + email);
 
-        String expireHex = EncryptUtil.getInstance().AES_decode(timeToken, encryptKey);
+        String expireHex = AesCrypto.getInstance().AES_decode(timeToken, encryptKey);
         long cha = new Date().getTime() - Long.parseLong(expireHex, 16);
         double result = cha * 1.0 / (1000 * 60 * 60);
 
@@ -179,6 +180,6 @@ public class ResetPasswordService implements ResetPasswordController {
         updateAuth.setId(Long.parseLong(String.valueOf(user.get("authId"))));
         updateAuth.setPassword(newPassword);
 
-        return CRUD.update(updateAuth);
+        return Entity.newInstance().input(updateAuth).update().isOk();
     }
 }

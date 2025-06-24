@@ -1,20 +1,20 @@
 package com.ajaxjs.iam.user.service;
 
 import com.ajaxjs.framework.BusinessException;
-import com.ajaxjs.framework.CRUD;
-import com.ajaxjs.framework.DiContextUtil;
-import com.ajaxjs.framework.WebHelper;
-import com.ajaxjs.framework.filter.google_captcha.GoogleCaptchaCheck;
+import com.ajaxjs.framework.spring.DiContextUtil;
+import com.ajaxjs.iam.UserConstants;
 import com.ajaxjs.iam.server.common.IamUtils;
-import com.ajaxjs.iam.user.common.UserConstants;
 import com.ajaxjs.iam.user.common.UserUtils;
 import com.ajaxjs.iam.user.common.session.UserSession;
 import com.ajaxjs.iam.user.common.util.CheckStrength;
 import com.ajaxjs.iam.user.controller.UserLoginRegisterController;
 import com.ajaxjs.iam.user.model.User;
 import com.ajaxjs.iam.user.model.UserAccount;
-import com.ajaxjs.util.StrUtil;
-import com.ajaxjs.util.logger.LogHelper;
+import com.ajaxjs.sqlman.Sql;
+import com.ajaxjs.sqlman.crud.Entity;
+import com.ajaxjs.util.RandomTools;
+import com.ajaxjs.util.WebUtils;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -29,8 +29,8 @@ import java.util.Objects;
 import java.util.function.Function;
 
 @Service
+@Slf4j
 public class UserLoginRegisterService implements UserLoginRegisterController, UserConstants {
-    private static final LogHelper LOGGER = LogHelper.getLog(UserLoginRegisterService.class);
 
     @Override
     public Boolean isLogin() {
@@ -44,13 +44,13 @@ public class UserLoginRegisterService implements UserLoginRegisterController, Us
     LogLoginService logLoginService;
 
     @Override
-    @GoogleCaptchaCheck
+//    @GoogleCaptchaCheck
     public boolean login(String loginId, String password, String returnUrl, HttpServletRequest req, HttpServletResponse resp) {
         loginId = loginId.trim();
         User user = getUserLoginByPassword(loginId, password);
 
         // 会员登录之后的动作，会保存 userId 和 userName 在 Session 中
-        userSession.put(UserSession.SESSION_KEY + user.getId() + "-" + StrUtil.getRandomString(4), user); // 同一个用户多端登录，加随机码区分
+        userSession.put(UserSession.SESSION_KEY + user.getId() + "-" + RandomTools.generateRandomString(4), user); // 同一个用户多端登录，加随机码区分
 //        session.setAttribute("userGroupId", user.getRoleId());// 获取资源权限总值
 
 //        if (user.getRoleId() == null || user.getRoleId() == 0L) {
@@ -89,12 +89,12 @@ public class UserLoginRegisterService implements UserLoginRegisterController, Us
             sql = String.format(sql, "login_id");
 
         String encodePsw = passwordEncode.apply(password);
-        User user = CRUD.info(User.class, sql, loginId, encodePsw);
+        User user = Sql.instance().input(sql, loginId, encodePsw).query(User.class);
 
         if (user == null)
             throw new BusinessException("用户 " + loginId + " 登录失败，用户不存在或密码错误");
 
-        LOGGER.info(user.getName() + " 登录成功！");
+        log.info(user.getName() + " 登录成功！");
 
         return user;
     }
@@ -147,12 +147,12 @@ public class UserLoginRegisterService implements UserLoginRegisterController, Us
         if (passwordLevel == CheckStrength.LEVEL.EASY)
             throw new UnsupportedOperationException("密码强度太低");
 
-        long userId = CRUD.create(params); // 写入数据库
+        long userId = Entity.instance().setTableName("user").input(params).create(Long.class).getNewlyId(); // 写入数据库
         UserAccount auth = new UserAccount();
         auth.setUserId(userId);
         auth.setPassword(passwordEncode.apply(psw));
         auth.setRegisterType(LoginType.PASSWORD);
-        auth.setRegisterIp(WebHelper.getIp(Objects.requireNonNull(DiContextUtil.getRequest())));
+        auth.setRegisterIp(WebUtils.getClientIp(Objects.requireNonNull(DiContextUtil.getRequest())));
 
         return true;
     }
@@ -177,6 +177,6 @@ public class UserLoginRegisterService implements UserLoginRegisterController, Us
         String sql = "SELECT id FROM user WHERE stat != 1 AND %s = ? AND tenantId = ? LIMIT 1";
         sql = String.format(sql, field.trim());
 
-        return CRUD.queryOne(Long.class, sql, value.trim(), tenantId) != null; // 有这个数据表示重复
+        return Sql.instance().input(sql, value.trim(), tenantId).queryOne(Long.class) != null; // 有这个数据表示重复
     }
 }

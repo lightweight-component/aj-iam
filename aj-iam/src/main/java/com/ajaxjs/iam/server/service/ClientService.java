@@ -1,12 +1,10 @@
 package com.ajaxjs.iam.server.service;
 
-
 import com.ajaxjs.iam.server.model.po.App;
+import com.ajaxjs.sqlman.Sql;
+import com.ajaxjs.sqlman.crud.Entity;
 import com.ajaxjs.util.RandomTools;
-
-import org.springframework.cache.Cache;
 import org.springframework.stereotype.Service;
-import org.springframework.util.ConcurrentLruCache;
 import org.springframework.util.StringUtils;
 
 @Service
@@ -31,15 +29,11 @@ public class ClientService {
         app.setClientId(clientId);
         app.setClientSecret(RandomTools.generateRandomString(32));
 
-        Cache cache;
-
-        ConcurrentLruCache s;
-
         // 保存到数据库
-        return CRUD.create(app) == null;
+        return Entity.newInstance().setTableName("app").input(app).create().isOk();
     }
 
     App findClientDetailsByClientId(String clientId) {
-        return CRUD.info(App.class, "SELECT * FROM app WHERE stat = 1 AND client_id = ?", clientId);
+        return Sql.newInstance().input("SELECT * FROM app WHERE stat = 1 AND client_id = ?", clientId).query(App.class);
     }
 }

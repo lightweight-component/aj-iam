@@ -10,7 +10,7 @@ import com.ajaxjs.iam.user.model.User;
 import com.ajaxjs.sqlman.Sql;
 import com.ajaxjs.sqlman.crud.Entity;
 import com.ajaxjs.util.RandomTools;
-import com.ajaxjs.util.cache.Cache;
+import com.ajaxjs.framework.spring.cache.smallredis.Cache;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

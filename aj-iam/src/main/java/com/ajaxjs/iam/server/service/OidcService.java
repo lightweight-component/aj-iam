@@ -7,7 +7,7 @@ import com.ajaxjs.iam.server.model.JwtAccessToken;
 import com.ajaxjs.iam.server.model.po.App;
 import com.ajaxjs.iam.user.common.session.UserSession;
 import com.ajaxjs.iam.user.model.User;
-import com.ajaxjs.util.cache.Cache;
+import com.ajaxjs.framework.spring.cache.smallredis.Cache;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

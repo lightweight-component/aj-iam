@@ -1,13 +1,14 @@
 package com.ajaxjs.iam.user.service;
 
 
-import com.ajaxjs.iam.user.common.UserConstants;
+import com.ajaxjs.iam.UserConstants;
 import com.ajaxjs.iam.user.controller.LogLoginController;
 import com.ajaxjs.iam.user.model.LogLogin;
 import com.ajaxjs.iam.user.model.User;
 import com.ajaxjs.sqlman.crud.Entity;
 import com.ajaxjs.sqlman.model.CreateResult;
 import com.ajaxjs.sqlman.model.PageResult;
+import com.ajaxjs.util.WebUtils;
 import com.ajaxjs.util.http_request.Get;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -39,7 +40,7 @@ public class LogLoginService implements LogLoginController, UserConstants {
         if (req == null)
             return;
 
-        String ip = getClientIp(req);
+        String ip = WebUtils.getClientIp(req);
 
         if ("127.0.0.1".equals(ip) || "0:0:0:0:0:0:0:1".equals(ip)) {
             ip = "localhost";
@@ -61,25 +62,6 @@ public class LogLoginService implements LogLoginController, UserConstants {
 
         bean.setIp(ip);
         bean.setUserAgent(req.getHeader("user-agent"));
-    }
-
-    public static String getClientIp(HttpServletRequest request) {
-        String ip = request.getHeader("X-Forwarded-For");
-
-        if (ip != null && ip.length() != 0 && !"unknown".equalsIgnoreCase(ip)) {
-            // 多级代理会有逗号, 取第一个
-            ip = ip.split(",")[0].trim();
-        } else {
-            ip = request.getHeader("Proxy-Client-IP");
-            if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
-                ip = request.getHeader("WL-Proxy-Client-IP");
-                if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
-                    ip = request.getRemoteAddr();
-                }
-            }
-        }
-
-        return ip;
     }
 
     @Override

@@ -1,14 +1,14 @@
 package com.ajaxjs.iam.server.model.po;
 
-import com.ajaxjs.data.jdbc_helper.common.IdField;
-import com.ajaxjs.data.jdbc_helper.common.TableName;
+import com.ajaxjs.sqlman.annotation.Id;
+import com.ajaxjs.sqlman.annotation.Table;
 import lombok.Data;
 
 import java.util.Date;
 
 @Data
-@TableName("access_token")
-@IdField("id")
+@Table("access_token")
+@Id("id")
 public class AccessTokenPo {
     /**
      * 主键 id，自增

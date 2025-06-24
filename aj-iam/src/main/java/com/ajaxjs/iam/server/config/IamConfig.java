@@ -2,13 +2,13 @@ package com.ajaxjs.iam.server.config;
 
 import com.ajaxjs.base.Sdk;
 //import com.ajaxjs.framework.filter.google_captcha.GoogleCaptchaInterceptor;
+import com.ajaxjs.framework.spring.cache.smallredis.Cache;
+import com.ajaxjs.framework.spring.cache.smallredis.ExpiryCache;
 import com.ajaxjs.framework.spring.database.ConnectionMgr;
 import com.ajaxjs.iam.server.service.OidcService;
 import com.ajaxjs.iam.user.common.session.ServletUserSession;
 import com.ajaxjs.iam.user.common.session.UserSession;
 import com.ajaxjs.util.JsonUtil;
-import com.ajaxjs.util.cache.Cache;
-import com.ajaxjs.util.cache.expiry.ExpiryCache;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -47,10 +47,10 @@ public class IamConfig implements WebMvcConfigurer {
     /**
      * 用户全局拦截器
      */
-    @Bean
-    UserInterceptor authInterceptor() {
-        return new UserInterceptor();
-    }
+//    @Bean
+//    UserInterceptor authInterceptor() {
+//        return new UserInterceptor();
+//    }
 
     @Bean
     @Qualifier("getuserfromjvmhash")
@@ -93,15 +93,15 @@ public class IamConfig implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         log.info("初始化 SSO 拦截器");
-        InterceptorRegistration interceptorRegistration = registry.addInterceptor(authInterceptor());
+//        InterceptorRegistration interceptorRegistration = registry.addInterceptor(authInterceptor());
 //        registry.addInterceptor(googleCaptchaMvcInterceptor());
-        interceptorRegistration.addPathPatterns("/**"); // 拦截所有
+//        interceptorRegistration.addPathPatterns("/**"); // 拦截所有
 
         // 不需要的拦截路径
-        if (StringUtils.hasText(excludes)) {
-            String[] arr = excludes.split("\\|");
-            interceptorRegistration.excludePathPatterns(arr);
-        }
+//        if (StringUtils.hasText(excludes)) {
+//            String[] arr = excludes.split("\\|");
+//            interceptorRegistration.excludePathPatterns(arr);
+//        }
     }
 
     @Bean

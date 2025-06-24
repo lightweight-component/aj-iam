@@ -1,8 +1,8 @@
 package com.ajaxjs.iam.user.model;
 
-import com.ajaxjs.data.jdbc_helper.common.TableName;
 import com.ajaxjs.framework.BaseModel;
 import com.ajaxjs.framework.IBaseModel;
+import com.ajaxjs.sqlman.annotation.Table;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -14,7 +14,7 @@ import java.util.Date;
  * @author sp42 frank@ajaxjs.com
  */
 @Data
-@TableName("user_account")
+@Table("user_account")
 @EqualsAndHashCode(callSuper = true)
 public class UserAccount extends BaseModel implements IBaseModel {
     /**

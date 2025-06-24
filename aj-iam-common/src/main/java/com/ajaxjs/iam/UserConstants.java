@@ -1,10 +1,12 @@
-package com.ajaxjs.iam.user.common;
+package com.ajaxjs.iam;
 
 /**
  * 用户常量
  */
 public interface UserConstants {
     String REDIS_PREFIX = "USER:";
+
+    String USER_KEY_IN_REQUEST = "USER_KEY_IN_REQUEST";
 
     /**
      * 性别

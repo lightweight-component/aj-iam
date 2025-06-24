@@ -1,6 +1,7 @@
 package com.ajaxjs.iam.client.filter;
 
-import com.ajaxjs.iam.client.model.UserConstants;
+
+import com.ajaxjs.iam.UserConstants;
 import com.ajaxjs.iam.jwt.JWebToken;
 import com.ajaxjs.iam.jwt.JWebTokenMgr;
 import com.ajaxjs.iam.model.SimpleUser;

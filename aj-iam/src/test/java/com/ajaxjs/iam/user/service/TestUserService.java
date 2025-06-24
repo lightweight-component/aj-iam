@@ -1,7 +1,7 @@
 package com.ajaxjs.iam.user.service;
 
 import com.ajaxjs.iam.server.BaseTest;
-import com.ajaxjs.iam.user.common.UserConstants;
+import com.ajaxjs.iam.UserConstants;
 import com.ajaxjs.iam.user.model.User;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

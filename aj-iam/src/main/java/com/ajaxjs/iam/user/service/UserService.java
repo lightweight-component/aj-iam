@@ -1,12 +1,13 @@
 package com.ajaxjs.iam.user.service;
 
-import com.ajaxjs.data.data_service.BaseEntityConstants;
-import com.ajaxjs.framework.CRUD;
-import com.ajaxjs.framework.DiContextUtil;
+import com.ajaxjs.framework.BaseEntityConstants;
+import com.ajaxjs.framework.spring.DiContextUtil;
 import com.ajaxjs.iam.model.SimpleUser;
-import com.ajaxjs.iam.user.common.UserConstants;
+import com.ajaxjs.iam.UserConstants;
 import com.ajaxjs.iam.user.controller.UserController;
 import com.ajaxjs.iam.user.model.User;
+import com.ajaxjs.sqlman.Sql;
+import com.ajaxjs.sqlman.crud.Entity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -14,8 +15,6 @@ import org.springframework.stereotype.Service;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Objects;
 import java.util.function.Function;
-
-import static com.ajaxjs.iam.resource_server.UserConstants.USER_KEY_IN_REQUEST;
 
 @Service
 public class UserService implements UserController, UserConstants {
@@ -28,7 +27,7 @@ public class UserService implements UserController, UserConstants {
         String sql = "SELECT * FROM user WHERE stat != 1 AND id = ?";
         sql = TenantService.addTenantIdQuery(sql);
 
-        return CRUD.info(User.class, sql, id);
+        return Sql.instance().input(sql, id).query(User.class);
     }
 
     /**
@@ -47,7 +46,7 @@ public class UserService implements UserController, UserConstants {
      * @return User 对象
      */
     public static SimpleUser getUserFromRequestCxt(HttpServletRequest req) {
-        return (SimpleUser) req.getAttribute(USER_KEY_IN_REQUEST);
+        return (SimpleUser) req.getAttribute(UserConstants.USER_KEY_IN_REQUEST);
     }
 
     @Override
@@ -62,7 +61,7 @@ public class UserService implements UserController, UserConstants {
 
     @Override
     public Boolean update(User user) {
-        return CRUD.update(user);
+        return Entity.instance().setTableName("user").input(user).update().isOk();
     }
 
     @Override
