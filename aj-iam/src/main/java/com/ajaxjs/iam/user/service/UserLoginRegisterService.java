@@ -2,6 +2,7 @@ package com.ajaxjs.iam.user.service;
 
 import com.ajaxjs.framework.BusinessException;
 import com.ajaxjs.framework.spring.DiContextUtil;
+import com.ajaxjs.framework.spring.database.EnableTransaction;
 import com.ajaxjs.iam.UserConstants;
 import com.ajaxjs.iam.server.common.IamUtils;
 import com.ajaxjs.iam.user.common.UserUtils;
@@ -12,6 +13,7 @@ import com.ajaxjs.iam.user.model.User;
 import com.ajaxjs.iam.user.model.UserAccount;
 import com.ajaxjs.sqlman.Sql;
 import com.ajaxjs.sqlman.crud.Entity;
+import com.ajaxjs.sqlman.util.Utils;
 import com.ajaxjs.util.RandomTools;
 import com.ajaxjs.util.WebUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -105,6 +107,7 @@ public class UserLoginRegisterService implements UserLoginRegisterController, Us
     }
 
     @Override
+    @EnableTransaction
     public Boolean register(Map<String, Object> params) {
         // 所有字符串 trim 一下
         for (String key : params.keySet()) {
@@ -121,15 +124,15 @@ public class UserLoginRegisterService implements UserLoginRegisterController, Us
         if (isNull(params, "password"))
             throw new IllegalArgumentException("注册密码不能为空");
 
-        boolean hasNoUsername = isNull(params, "username"), hasNoEmail = isNull(params, "email"), hasNoPhone = isNull(params, "phone");
+        boolean hasNoUsername = isNull(params, "loginId"), hasNoEmail = isNull(params, "email"), hasNoPhone = isNull(params, "phone");
         if (hasNoUsername && hasNoEmail && hasNoPhone)
-            throw new IllegalArgumentException("没有用户标识， username/email/phone 至少填一种");
+            throw new IllegalArgumentException("没有用户标识， loginId/email/phone 至少填一种");
 
         int tenantId = Integer.parseInt(params.get("tenantId").toString());
 
         // 是否重复
-        if (!hasNoUsername && isRepeat("username", params.get("username").toString(), tenantId))
-            throw new IllegalArgumentException("用户名 username: " + params.get("username").toString() + " 重复");
+        if (!hasNoUsername && isRepeat("login_id", params.get("loginId").toString(), tenantId))
+            throw new IllegalArgumentException("用户名 loginId: " + params.get("loginId").toString() + " 重复");
 
         if (!hasNoEmail && isRepeat("email", params.get("email").toString(), tenantId))
             throw new IllegalArgumentException("邮箱: " + params.get("email").toString() + " 重复");
@@ -147,14 +150,16 @@ public class UserLoginRegisterService implements UserLoginRegisterController, Us
         if (passwordLevel == CheckStrength.LEVEL.EASY)
             throw new UnsupportedOperationException("密码强度太低");
 
+        params = Utils.changeFieldToColumnName(params);
         long userId = Entity.instance().setTableName("user").input(params).create(Long.class).getNewlyId(); // 写入数据库
+
         UserAccount auth = new UserAccount();
         auth.setUserId(userId);
         auth.setPassword(passwordEncode.apply(psw));
         auth.setRegisterType(LoginType.PASSWORD);
         auth.setRegisterIp(WebUtils.getClientIp(Objects.requireNonNull(DiContextUtil.getRequest())));
 
-        return true;
+        return Entity.instance().setTableName("user_account").input(auth).create(Long.class).isOk();
     }
 
     private static boolean isNull(Map<String, Object> params, String key) {
@@ -174,7 +179,7 @@ public class UserLoginRegisterService implements UserLoginRegisterController, Us
      * @return true=值重复
      */
     public static boolean isRepeat(String field, String value, int tenantId) {
-        String sql = "SELECT id FROM user WHERE stat != 1 AND %s = ? AND tenantId = ? LIMIT 1";
+        String sql = "SELECT id FROM user WHERE stat != 1 AND %s = ? AND tenant_id = ? LIMIT 1";
         sql = String.format(sql, field.trim());
 
         return Sql.instance().input(sql, value.trim(), tenantId).queryOne(Long.class) != null; // 有这个数据表示重复

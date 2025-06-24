@@ -2,10 +2,12 @@ package com.ajaxjs.iam.client.filter;
 
 
 import com.ajaxjs.iam.UserConstants;
+import com.ajaxjs.iam.client.annotation.AllowAccess;
 import com.ajaxjs.iam.jwt.JWebToken;
 import com.ajaxjs.iam.jwt.JWebTokenMgr;
 import com.ajaxjs.iam.model.SimpleUser;
 import com.ajaxjs.util.JsonUtil;
+import com.ajaxjs.util.WebUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -14,12 +16,14 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.util.StringUtils;
+import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.lang.reflect.Method;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.Enumeration;
@@ -42,7 +46,7 @@ public class UserInterceptor implements HandlerInterceptor {
     @Value("${auth.run:true}")
     private String run;
 
-    @Value("${auth.cacheType:jvm_hash}")
+    @Value("${auth.cacheType:jwt}")
     private String cacheType;
 
     @Autowired(required = false)
@@ -59,7 +63,7 @@ public class UserInterceptor implements HandlerInterceptor {
     /**
      * JWT 验证的密钥
      */
-    @Value("${User.oidc.jwtSecretKey}")
+    @Value("${User.oidc.jwtSecretKey:Df87sD#$%#A}")
     private String jwtSecretKey;
 
     /**
@@ -88,12 +92,20 @@ public class UserInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
+        if (handler instanceof HandlerMethod) {
+            Method method = ((HandlerMethod) handler).getMethod();
+
+            if (method.isAnnotationPresent(AllowAccess.class))
+                return true;
+        }
+
         if (isDebug && "1".equals(request.getParameter("allow"))) // 方便开发
             return true;
         else if (StringUtils.hasText(run) && Boolean.parseBoolean(run)) {
             String token = extractToken(request);
 
-            if (!StringUtils.hasText(token)) return returnErrorMsg(401, response);
+            if (!StringUtils.hasText(token))
+                return returnErrorMsg(401, response);
 
             String jsonUser;
 
@@ -106,38 +118,37 @@ public class UserInterceptor implements HandlerInterceptor {
                         serverErr(response, "配置参数 jvm_hash 不正确");
 
                         return false;
-                    } else jsonUser = getUserFromJvmHash.apply(token);
+                    } else
+                        jsonUser = getUserFromJvmHash.apply(token);
                     break;
                 case "jwt":
+                    JWebTokenMgr mgr = jWebTokenMgr();
+                    JWebToken jwt = mgr.parse(token);
 
+                    if (mgr.isValid(jwt)) {
+                        jsonUser = "{\"id\": %s, \"name\": \"%s\", \"tenantId\":%s}";
+
+                        Integer tenantId = null;
+                        String aud = jwt.getPayload().getAud();
+
+                        if (StringUtils.hasText(aud)) {
+                            Matcher matcher = Pattern.compile("tenantId=(\\d+)").matcher(aud);
+
+                            if (matcher.find())
+                                tenantId = Integer.parseInt(matcher.group(1));
+                        }
+
+                        jsonUser = String.format(jsonUser, jwt.getPayload().getSub(), jwt.getPayload().getName(), tenantId);
+                    } else {
+                        returnErrorMsg(403, response);
+
+                        return false;
+                    }
                     break;
                 default:
                     serverErr(response, "配置参数不正确");
 
                     return false;
-            }
-
-            JWebTokenMgr mgr = jWebTokenMgr();
-            JWebToken jwt = mgr.parse(token);
-
-            if (mgr.isValid(jwt)) {
-                jsonUser = "{\"id\": %s, \"name\": \"%s\", \"tenantId\":%s}";
-
-                Integer tenantId = null;
-                String aud = jwt.getPayload().getAud();
-
-                if (StringUtils.hasText(aud)) {
-                    Matcher matcher = Pattern.compile("tenantId=(\\d+)").matcher(aud);
-
-                    if (matcher.find())
-                        tenantId = Integer.parseInt(matcher.group(1));
-                }
-
-                jsonUser = String.format(jsonUser, jwt.getPayload().getSub(), jwt.getPayload().getName(), tenantId);
-            } else {
-                returnErrorMsg(403, response);
-
-                return false;
             }
 
             if (StringUtils.hasText(jsonUser)) {
@@ -147,10 +158,11 @@ public class UserInterceptor implements HandlerInterceptor {
                 request.setAttribute(UserConstants.USER_KEY_IN_REQUEST, user);
 
                 return true;
-            } else return returnErrorMsg(401, response);
-        } else return true; // 关掉了认证
+            } else
+                return returnErrorMsg(401, response);
+        } else
+            return true; // 关掉了认证
     }
-
 
     /**
      * 根据错误代码返回响应的信息
@@ -247,12 +259,17 @@ public class UserInterceptor implements HandlerInterceptor {
         if (token == null) {
             token = request.getHeader("token");
 
-            // 如果从请求头的"token"字段提取不到token，尝试从请求参数的"access_token"字段提取
             if (token == null) {
-                token = request.getParameter("access_token");
 
-                // 如果上述方式都提取不到 token，记录警告日志
-                if (token == null) log.warn("Token not found in request parameters. Not an OAuth2 request.");
+                token = WebUtils.getCookie(request, "token");
+                // 如果从请求头的"token"字段提取不到token，尝试从请求参数的"access_token"字段提取
+                if (token == null) {
+                    token = request.getParameter("access_token");
+
+                    // 如果上述方式都提取不到 token，记录警告日志
+                    if (token == null)
+                        log.warn("Token not found in request parameters. Not an OAuth2 request.");
+                }
             }
         }
 

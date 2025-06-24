@@ -9,6 +9,15 @@ public class TestJWT {
     public void testMakeToken() {
         JWebToken token = mgr.tokenFactory("1000", "user01", "admin, guest", JwtUtils.setExpire(24));
         System.out.println(token.toString());
+
+//        System.out.println(mgr.isValid(token.toString()));
+    }
+
+    @Test
+    public void testValid2() {
+
+
+        System.out.println(mgr.isValid("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMDAwIiwibmFtZSI6InVzZXIwMSIsImF1ZCI6ImFkbWluLCBndWVzdCIsImV4cCI6MTc1MDg2NzE3OSwiaXNzIjoiZm9vQGJhci5uZXQiLCJpYXQiOjE3NTA3ODA3Nzl9.-kHuj_fE9MqQnhNKOMyxkQBHUQkTx7Avyll0aT-DLns"));
     }
 
     @Test

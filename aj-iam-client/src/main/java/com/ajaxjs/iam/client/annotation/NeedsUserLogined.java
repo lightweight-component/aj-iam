@@ -1,4 +1,4 @@
-package com.ajaxjs.iam.client;
+package com.ajaxjs.iam.client.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

@@ -31,10 +31,10 @@ public class ResetPasswordService implements ResetPasswordController {
     @Qualifier("passwordEncode")
     Function<String, String> passwordEncode;
 
-    @Value("${User.restPassword.encryptKey}")
+    @Value("${User.restPassword.encryptKey:d4X87f43}")
     private String encryptKey;
 
-    @Value("${Website.basePath}")
+    @Value("${Website.basePath: }")
     private String websiteBasePath;
 
     /**

@@ -1,6 +1,7 @@
 package com.ajaxjs.iam.user.controller;
 
 //import com.ajaxjs.framework.filter.google_captcha.GoogleCaptchaCheck;
+
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -43,7 +44,7 @@ public interface UserLoginRegisterController {
     /**
      * 用户注册
      * <p>
-     * TODO 数据库事务 和 验证码
+     * TODO 验证码
      *
      * @param params 用户参数
      * @return 是否成功

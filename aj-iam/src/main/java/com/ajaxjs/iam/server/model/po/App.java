@@ -44,4 +44,9 @@ public class App extends BaseModel {
      * 图标
      */
     private String logo;
+
+    /**
+     * 租户 id
+     */
+    private Long tenantId;
 }

@@ -1,6 +1,6 @@
 package com.ajaxjs.iam.client.filter;
 
-import com.ajaxjs.iam.client.NeedsUserLogined;
+import com.ajaxjs.iam.client.annotation.NeedsUserLogined;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 
@@ -28,7 +28,6 @@ public class UserAccessHandlerInterceptor implements HandlerInterceptor {
      */
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-
         if (handler instanceof HandlerMethod) {  // 检查处理器是否为 HandlerMethod 类型，即是否是一个方法处理请求
 
             Method method = ((HandlerMethod) handler).getMethod();// 获取处理请求的具体方法
