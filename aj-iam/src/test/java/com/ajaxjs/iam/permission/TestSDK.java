@@ -14,7 +14,7 @@ public class TestSDK extends BaseTest {
 
     @Test
     public void test() {
-        SDK.init(PermissionList.class);
+        PermissionService.init(PermissionList.class);
 
         boolean check = PermissionList.USER_MANAGE.check(257);
         System.out.println(check);

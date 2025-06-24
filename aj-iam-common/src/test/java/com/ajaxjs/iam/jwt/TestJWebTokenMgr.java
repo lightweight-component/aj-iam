@@ -5,8 +5,8 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class JWebTokenMgrTest {
-    private JWebTokenMgr jWebTokenMgr = new JWebTokenMgr();
+public class TestJWebTokenMgr {
+    private final JWebTokenMgr jWebTokenMgr = new JWebTokenMgr();
 
     @Test
     public void testParseValidToken() {

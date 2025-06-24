@@ -1,7 +1,7 @@
 package com.ajaxjs.iam.server.service;
 
 import com.ajaxjs.iam.jwt.JWebTokenMgr;
-import com.ajaxjs.iam.jwt.Utils;
+import com.ajaxjs.iam.jwt.JwtUtils;
 import com.ajaxjs.iam.server.controller.OidcController;
 import com.ajaxjs.iam.server.model.JwtAccessToken;
 import com.ajaxjs.iam.server.model.po.App;
@@ -72,7 +72,7 @@ public class OidcService extends OAuthCommon implements OidcController {
 
             // 生成 JWT Token
             // TODO user.getName() 中文名会乱码
-            String jWebToken = jWebTokenMgr.tokenFactory(String.valueOf(user.getId()), user.getLoginId(), scope, Utils.setExpire(jwtExpireHours)).toString();
+            String jWebToken = jWebTokenMgr.tokenFactory(String.valueOf(user.getId()), user.getLoginId(), scope, JwtUtils.setExpire(jwtExpireHours)).toString();
             accessToken.setId_token(jWebToken);
 
             String key = JWT_TOKEN_USER_KEY + "-" + jWebToken;
