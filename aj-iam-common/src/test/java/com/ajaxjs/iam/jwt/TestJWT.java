@@ -15,9 +15,7 @@ public class TestJWT {
 
     @Test
     public void testValid2() {
-
-
-        System.out.println(mgr.isValid("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMDAwIiwibmFtZSI6InVzZXIwMSIsImF1ZCI6ImFkbWluLCBndWVzdCIsImV4cCI6MTc1MDg2NzE3OSwiaXNzIjoiZm9vQGJhci5uZXQiLCJpYXQiOjE3NTA3ODA3Nzl9.-kHuj_fE9MqQnhNKOMyxkQBHUQkTx7Avyll0aT-DLns"));
+        System.out.println(mgr.isValid("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIzMyIsIm5hbWUiOiJKYWNrODg4OCIsImF1ZCI6bnVsbCwiZXhwIjoxNzUwODkxODg1LCJpc3MiOiJmb29AYmFyLm5ldCIsImlhdCI6MTc1MDg3Mzg4NX0.SrfQsJQkfa1aDSk2slA6BAJsGckzGNOrQlVU2OVDfcM"));
     }
 
     @Test

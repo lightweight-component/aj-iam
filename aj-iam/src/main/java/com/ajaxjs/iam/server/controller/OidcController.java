@@ -47,8 +47,24 @@ public interface OidcController {
      */
     @PostMapping("/token")
     JwtAccessToken token(@RequestHeader String authorization, @RequestParam("grant_type") String grantType,
-                                 @RequestParam String code, @RequestParam String state,
-                                 @RequestParam(value = "web_url", required = false) String webUrl);
+                         @RequestParam String code, @RequestParam String state,
+                         @RequestParam(value = "web_url", required = false) String webUrl);
+
+    /**
+     * ROPC 密码模式获取 Token
+     *
+     * @param grant_type    必填，且固定是 password
+     * @param username
+     * @param password
+     * @param client_id
+     * @param client_secret
+     * @param scope
+     * @return 应用的 JWT AccessToken
+     */
+    @PostMapping("/ropc_token")
+    JwtAccessToken ropcToken(@RequestParam String grant_type, @RequestParam String username, @RequestParam String password,
+                             @RequestParam String client_id, @RequestParam String client_secret,
+                             @RequestParam(value = "scope", required = false) String scope);
 
     /**
      * 客户端凭证获取 Token

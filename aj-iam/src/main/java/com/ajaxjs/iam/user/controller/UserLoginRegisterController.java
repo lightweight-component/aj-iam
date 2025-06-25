@@ -50,7 +50,7 @@ public interface UserLoginRegisterController {
      * @return 是否成功
      */
     @PostMapping
-    Boolean register(@RequestParam Map<String, Object> params);
+    Boolean register(@RequestBody Map<String, Object> params);
 
     /**
      * 检查用户某个值是否已经存在一样的值

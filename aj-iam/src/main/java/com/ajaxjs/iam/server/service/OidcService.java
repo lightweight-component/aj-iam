@@ -1,5 +1,6 @@
 package com.ajaxjs.iam.server.service;
 
+import com.ajaxjs.framework.spring.cache.smallredis.Cache;
 import com.ajaxjs.iam.jwt.JWebTokenMgr;
 import com.ajaxjs.iam.jwt.JwtUtils;
 import com.ajaxjs.iam.server.controller.OidcController;
@@ -7,7 +8,8 @@ import com.ajaxjs.iam.server.model.JwtAccessToken;
 import com.ajaxjs.iam.server.model.po.App;
 import com.ajaxjs.iam.user.common.session.UserSession;
 import com.ajaxjs.iam.user.model.User;
-import com.ajaxjs.framework.spring.cache.smallredis.Cache;
+import com.ajaxjs.iam.user.service.UserLoginRegisterService;
+import com.ajaxjs.sqlman.Sql;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -86,6 +88,45 @@ public class OidcService extends OAuthCommon implements OidcController {
             return accessToken;
         } else
             throw new IllegalArgumentException("非法 code：" + code);
+    }
+
+    @Autowired
+    UserLoginRegisterService userLoginRegisterService;
+
+    @Override
+    public JwtAccessToken ropcToken(String grant_type, String username, String password, String client_id, String client_secret, String scope) {
+        if (!"password".equals(grant_type))
+            throw new IllegalArgumentException("参数 grant_type 只能是 authorization_code");
+
+        App app = Sql.instance().input("SELECT * FROM app WHERE stat != 1 AND client_id = ? AND client_secret = ?", client_id, client_secret).query(App.class);
+
+        if (app == null)
+            throw new UnsupportedOperationException("App Not found: " + client_id);
+
+        Long tenantId = app.getTenantId();
+        User user = userLoginRegisterService.getUserLoginByPassword(username, password, tenantId);
+
+        // 生成 Access Token
+        JwtAccessToken accessToken = new JwtAccessToken();
+        createToken(accessToken, app, GrantType.OIDC);
+
+        // 保存 token 在缓存
+        TokenUser tokenUser = new TokenUser();
+        tokenUser.setUserId(user.getId());
+        tokenUser.setAccessToken(accessToken);
+
+        // 生成 JWT Token
+        // TODO user.getName() 中文名会乱码
+        String jWebToken = jWebTokenMgr.tokenFactory(String.valueOf(user.getId()), user.getLoginId(), scope, JwtUtils.setExpire(jwtExpireHours)).toString();
+
+        boolean is = jWebTokenMgr.isValid(jWebToken);
+        accessToken.setId_token(jWebToken);
+
+        String key = JWT_TOKEN_USER_KEY + "-" + jWebToken;
+        cache.put(key, tokenUser, getTokenExpires(app));
+        log.info("save user {} to cache, key: {}", tokenUser, key);
+
+        return accessToken;
     }
 
     @Override

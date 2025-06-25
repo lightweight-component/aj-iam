@@ -13,6 +13,7 @@ import com.ajaxjs.iam.user.model.User;
 import com.ajaxjs.iam.user.model.UserAccount;
 import com.ajaxjs.sqlman.Sql;
 import com.ajaxjs.sqlman.crud.Entity;
+import com.ajaxjs.sqlman.util.SnowflakeId;
 import com.ajaxjs.sqlman.util.Utils;
 import com.ajaxjs.util.RandomTools;
 import com.ajaxjs.util.WebUtils;
@@ -48,8 +49,7 @@ public class UserLoginRegisterService implements UserLoginRegisterController, Us
     @Override
 //    @GoogleCaptchaCheck
     public boolean login(String loginId, String password, String returnUrl, HttpServletRequest req, HttpServletResponse resp) {
-        loginId = loginId.trim();
-        User user = getUserLoginByPassword(loginId, password);
+        User user = getUserLoginByPassword(loginId, password, 0L);
 
         // 会员登录之后的动作，会保存 userId 和 userName 在 Session 中
         userSession.put(UserSession.SESSION_KEY + user.getId() + "-" + RandomTools.generateRandomString(4), user); // 同一个用户多端登录，加随机码区分
@@ -80,8 +80,11 @@ public class UserLoginRegisterService implements UserLoginRegisterController, Us
     /**
      * 密码支持帐号、邮件、手机作为身份凭证
      */
-    public User getUserLoginByPassword(String loginId, String password) {
-        String sql = "SELECT u.* FROM user u INNER JOIN user_account a ON a.user_id = u.id WHERE u.stat != 1 AND u.%s = ? AND a.password = ?";
+    public User getUserLoginByPassword(String loginId, String password, Long tenantId) {
+        loginId = loginId.trim();
+        password = password.trim();
+
+        String sql = "SELECT u.* FROM user u INNER JOIN user_account a ON a.user_id = u.id WHERE u.stat != 1 AND u.%s = ? AND a.password = ? AND u.tenant_id = ?";
 
         if (UserUtils.testBCD(LoginIdType.PSW_LOGIN_EMAIL, loginIdType) && UserUtils.isValidEmail(loginId))
             sql = String.format(sql, "email");
@@ -91,7 +94,7 @@ public class UserLoginRegisterService implements UserLoginRegisterController, Us
             sql = String.format(sql, "login_id");
 
         String encodePsw = passwordEncode.apply(password);
-        User user = Sql.instance().input(sql, loginId, encodePsw).query(User.class);
+        User user = Sql.instance().input(sql, loginId, encodePsw, tenantId).query(User.class);
 
         if (user == null)
             throw new BusinessException("用户 " + loginId + " 登录失败，用户不存在或密码错误");
@@ -151,6 +154,8 @@ public class UserLoginRegisterService implements UserLoginRegisterController, Us
             throw new UnsupportedOperationException("密码强度太低");
 
         params = Utils.changeFieldToColumnName(params);
+        params.put("uid", SnowflakeId.get());
+
         long userId = Entity.instance().setTableName("user").input(params).create(Long.class).getNewlyId(); // 写入数据库
 
         UserAccount auth = new UserAccount();

@@ -1,7 +1,9 @@
 package com.ajaxjs.iam.client;
 
 import com.ajaxjs.iam.jwt.JwtAccessToken;
+import com.ajaxjs.util.JsonUtil;
 import com.ajaxjs.util.RandomTools;
+import com.ajaxjs.util.http_request.Post;
 import com.ajaxjs.util.http_request.SkipSSL;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Data;
@@ -22,6 +24,8 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 @Data
@@ -54,7 +58,7 @@ public abstract class BaseOidcClientUserController {
      * @param clientId      客户端 ID，用于识别请求 OAuth 服务的应用。
      * @param websiteUrl    应用的网站 URL，授权服务器完成授权后会重定向到该 URL 的回调接口。
      * @param webUrl        前端页面地址，用于跳到这里以便获取 Token。
-     * @return RedirectView 返回一个重定向视图对象，包含了构造的重定向URL。
+     * @return RedirectView 返回一个重定向视图对象，包含了构造的重定向 URL。
      */
     public RedirectView loginPageUrl(HttpSession session, String userLoginCode, String clientId, String websiteUrl, String webUrl) {
         String state = RandomTools.generateRandomString(5);
@@ -140,5 +144,66 @@ public abstract class BaseOidcClientUserController {
 //			 处理授权失败的逻辑
             throw new SecurityException("获取 JWT Token 失败");
         }
+    }
+
+    @Value("${user.clientId}")
+    String clientId;
+
+    @Value("${user.clientSecret}")
+    String clientSecret;
+
+    @Value("${user.tenantId}")
+    Integer tenantId;
+
+    public JwtAccessToken ropcLogin(String username, String password) {
+        Map<String, Object> bodyParams = new HashMap<>();
+        bodyParams.put("grant_type", "password");
+        bodyParams.put("username", username);
+        bodyParams.put("password", password);
+        bodyParams.put("client_id", clientId);
+        bodyParams.put("client_secret", clientSecret);
+        Map<String, Object> result = Post.api(getTokenApi(), bodyParams);
+
+        if (result == null)
+            throw new RuntimeException("获取 JWT Token 失败");
+        else {
+            if ((int) result.get("status") == 0)
+                throw new RuntimeException(result.get("message").toString());
+            else {
+                Map<String, Object> map = (Map<String, Object>) result.get("data");
+                JwtAccessToken token = JsonUtil.map2pojo(map, JwtAccessToken.class);
+
+                return token;
+            }
+        }
+
+//        HttpHeaders headers = new HttpHeaders();
+//        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+//
+//        MultiValueMap<String, String> bodyParams = new LinkedMultiValueMap<>();
+//        bodyParams.add("grant_type", "password");
+//        bodyParams.add("username", username);
+//        bodyParams.add("password", password);
+//        bodyParams.add("client_id", clientId);
+//        bodyParams.add("client_secret", clientSecret);
+//
+//        RestTemplate restTemplate = getRestTemplate();
+//        ResponseEntity<JwtAccessToken> responseEntity = null;
+//
+//        try {
+//            responseEntity = restTemplate.exchange(getTokenApi(), HttpMethod.POST,
+//                    new HttpEntity<>(bodyParams, headers), new ParameterizedTypeReference<JwtAccessToken>() {
+//                    });
+//
+//            System.out.println(responseEntity);
+//        } catch (HttpServerErrorException e) {
+//            log.error("ropcLogin:::", e);
+//            String json = e.getResponseBodyAsString();
+//            System.out.println(json);
+//            Map<String, Object> map = JsonUtil.json2map(json);
+//
+//            if (map.containsKey("message"))
+//                throw new RuntimeException(map.get("message").toString());
+//        }
     }
 }

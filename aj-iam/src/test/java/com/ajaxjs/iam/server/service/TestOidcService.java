@@ -56,4 +56,9 @@ public class TestOidcService extends BaseTest {
         mgr.setSecretKey("aEsD65643vb2");
         System.out.println(mgr.isValid(token.getId_token()));
     }
+
+    @Test
+    public void testRopcToken() {
+        OidcService.ropcToken("password", "Jack8888", "jTomcom@1120", "r3fgD3x43ft5H", "zKvmMA4KmJ2CIijl9ubqbXpHm1", null);
+    }
 }

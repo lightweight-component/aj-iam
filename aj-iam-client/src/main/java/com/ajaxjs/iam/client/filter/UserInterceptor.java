@@ -251,9 +251,8 @@ public class UserInterceptor implements HandlerInterceptor {
      * @return 返回提取到的 token，如果未能提取到则返回 null。
      */
     public String extractToken(HttpServletRequest request) {
-        String token = extractHeaderToken(request); // 尝试从请求头的"Authorization"字段提取 token
-        String authorization = request.getHeader("Authorization"); // 尝试从请求头的"Authorization"字段以另一种大小写形式提取 token
-        String authorization2 = request.getHeader("authorization");
+//        String token = extractHeaderToken(request); // 尝试从请求头的"Authorization"字段提取 token
+        String token = request.getHeader("Authorization"); // 尝试从请求头的"Authorization"字段以另一种大小写形式提取 token
 
         // 如果从请求头的"Authorization"字段提取不到 token，尝试从请求头的"token"字段提取
         if (token == null) {
@@ -268,7 +267,7 @@ public class UserInterceptor implements HandlerInterceptor {
 
                     // 如果上述方式都提取不到 token，记录警告日志
                     if (token == null)
-                        log.warn("Token not found in request parameters. Not an OAuth2 request.");
+                        log.warn("Token not found in request parameters. Not an OAuth2 request. path: " + request.getRequestURI());
                 }
             }
         }

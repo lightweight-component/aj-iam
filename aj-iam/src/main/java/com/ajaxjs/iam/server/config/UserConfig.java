@@ -24,7 +24,7 @@ public class UserConfig {
         return e::md5salt;
     }
 
-    @Value("${User.oidc.jwtSecretKey: D2dfdX4ds}")
+    @Value("${User.oidc.jwtSecretKey:Df87sD#$%#A}")
     private String jwtSecretKey;
 
     @Bean
