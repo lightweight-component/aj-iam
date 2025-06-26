@@ -10,7 +10,7 @@ public class TestJWT {
         JWebToken token = mgr.tokenFactory("1000", "user01", "admin, guest", JwtUtils.setExpire(24));
         System.out.println(token.toString());
 
-//        System.out.println(mgr.isValid(token.toString()));
+        System.out.println(mgr.isValid(token.toString()));
     }
 
     @Test

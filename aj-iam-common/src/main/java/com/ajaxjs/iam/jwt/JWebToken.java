@@ -1,5 +1,6 @@
 package com.ajaxjs.iam.jwt;
 
+import com.ajaxjs.util.Base64Helper;
 import com.ajaxjs.util.StrUtil;
 import lombok.Data;
 
@@ -49,7 +50,7 @@ public class JWebToken {
         if (StrUtil.isEmptyText(payloadJson))
             throw new IllegalArgumentException("头 Payload 参数有问题");
 
-        String p = JwtUtils.encode(payloadJson);
+        String p = Base64Helper.encode().input(payloadJson).withoutPadding().getString();
 
         return encodedHeader + "." + p;
     }

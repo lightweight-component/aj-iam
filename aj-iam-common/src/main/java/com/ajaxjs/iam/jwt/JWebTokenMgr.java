@@ -4,6 +4,7 @@ package com.ajaxjs.iam.jwt;
 
 import com.ajaxjs.util.EncodeTools;
 import com.ajaxjs.util.JsonUtil;
+import com.ajaxjs.util.MessageDigestHelper;
 import com.ajaxjs.util.StrUtil;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -100,7 +101,8 @@ public class JWebTokenMgr {
         if (StrUtil.isEmptyText(headerPayload))
             throw new IllegalArgumentException("头 Payload 参数有问题");
 
-        return JwtUtils.hmacSha256(headerPayload, secretKey);
+        return new MessageDigestHelper().setAlgorithmName("HmacSHA256").setKey(secretKey).
+                setValue(headerPayload).setBase64withoutPadding(true).setHexStr(false).getResult();
     }
 
     /**
