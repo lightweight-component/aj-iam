@@ -272,10 +272,13 @@ public class UserInterceptor implements HandlerInterceptor {
             }
         }
 
+        if(token.toLowerCase().startsWith(BEARER_TYPE))
+            token = token.substring(7).trim();
+
         return token;
     }
 
-    private static final String BEARER_TYPE = "Bearer";
+    private static final String BEARER_TYPE = "bearer";
 
     /**
      * 从 HTTP 请求中提取认证 Token。
