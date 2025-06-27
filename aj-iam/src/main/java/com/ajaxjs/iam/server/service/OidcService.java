@@ -36,7 +36,7 @@ public class OidcService extends OAuthCommon implements OidcController {
     @Autowired
     JWebTokenMgr jWebTokenMgr;
 
-    @Value("${User.oidc.jwtExpireHours: 5}")
+    @Value("${User.oidc.jwtExpireHours:74}")
     int jwtExpireHours;
 
     @Override
