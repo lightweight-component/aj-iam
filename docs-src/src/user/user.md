@@ -8,7 +8,7 @@ tags:
 layout: layouts/docs.njk
 ---
 
-# The User System
+# User System
 
 As part of a user system, the following core modules are essential and cannot be overlooked:
 
@@ -55,16 +55,15 @@ In the following sections, we will discuss these modules in detail, along with r
 User registration refers to the process of creating a new user account for an application. In a centralized user center architecture, the application itself does not store core user data such as username, email, phone number, or password. Instead, this data is managed and stored exclusively by the user center.
 
 The user center is responsible for handling user registration, authentication (login), and access control. It verifies whether a user is valid and communicates this information back to the application.
-
 However, a common challenge arises when the database schema of the user center ***does not meet the specific needs*** of the application. Since the structure of the user center's database is often fixed, it may not be feasible to adapt or extend its fields to match the application’s requirements.
 
 One possible workaround is to add a JSON-type field in the user table to store arbitrary data. While this can be useful for unstructured or dynamic data, it is **not ideal for structured data**, as it sacrifices query performance, type safety, and maintainability.
-Recommended Solution
+### Recommended Solution
 
 A better approach is to store the **application-specific user information locally** within the application's own database after the user has been registered in the user center. To link the local user data with the central user record, you can include a field such as `iam_id` that references the user ID from the user center.
 
 This way:
 
 - The core identity and authentication remain under the control of the user center.
-- The application can store and manage extended user attributes tailored to its business needs.
+- The application can store and manage extended user attributes tailored to its business needs. Since the core user information is accessed easily, you don't have much remote calls to the user center.
 - There is a clean separation between identity management and application-specific data.
