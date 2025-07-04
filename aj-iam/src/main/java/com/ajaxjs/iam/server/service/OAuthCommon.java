@@ -14,6 +14,7 @@ import com.ajaxjs.util.EncodeTools;
 import com.ajaxjs.util.MessageDigestHelper;
 import com.ajaxjs.util.RandomTools;
 import com.ajaxjs.framework.spring.cache.smallredis.Cache;
+import com.ajaxjs.util.StrUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.util.StringUtils;
@@ -72,7 +73,7 @@ public abstract class OAuthCommon implements IamConstants {
      * @return 返回匹配的 App 对象，如果不存在或密钥不合法，则抛出 BusinessException 异常。
      * @throws BusinessException 如果应用不存在或提供的密钥非法，则抛出此异常。
      */
-    public App getApp(String clientId, String clientSecret) {
+    public static App getApp(String clientId, String clientSecret) {
         // 通过 CRUD 操作，查询应用信息，条件是状态为0、客户端 ID 和密钥匹配
         App app = Sql.newInstance().input("SELECT * FROM app WHERE stat = 0 AND client_id = ? AND client_secret = ?", clientId, clientSecret).query(App.class);
 
@@ -85,9 +86,9 @@ public abstract class OAuthCommon implements IamConstants {
     /**
      * 根据 HTTP 头的 authorization 获取 App 信息
      */
-    public App getAppByAuthHeader(String authorization) {
-        authorization = authorization.replaceAll("Basic ", "");
-        String base64Str = EncodeTools.base64EncodeToStringUtf8(authorization);
+    public static App getAppByAuthHeader(String authorization) {
+        authorization = authorization.replaceAll("Basic ", StrUtil.EMPTY_STRING);
+        String base64Str = EncodeTools.base64DecodeToStringUtf8(authorization);
 
         if (!base64Str.contains(":"))
             throw new IllegalArgumentException("非法 Token");

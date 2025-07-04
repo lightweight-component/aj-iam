@@ -2,12 +2,15 @@ package com.ajaxjs.iam.user.service;
 
 import com.ajaxjs.framework.BaseEntityConstants;
 import com.ajaxjs.framework.spring.DiContextUtil;
-import com.ajaxjs.iam.model.SimpleUser;
 import com.ajaxjs.iam.UserConstants;
+import com.ajaxjs.iam.model.SimpleUser;
+import com.ajaxjs.iam.server.model.po.App;
+import com.ajaxjs.iam.server.service.OAuthCommon;
 import com.ajaxjs.iam.user.controller.UserController;
 import com.ajaxjs.iam.user.model.User;
 import com.ajaxjs.sqlman.Sql;
 import com.ajaxjs.sqlman.crud.Entity;
+import com.ajaxjs.sqlman.util.Utils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -28,6 +31,14 @@ public class UserService implements UserController, UserConstants {
         sql = TenantService.addTenantIdQuery(sql);
 
         return Sql.instance().input(sql, id).query(User.class);
+    }
+
+    @Override
+    public User queryUserByClient(String authorization, String field, String value) {
+        App app = OAuthCommon.getAppByAuthHeader(authorization);
+        String sql = "SELECT * FROM user WHERE stat != 1 AND tenant_id = ? AND " + Utils.escapeSqlInjection(field) + " = ?";
+
+        return Sql.instance().input(sql, app.getTenantId(), value).query(User.class);
     }
 
     /**

@@ -19,6 +19,17 @@ public interface UserController {
     User info(@PathVariable Long id);
 
     /**
+     * 通过客户端认证，根据字段查询用户
+     *
+     * @param authorization 客户端认证
+     * @param field         用户名/邮箱/手机
+     * @param value         值
+     * @return 用户详情
+     */
+    @GetMapping("/by_client")
+    User queryUserByClient(@RequestHeader("authorization") String authorization, @RequestParam String field, @RequestParam String value);
+
+    /**
      * 获取用户详情（根据登录用户 Session）
      *
      * @return 用户详情
