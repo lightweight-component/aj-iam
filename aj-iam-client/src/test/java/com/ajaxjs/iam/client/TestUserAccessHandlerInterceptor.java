@@ -1,6 +1,6 @@
 package com.ajaxjs.iam.client;
 
-import com.ajaxjs.iam.client.annotation.NeedsUserLogined;
+import com.ajaxjs.iam.annotation.NeedsUserLogined;
 import com.ajaxjs.iam.client.filter.UserAccessHandlerInterceptor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

@@ -1,13 +1,14 @@
 package com.ajaxjs.iam.user.service;
 
-import com.ajaxjs.framework.BaseEntityConstants;
-import com.ajaxjs.framework.spring.DiContextUtil;
+
+import com.ajaxjs.framework.model.BaseEntityConstants;
 import com.ajaxjs.iam.UserConstants;
 import com.ajaxjs.iam.model.SimpleUser;
 import com.ajaxjs.iam.server.model.po.App;
 import com.ajaxjs.iam.server.service.OAuthCommon;
 import com.ajaxjs.iam.user.controller.UserController;
 import com.ajaxjs.iam.user.model.User;
+import com.ajaxjs.spring.DiContextUtil;
 import com.ajaxjs.sqlman.Sql;
 import com.ajaxjs.sqlman.crud.Entity;
 import com.ajaxjs.sqlman.util.Utils;

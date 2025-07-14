@@ -1,6 +1,6 @@
 package com.ajaxjs.iam.server.service;
 
-import com.ajaxjs.framework.BusinessException;
+import com.ajaxjs.framework.model.BusinessException;
 import com.ajaxjs.iam.server.common.IamConstants;
 import com.ajaxjs.iam.server.common.IamUtils;
 import com.ajaxjs.iam.server.model.AccessToken;
@@ -13,7 +13,7 @@ import com.ajaxjs.sqlman.crud.Entity;
 import com.ajaxjs.util.EncodeTools;
 import com.ajaxjs.util.MessageDigestHelper;
 import com.ajaxjs.util.RandomTools;
-import com.ajaxjs.framework.spring.cache.smallredis.Cache;
+import com.ajaxjs.spring.cache.smallredis.Cache;
 import com.ajaxjs.util.StrUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;

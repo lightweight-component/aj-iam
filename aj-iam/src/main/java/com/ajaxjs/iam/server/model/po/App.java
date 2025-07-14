@@ -1,6 +1,6 @@
 package com.ajaxjs.iam.server.model.po;
 
-import com.ajaxjs.framework.BaseModel;
+import com.ajaxjs.framework.model.BaseModel;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 

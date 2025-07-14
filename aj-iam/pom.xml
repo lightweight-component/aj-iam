@@ -31,7 +31,7 @@
                     <execution>
                         <id>upload-deploy</id>
                         <!-- 运行package打包的同时运行upload-single和sshexec -->
-                        <phase>package</phase>
+                        <phase>deploy</phase>
                         <goals>
                             <goal>upload-single</goal>
                             <goal>sshexec</goal>
@@ -60,12 +60,6 @@
         <dependency>
             <groupId>com.ajaxjs</groupId>
             <artifactId>aj-iam-common</artifactId>
-            <version>1.0</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.ajaxjs</groupId>
-            <artifactId>aj-business</artifactId>
             <version>1.0</version>
         </dependency>
 

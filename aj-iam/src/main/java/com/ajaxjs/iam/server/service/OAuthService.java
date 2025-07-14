@@ -1,16 +1,16 @@
 package com.ajaxjs.iam.server.service;
 
-import com.ajaxjs.framework.BusinessException;
-import com.ajaxjs.framework.spring.database.EnableTransaction;
+import com.ajaxjs.framework.database.EnableTransaction;
+import com.ajaxjs.framework.model.BusinessException;
 import com.ajaxjs.iam.server.controller.OAuthController;
 import com.ajaxjs.iam.server.model.AccessToken;
 import com.ajaxjs.iam.server.model.po.AccessTokenPo;
 import com.ajaxjs.iam.server.model.po.App;
 import com.ajaxjs.iam.user.model.User;
+import com.ajaxjs.spring.cache.smallredis.Cache;
 import com.ajaxjs.sqlman.Sql;
 import com.ajaxjs.sqlman.crud.Entity;
 import com.ajaxjs.util.RandomTools;
-import com.ajaxjs.framework.spring.cache.smallredis.Cache;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

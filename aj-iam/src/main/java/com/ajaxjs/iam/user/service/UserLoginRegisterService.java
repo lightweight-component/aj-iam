@@ -1,8 +1,8 @@
 package com.ajaxjs.iam.user.service;
 
-import com.ajaxjs.framework.BusinessException;
-import com.ajaxjs.framework.spring.DiContextUtil;
-import com.ajaxjs.framework.spring.database.EnableTransaction;
+
+import com.ajaxjs.framework.database.EnableTransaction;
+import com.ajaxjs.framework.model.BusinessException;
 import com.ajaxjs.iam.UserConstants;
 import com.ajaxjs.iam.server.common.IamUtils;
 import com.ajaxjs.iam.user.common.UserUtils;
@@ -11,6 +11,7 @@ import com.ajaxjs.iam.user.common.util.CheckStrength;
 import com.ajaxjs.iam.user.controller.UserLoginRegisterController;
 import com.ajaxjs.iam.user.model.User;
 import com.ajaxjs.iam.user.model.UserAccount;
+import com.ajaxjs.spring.DiContextUtil;
 import com.ajaxjs.sqlman.Sql;
 import com.ajaxjs.sqlman.crud.Entity;
 import com.ajaxjs.sqlman.util.SnowflakeId;

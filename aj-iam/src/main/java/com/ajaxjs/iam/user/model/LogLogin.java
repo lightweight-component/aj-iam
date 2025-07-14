@@ -1,6 +1,6 @@
 package com.ajaxjs.iam.user.model;
 
-import com.ajaxjs.framework.BaseModel;
+import com.ajaxjs.framework.model.BaseModel;
 import com.ajaxjs.sqlman.annotation.Table;
 import lombok.Data;
 import lombok.EqualsAndHashCode;

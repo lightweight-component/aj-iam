@@ -1,6 +1,7 @@
 package com.ajaxjs.iam.server;
 
-import com.ajaxjs.framework.spring.database.DataBaseConnection;
+
+import com.ajaxjs.framework.database.DataBaseConnection;
 import com.ajaxjs.sqlman.JdbcConnection;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;

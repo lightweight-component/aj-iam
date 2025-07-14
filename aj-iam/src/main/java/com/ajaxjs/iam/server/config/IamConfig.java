@@ -1,14 +1,16 @@
 package com.ajaxjs.iam.server.config;
 
 import com.ajaxjs.base.Sdk;
-import com.ajaxjs.framework.spring.BaseConfigure;
-import com.ajaxjs.framework.spring.cache.smallredis.Cache;
-import com.ajaxjs.framework.spring.cache.smallredis.ExpiryCache;
-import com.ajaxjs.framework.spring.database.ConnectionMgr;
+import com.ajaxjs.framework.database.DataBaseConnection;
+
+import com.ajaxjs.iam.server.controller.UserInterceptor;
 import com.ajaxjs.iam.server.service.OidcService;
 import com.ajaxjs.iam.user.common.session.ServletUserSession;
 import com.ajaxjs.iam.user.common.session.UserSession;
+import com.ajaxjs.spring.cache.smallredis.Cache;
+import com.ajaxjs.spring.cache.smallredis.ExpiryCache;
 import com.ajaxjs.util.JsonUtil;
+import com.ajaxjs.util.StrUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,7 +18,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import javax.sql.DataSource;
 import java.util.function.Function;
@@ -25,7 +29,7 @@ import static com.ajaxjs.iam.server.common.IamConstants.JWT_TOKEN_USER_KEY;
 
 @Configuration
 @Slf4j
-public class IamConfig extends BaseConfigure {
+public class IamConfig implements WebMvcConfigurer {
     @Value("${db.url}")
     private String url;
 
@@ -37,7 +41,7 @@ public class IamConfig extends BaseConfigure {
 
     @Bean(value = "dataSource", destroyMethod = "close")
     DataSource getDs() {
-        return ConnectionMgr.setupJdbcPool("com.mysql.cj.jdbc.Driver", url, user, psw);
+        return DataBaseConnection.setupMySqlJdbcPool(url, user, psw);
     }
 
     /**
@@ -83,23 +87,26 @@ public class IamConfig extends BaseConfigure {
 //        return g;
 //    }
 
+    @Bean
+    UserInterceptor authInterceptor() {
+        return new UserInterceptor();
+    }
+
     /**
      * 加入认证拦截器
      */
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         log.info("初始化 SSO 拦截器");
-//        InterceptorRegistration interceptorRegistration = registry.addInterceptor(authInterceptor());
+        InterceptorRegistration interceptorRegistration = registry.addInterceptor(authInterceptor());
 //        registry.addInterceptor(googleCaptchaMvcInterceptor());
-//        interceptorRegistration.addPathPatterns("/**"); // 拦截所有
+        interceptorRegistration.addPathPatterns("/**"); // 拦截所有
 
         // 不需要的拦截路径
-//        if (StringUtils.hasText(excludes)) {
-//            String[] arr = excludes.split("\\|");
-//            interceptorRegistration.excludePathPatterns(arr);
-//        }
-
-        super.addInterceptors(registry);
+        if (StrUtil.hasText(excludes)) {
+            String[] arr = excludes.split(",|\\|");
+            interceptorRegistration.excludePathPatterns(arr);
+        }
     }
 
     @Bean
@@ -129,15 +136,15 @@ public class IamConfig extends BaseConfigure {
 //        return new CrossFilter();
 //    }
 
-    /**
-     * 跨域
-     *
-     * @param registry 注册跨域
-     */
-    @Override
-    public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/**").allowedHeaders("*").allowedMethods("POST", "GET", "PUT", "OPTIONS", "DELETE").allowedOrigins("*").allowCredentials(false);
-    }
+//    /**
+//     * 跨域
+//     *
+//     * @param registry 注册跨域
+//     */
+//    @Override
+//    public void addCorsMappings(CorsRegistry registry) {
+//        registry.addMapping("/**").allowedHeaders("*").allowedMethods("POST", "GET", "PUT", "OPTIONS", "DELETE").allowedOrigins("*").allowCredentials(false);
+//    }
 
 //    @Bean
 //    public CorsFilter corsFilter() {

@@ -1,12 +1,11 @@
 package com.ajaxjs.base;
 
-import com.ajaxjs.framework.IBaseModel;
 import lombok.Data;
 
 import java.util.Map;
 
 @Data
-public class MailVo implements IBaseModel {
+public class MailVo {
     /**
      * 发件人邮箱
      */

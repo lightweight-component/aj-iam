@@ -1,4 +1,4 @@
-package com.ajaxjs.iam.client.filter;
+package com.ajaxjs.iam.server.controller;
 
 
 import com.ajaxjs.iam.BaseUserInterceptor;

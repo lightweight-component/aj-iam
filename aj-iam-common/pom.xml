@@ -5,7 +5,7 @@
     <parent>
         <groupId>com.ajaxjs</groupId>
         <artifactId>ajaxjs-parent</artifactId>
-        <version>1.31</version>
+        <version>1.32</version>
         <relativePath/>
     </parent>
     <artifactId>aj-iam-common</artifactId>
@@ -17,7 +17,7 @@
         <dependency>
             <groupId>com.ajaxjs</groupId>
             <artifactId>ajaxjs-util</artifactId>
-            <version>1.2.4</version>
+            <version>1.2.6</version>
         </dependency>
 
         <!-- 编译为 jar 包时依赖的 -->

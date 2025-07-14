@@ -1,7 +1,7 @@
 package com.ajaxjs.iam.permission;
 
 
-import com.ajaxjs.business.tree.FlatArrayToTree;
+import com.ajaxjs.framework.tree.FlatArrayToTree;
 import com.ajaxjs.iam.server.controller.PermissionController;
 import com.ajaxjs.sqlman.Sql;
 import com.ajaxjs.sqlman.crud.Entity;

@@ -1,13 +1,12 @@
 package com.ajaxjs.iam.server.model;
 
-import com.ajaxjs.framework.IBaseModel;
 import lombok.Data;
 
 /**
  * 访问令牌
  */
 @Data
-public class AccessToken implements IBaseModel {
+public class AccessToken {
     /**
      * Access Token
      */

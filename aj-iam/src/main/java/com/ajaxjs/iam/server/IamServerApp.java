@@ -9,5 +9,7 @@ import org.springframework.context.annotation.ComponentScan;
 public class IamServerApp {
     public static void main(String[] args) {
         SpringApplication.run(IamServerApp.class, args);
+        System.out.println("(♥◠‿◠)ﾉﾞ  AJ-IAM-Server 启动成功   ლ(´ڡ`ლ)ﾞ  \n" +
+                "=========================================【AJ-IAM-Server】==================================================");
     }
 }

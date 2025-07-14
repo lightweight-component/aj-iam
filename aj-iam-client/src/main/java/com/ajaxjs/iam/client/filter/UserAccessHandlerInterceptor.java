@@ -1,6 +1,6 @@
 package com.ajaxjs.iam.client.filter;
 
-import com.ajaxjs.iam.client.annotation.NeedsUserLogined;
+import com.ajaxjs.iam.annotation.NeedsUserLogined;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 
@@ -12,6 +12,7 @@ import java.lang.reflect.Method;
 /**
  * 检查用户是否已登录的拦截器
  */
+@Deprecated
 public class UserAccessHandlerInterceptor implements HandlerInterceptor {
     public static final String USER_IN_SESSION = "USER";
 

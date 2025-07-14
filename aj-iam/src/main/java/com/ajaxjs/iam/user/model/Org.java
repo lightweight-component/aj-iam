@@ -1,6 +1,6 @@
 package com.ajaxjs.iam.user.model;
 
-import com.ajaxjs.framework.BaseModel;
+import com.ajaxjs.framework.model.BaseModel;
 
 /**
  * 组织
