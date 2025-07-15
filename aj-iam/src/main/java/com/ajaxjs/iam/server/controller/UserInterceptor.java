@@ -35,6 +35,7 @@ import java.util.regex.Pattern;
  * @Bean UserInterceptor authInterceptor() {
  * return new UserInterceptor();
  * }
+ *
  * </code>
  */
 @Slf4j

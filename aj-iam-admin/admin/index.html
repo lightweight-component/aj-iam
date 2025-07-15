@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <title>AJ-IAM 管理后台</title>
+    <link rel="stylesheet" href="../common/common.css" />
+    <link rel="stylesheet" href="../common/admin.css" />
+    <!-- Font Awesome CSS-->
+    <!-- <link href="https://cdn.bootcss.com/font-awesome/5.13.0/css/all.css" rel="stylesheet"> -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css" />
+    <script src="../common/common.js"></script>
+    <!--#include file="head.html" -->
+    <style>
+		html,
+        body {
+            height: 100%;
+            overflow: hidden;
+        }
+	</style>
+</head>
+
+<body>
+<menu>
+    <h3 style="margin:20px 0 0 13px;color:#2f518c">AJ-IAM 管理后台</h3>
+    <br />
+    <br />
+    <br />
+    <ul>
+        <li>
+            <a href="pages/welcome.jsp" target="iframe">首页</a>
+        </li>
+        <li>
+            <a href="user.html" target="iframe">用户管理</a>
+        </li>
+        <li>
+            <a href="app.html" target="iframe">应用管理</a>
+        </li>
+        <li>
+            <a href="pages/object-type.jsp" target="iframe">组织管理</a>
+        </li>
+        <li>
+            <a href="pages/seat-objectType.jsp" target="iframe">租户管理</a>
+        </li>
+        <li>
+            <a href="pages/menu-group.jsp" target="iframe">Token 管理</a>
+        </li>
+        <li>
+            <a href="user.html" target="iframe">用户日志</a>
+        </li>
+        <li>
+            <a href="#" onclick="localStorage.removeItem('accessToken');localStorage.removeItem('userInfo');location.assign('.')">退出</a>
+        </li>
+    </ul>
+</menu>
+<div class="container">
+    <iframe src="welcome.html" name="iframe"></iframe>
+</div>
+</body>
+</html>

@@ -98,9 +98,9 @@ public class IamConfig implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         log.info("初始化 SSO 拦截器");
-        InterceptorRegistration interceptorRegistration = registry.addInterceptor(authInterceptor());
+        InterceptorRegistration interceptorRegistration = registry.addInterceptor(authInterceptor()).order(2);
 //        registry.addInterceptor(googleCaptchaMvcInterceptor());
-        interceptorRegistration.addPathPatterns("/**"); // 拦截所有
+        interceptorRegistration.addPathPatterns("/**").excludePathPatterns("/favicon.ico"); // 拦截所有
 
         // 不需要的拦截路径
         if (StrUtil.hasText(excludes)) {

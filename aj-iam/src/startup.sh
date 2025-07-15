@@ -1,3 +1,4 @@
+# centos 启动脚本，需要修改你的进程名
 # 获取进程名
 process_name=aj-iam-server.jar
 
