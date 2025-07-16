@@ -31,14 +31,14 @@
                     <execution>
                         <id>upload-deploy</id>
                         <!-- 运行package打包的同时运行upload-single和sshexec -->
-                        <phase>deploy</phase>
+                        <phase>package</phase>
                         <goals>
                             <goal>upload-single</goal>
                             <goal>sshexec</goal>
                         </goals>
                         <configuration>
                             <!-- 指定 SSH 账号 -->
-                            <serverId>high.ajaxjs.com</serverId>
+                            <serverId>test.ajaxjs.com</serverId>
                             <!-- 要更新的 jar 包 -->
                             <fromFile>target/aj-iam-server.jar</fromFile>
                             <!-- 服务器部署位置 -->

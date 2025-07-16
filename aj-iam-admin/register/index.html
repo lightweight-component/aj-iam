@@ -31,26 +31,36 @@
             <fieldset class="fieldset-box" style="width:350px;">
                 <legend>IAM 用户注册</legend>
 
-                <input class="text-input-1" type="text" name="userName" placeholder="用户名" /> <span>*</span>
-                <br />
-                <br />
-                <input class="text-input-1" type="text" name="userName" placeholder="手机" /> <span>&nbsp;</span>
-                <br />
-                <br />
-                <input class="text-input-1" type="text" name="userName" placeholder="邮箱" /> <span>&nbsp;</span>
-                <br />
-                <br />
-                <input class="text-input-1" type="password" name="password" placeholder="输入密码" /> <span>*</span>
-                <br />
-                <br />
-                <input class="text-input-1" type="password" name="password" placeholder="重复密码" /> <span>*</span>
-                <br />
-                <br />
-                <br /><div id="captcha-el"></div>
-                <br />
-                <button class="button-1" onclick="login();return false;">注册</button>
-                <br />
-                <br />
+                <form action="../../iam_api/create_user" method="post" target="resultFrame">
+                    <!-- 隐藏的 iframe -->
+                    <iframe name="resultFrame" id="resultFrame" style="display:none;"></iframe>
+
+                    <input class="text-input-1" type="text" name="name" placeholder="用户名" /> <span>*</span>
+                    <br />
+                    <br />
+                    <input class="text-input-1" type="text" name="phone" placeholder="手机" /> <span>&nbsp;</span>
+                    <br />
+                    <br />
+                    <input class="text-input-1" type="text" name="userName" placeholder="邮箱" /> <span>&nbsp;</span>
+                    <br />
+                    <br />
+                    <input class="text-input-1" type="password" name="password" placeholder="输入密码" /> <span>*</span>
+                    <br />
+                    <br />
+                    <input class="text-input-1" type="password" name="password" placeholder="重复密码" /> <span>*</span>
+                    <br />
+                    <br />
+                    <input class="text-input-1" type="text" name="captcha_code" placeholder="验证码" style="width:110px;" />
+                    <input type="hidden" name="uuid" />
+                    <img class="captcha" style="vertical-align: bottom;cursor: pointer;" />
+
+                    <span>*</span>
+                    <br />
+                    <br />
+                    <button class="button-1">注册</button>
+                    <br />
+                    <br />
+                </form>
                 <a href="../login">用户登录</a>
             </fieldset>
             <br />
@@ -62,9 +72,59 @@
         </td>
     </tr>
 </table>
+
+<script>
+    (function(){
+        function generateUUID() {
+          return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+            const r = Math.random() * 16 | 0,
+                  v = c === 'x' ? r : (r & 0x3 | 0x8);
+            return v.toString(16);
+          });
+        }
+
+        let el = document.querySelector('.captcha');
+        let uuidEl = document.querySelector('input[type="hidden"][name="uuid"]');
+
+        function set() {
+            const uuid = generateUUID();
+            el.src = '../../iam_api/captcha/?uuid=' + uuid;
+            uuidEl.value = uuid;
+        }
+
+        set();
+        el.onclick = set;
+    })();
+
+     // 监听 iframe 加载完成事件，读取返回内容
+    document.getElementById('resultFrame').onload = function () {
+        const iframe = document.getElementById('resultFrame');
+        let responseText = '';
+
+        try {
+            // 获取 iframe 中的内容
+            const doc = iframe.contentDocument || iframe.contentWindow.document;
+            responseText = doc.body.textContent || doc.documentElement.textContent;
+        } catch (e) {
+            responseText = '无法访问响应内容（可能是跨域）';
+        }
+
+        console.log(responseText);
+
+        if (responseText) {
+            const json = JSON.parse(responseText);
+            if (json.status) {
+                //location.assign('../oidc/authorization' + location.search);
+            } else
+             alert(json.message)
+        }
+        // 显示响应内容到页面
+        //document.getElementById('response').innerText = responseText;
+    };
+</script>
 </body>
 <script>
-        function login() {
+/**        function login() {
             let userName = document.querySelector('*[name=userName]').value;
             let password = document.querySelector('*[name=password]').value;
 
@@ -73,6 +133,6 @@
                     location.assign('../oidc/authorization' + location.search);
                 }
             });
-        }
+        }*/
 	</script>
 </html>
