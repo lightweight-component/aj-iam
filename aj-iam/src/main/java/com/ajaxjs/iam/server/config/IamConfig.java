@@ -39,10 +39,10 @@ public class IamConfig implements WebMvcConfigurer {
     @Value("${db.psw}")
     private String psw;
 
-    @Bean(value = "dataSource", destroyMethod = "close")
-    DataSource getDs() {
-        return DataBaseConnection.setupMySqlJdbcPool(url, user, psw);
-    }
+//    @Bean(value = "dataSource", destroyMethod = "close")
+//    DataSource getDs() {
+//        return DataBaseConnection.setupMySqlJdbcPool(url, user, psw);
+//    }
 
     /**
      * 用户全局拦截器

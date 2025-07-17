@@ -6,7 +6,7 @@
 
 # aj-iam-client
 
-OAuth 的 客户端 Client
+IAM Client SDK for Java/SpringBoot
 
 Tutorial: https://framework.ajaxjs.com/docs/aj/?section=json.
 

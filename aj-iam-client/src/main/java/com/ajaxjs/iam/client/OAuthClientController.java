@@ -23,8 +23,8 @@ import javax.servlet.http.HttpSession;
 /**
  * OAuth 授权客户端控制器
  */
-@RestController
-@RequestMapping("/oauth_client")
+//@RestController
+//@RequestMapping("/oauth_client")
 @Slf4j
 public class OAuthClientController {
     @Value("${client.id}")

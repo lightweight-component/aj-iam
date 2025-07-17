@@ -1,6 +1,5 @@
 package com.ajaxjs.iam.client.filter;
 
-
 import com.ajaxjs.iam.BaseUserInterceptor;
 import com.ajaxjs.iam.UserConstants;
 import com.ajaxjs.iam.annotation.AllowAccess;
@@ -13,8 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
-import org.springframework.data.redis.core.StringRedisTemplate;
+//import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.util.StringUtils;
 import org.springframework.web.method.HandlerMethod;
@@ -29,24 +27,17 @@ import java.util.regex.Pattern;
 
 /**
  * 资源拦截器
- * 用法：
- * <code>
- *
- * @Bean UserInterceptor authInterceptor() {
- * return new UserInterceptor();
- * }
- * </code>
  */
 @Slf4j
 public class UserInterceptor extends BaseUserInterceptor implements HandlerInterceptor {
     @Value("${auth.run:true}")
-    private String run;
+    private boolean run;
 
     @Value("${auth.cacheType:jwt}")
     private String cacheType;
 
-    @Autowired(required = false)
-    private StringRedisTemplate redis;
+//    @Autowired(required = false)
+//    private StringRedisTemplate redis;
 
     /**
      * 本地可以获取用户信息
@@ -56,22 +47,8 @@ public class UserInterceptor extends BaseUserInterceptor implements HandlerInter
     @Qualifier("getuserfromjvmhash")
     private Function<String, String> getUserFromJvmHash;
 
-    /**
-     * JWT 验证的密钥
-     */
-    @Value("${User.oidc.jwtSecretKey:Df87sD#$%#A}")
-    private String jwtSecretKey;
-
-    /**
-     * JWT 解密
-     */
-    @Bean
-    JWebTokenMgr jWebTokenMgr() {
-        JWebTokenMgr mgr = new JWebTokenMgr();
-        mgr.setSecretKey(jwtSecretKey);
-
-        return mgr;
-    }
+    @Autowired(required = false)
+    JWebTokenMgr jWebTokenMgr;
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
@@ -84,7 +61,7 @@ public class UserInterceptor extends BaseUserInterceptor implements HandlerInter
 
         if (Version.isDebug && "1".equals(request.getParameter("allow"))) // 方便开发
             return true;
-        else if (StringUtils.hasText(run) && Boolean.parseBoolean(run)) {
+        else if (run) {
             String token = extractToken(request);
 
             if (!StringUtils.hasText(token))
@@ -93,9 +70,9 @@ public class UserInterceptor extends BaseUserInterceptor implements HandlerInter
             String jsonUser;
 
             switch (cacheType) {
-                case "redis":
-                    jsonUser = redis.opsForValue().get(UserConstants.REDIS_PREFIX + token);
-                    break;
+//                case "redis":
+//                    jsonUser = redis.opsForValue().get(UserConstants.REDIS_PREFIX + token);
+//                    break;
                 case "jvm_hash":
                     if (getUserFromJvmHash == null) {
                         serverErr(response, "配置参数 jvm_hash 不正确");
@@ -105,10 +82,11 @@ public class UserInterceptor extends BaseUserInterceptor implements HandlerInter
                         jsonUser = getUserFromJvmHash.apply(token);
                     break;
                 case "jwt":
-                    JWebTokenMgr mgr = jWebTokenMgr();
-                    JWebToken jwt = mgr.parse(token);
+//                    JWebTokenMgr mgr = getBean(request, JWebTokenMgr.class);
 
-                    if (mgr.isValid(jwt)) {
+                    JWebToken jwt = jWebTokenMgr.parse(token);
+
+                    if (jWebTokenMgr.isValid(jwt)) {
                         jsonUser = "{\"id\": %s, \"name\": \"%s\", \"tenantId\":%s}";
 
                         Integer tenantId = null;
