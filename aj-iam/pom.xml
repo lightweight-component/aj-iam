@@ -63,6 +63,12 @@
             <version>1.0</version>
         </dependency>
 
+        <dependency>
+            <groupId>com.ajaxjs</groupId>
+            <artifactId>aj-dataservice</artifactId>
+            <version>1.0</version>
+        </dependency>
+
         <!-- RedisTemplate -->
         <dependency>
             <groupId>org.springframework.data</groupId>
