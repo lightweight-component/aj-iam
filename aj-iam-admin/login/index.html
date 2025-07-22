@@ -54,7 +54,7 @@
             let userName = document.querySelector('*[name=userName]').value;
             let password = document.querySelector('*[name=password]').value;
 
-            aj.xhr.postForm('../user/login', { loginId: userName, password: password }, json => {
+            aj.xhr.postForm('../../iam_api/user/login', { loginId: userName, password: password }, json => {
                 if (json.status) {
                     location.assign('../oidc/authorization' + location.search);
                 }

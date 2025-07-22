@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>用户登录日志</title>
+    <!--#include file="common/head.html" -->
+</head>
+
+<body class="inner-page">
+    <h2>用户登录日志</h2>
+
+    <div id="vue">
+        <admintable api-url="http://localhost/iam_api/common_api/user_login_log" :disable-create="true">
+            <template v-slot="slotProps">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>用户 id</th>
+                        <th>用户名称</th>
+                        <th>登录类型</th>
+                        <th>IP/区域</th>
+                        <th>UserAgent</th>
+                        <th>登录日期</th>
+                    </tr>
+                </thead>
+                <tr v-for="(item) in slotProps.list">
+                    <td>{{item.id}}</td>
+                    <td>#{{item.userId}}</td>
+                    <td>{{item.userName}}</td>
+                    <td>{{item.loginType}}</td>
+                    <td>{{item.ip}}/{{item.ipLocation}}</td>
+                    <td>
+                        <div style="width:400px;margin:0 auto;" class="ellipsis" :title="item.userAgent">
+                            {{item.userAgent}}
+                        </div>
+                    </td>
+                    <td>
+                        <admintable-date-column :item="item" />
+                    </td>
+                </tr>
+            </template>
+        </admintable>
+    </div>
+
+    <script src="common/component.js"></script>
+    <script>
+        new Vue({
+            el: '#vue'
+        });
+    </script>
+</body>
+
+</html>

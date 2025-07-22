@@ -127,3 +127,71 @@ ul.item li {
     display: inline-block;
     padding: 5px 10px;
 }
+
+.active {
+    background-color: #007bff;
+    color: white;
+}
+
+button {
+    margin: 0 5px;
+    padding: 5px 10px;
+}
+
+.pagination {
+    margin: 20px auto;
+    text-align: center;
+    max-width: 80%;
+    font-size: 14px;
+}
+
+.pagination a {
+    margin: 3px 5px;
+    padding: 5px 10px;
+    text-decoration: none;
+    color: #007bff;
+    border: 1px solid #007bff;
+    border-radius: 3px;
+    display: inline-block;
+    cursor: pointer;
+
+    &:hover {
+        background-color: #9fc1e6;
+        color: white;
+        border-color: #007bff;
+    }
+}
+
+.pagination a.active {
+    background-color: #007bff;
+    color: white;
+    border-color: #007bff;
+}
+
+.pagination a.disabled {
+    color: #6c757d;
+    border-color: #6c757d;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+.pagination .text {
+    color: gray;
+}
+
+.userInfo {
+    position: fixed;
+    top: 0;
+    right: 0;
+    height: 40px;
+    line-height: 40px;
+    width: 360px;
+    padding: 3px;
+    font-size: 14px;
+    background-image: linear-gradient(to left, rgb(115, 115, 179), rgba(0, 0, 255, 0));
+}
+
+.userInfo select {
+    width: 130px;
+    height: 25px !important;
+}

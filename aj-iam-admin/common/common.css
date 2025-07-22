@@ -238,3 +238,11 @@ input[type=number]:focus {
 select:focus {
     border-color: gray;
 }
+
+
+
+ .ellipsis {
+    white-space: nowrap; /* 强制文本在一行内显示 */
+    overflow: hidden; /* 隐藏超出宽度的内容 */
+    text-overflow: ellipsis; /* 当文本溢出时显示省略号 */
+  }

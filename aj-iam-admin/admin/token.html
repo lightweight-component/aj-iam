@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Token 管理</title>
+    <!--#include file="common/head.html" -->
+</head>
+
+<body class="inner-page">
+    <h2>Token 管理</h2>
+
+    <div id="vue">
+        <admintable api-url="http://localhost/iam_api/common_api/token" :disable-create="true">
+            <template v-slot="slotProps">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Access Token</th>
+                        <th>Refresh Token</th>
+                        <th>用户名</th>
+                        <th>客户端ID</th>
+                        <th>授权类型</th>
+                        <th>过期时间</th>
+                        <th>创建日期</th>
+                    </tr>
+                </thead>
+                <tr v-for="(item) in slotProps.list">
+                    <td>{{item.id}}</td>
+                    <td>{{item.accessToken}}</td>
+                    <td>{{item.refreshToken}}</td>
+                    <td>#{{item.userId}} {{item.userName}}</td>
+                    <td>{{item.clientId}}</td>
+                    <td>{{item.grantType}}</td>
+                    <td>{{item.expiresDate}}</td>
+                    <td>
+                        <admintable-date-column :item="item" />
+                    </td>
+                </tr>
+            </template>
+        </admintable>
+    </div>
+
+    <script src="common/component.js"></script>
+    <script>
+        new Vue({
+            el: '#vue'
+        });
+    </script>
+</body>
+
+</html>

@@ -1,53 +1,104 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <title>AJ-IAM 管理后台</title>
-    
+
     <!--#include file="common/head.html" -->
     <style>
-		html,
+        html,
         body {
             height: 100%;
             overflow: hidden;
         }
-	</style>
+    </style>
 </head>
 
 <body>
-<menu>
-    <h3 style="margin:20px 0 0 13px;color:#2f518c">AJ-IAM 管理后台</h3>
-    <br />
-    <br />
-    <br />
-    <ul>
-        <li>
-            <a href="pages/welcome.jsp" target="iframe">首页</a>
-        </li>
-        <li>
-            <a href="user.html" target="iframe">用户管理</a>
-        </li>
-        <li>
-            <a href="app.html" target="iframe">应用管理</a>
-        </li>
-        <li>
-            <a href="pages/object-type.jsp" target="iframe">组织管理</a>
-        </li>
-        <li>
-            <a href="tenant.html" target="iframe">租户管理</a>
-        </li>
-        <li>
-            <a href="pages/menu-group.jsp" target="iframe">Token 管理</a>
-        </li>
-        <li>
-            <a href="user.html" target="iframe">用户日志</a>
-        </li>
-        <li>
-            <a href="#" onclick="localStorage.removeItem('accessToken');localStorage.removeItem('userInfo');location.assign('.')">退出</a>
-        </li>
-    </ul>
-</menu>
-<div class="container">
-    <iframe src="welcome.html" name="iframe"></iframe>
-</div>
+    <menu>
+        <h3 style="margin:20px 0 0 13px;color:#2f518c">AJ-IAM 管理后台</h3>
+        <br />
+        <br />
+        <br />
+        <ul>
+            <li>
+                <a href="pages/welcome.jsp" target="iframe">首页</a>
+            </li>
+            <li>
+                <a href="user.html" target="iframe">用户管理</a>
+            </li>
+            <li>
+                <a href="app.html" target="iframe">应用管理</a>
+            </li>
+            <li>
+                <a href="pages/object-type.jsp" target="iframe">组织管理</a>
+            </li>
+            <li>
+                <a href="tenant.html" target="iframe">租户管理</a>
+            </li>
+            <li>
+                <a href="token.html" target="iframe">Token 管理</a>
+            </li>
+            <li>
+                <a href="user_login_log.html" target="iframe">用户登录日志</a>
+            </li>
+        </ul>
+    </menu>
+    <div class="container">
+        <iframe src="welcome.html" name="iframe"></iframe>
+    </div>
+    <div class="userInfo">
+        Amdin 已登录，<a href="#"
+            onclick="localStorage.removeItem('accessToken');localStorage.removeItem('userInfo');location.assign('.')">登出</a>。
+        切换租户 <select class="tenantSelect" onchange="changeTenant(this)"></select>
+
+        <script>
+            setTimeout(() => {
+                // 显示选中项
+                var tenantId = localStorage.getItem("tenantId");
+
+                if (tenantId != null) {
+                    var option = document.querySelector('.tenantSelect option[value="' + tenantId + '"]');
+
+                    if (option)
+                        option.setAttribute('selected', true);
+                }
+            }, 300);
+
+            function changeTenant(selectEl) {
+                var tenantId = selectEl.options[selectEl.selectedIndex].value;
+
+                if (tenantId)
+                    localStorage.setItem("tenantId", tenantId);// 存储
+                else
+                    window.localStorage.removeItem('tenantId');
+
+                window.parent.frames.center.location.reload();
+            }
+
+            aj.xhr.get('../../iam_api/common_api/tenant/list', json => {
+                const list = json.data;
+                const selectEl = document.querySelector('.tenantSelect');
+
+                // 遍历数据数组
+                list.forEach(item => {
+                    // 创建 option 元素
+                    const option = document.createElement('option');
+                    // 设置 option 的值和显示文本
+                    option.value = item.id; // 或者使用 item.name 作为 value
+                    option.textContent = item.name;
+                    // 将 option 添加到 select 元素中
+                    selectEl.appendChild(option);
+                });
+            }, {
+                header: {
+                    Authorization: 'Bearer ' + accessToken
+                }
+            });
+
+
+        </script>
+    </div>
 </body>
+
 </html>

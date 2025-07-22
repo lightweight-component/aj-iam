@@ -1,154 +1,102 @@
 <!DOCTYPE html>
 <html>
-
 <head>
     <title>租户管理</title>
     <!--#include file="common/head.html" -->
-    <style>
-        .active {
-            background-color: #007bff;
-            color: white;
-        }
-
-        button {
-            margin: 0 5px;
-            padding: 5px 10px;
-        }
-
-        .pagination {
-            margin-top: 20px;
-            text-align: center;
-        }
-
-        .pagination a {
-            margin: 0 5px;
-            padding: 5px 10px;
-            text-decoration: none;
-            color: #007bff;
-            border: 1px solid #007bff;
-            border-radius: 3px;
-            display: inline-block;
-            cursor: pointer;
-        }
-
-        .pagination a.active {
-            background-color: #007bff;
-            color: white;
-            border-color: #007bff;
-        }
-
-        .pagination a.disabled {
-            color: #6c757d;
-            border-color: #6c757d;
-            cursor: not-allowed;
-            pointer-events: none;
-        }
-    </style>
 </head>
 
 <body class="inner-page">
     <h2>租户管理</h2>
 
     <div id="vue">
-        <div class="btns" align="right">
-            <a href="#" @click="isShowCreate = true"><span style="color:green">➕</span> 添加</a>
-        </div>
-         <admintable></admintable>
-        <table class="list-table">
-           
-            <thead>
-                <tr>
-                    <th>id</th>
-                    <th>租户名称</th>
-                    <th>租户编码</th>
-                    <th>租户简介</th>
-                    <th>创建日期</th>
-                    <th>状态</th>
-                    <th>操作</th>
+        <admintable api-url="../../iam_api/common_api/tenant">
+            <template v-slot="slotProps">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>租户名称</th>
+                        <th>租户编码</th>
+                        <th>租户简介</th>
+                        <th>创建日期</th>
+                        <th>状态</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tr v-for="(item) in slotProps.list">
+                    <td>{{item.id}}</td>
+                    <td>
+                        <span v-show="slotProps.data.editingId != item.id">{{item.name}}</span>
+                        <input type="text" v-show="slotProps.data.editingId == item.id" v-model="item.name" />
+                    </td>
+                    <td>
+                        <span v-show="slotProps.data.editingId != item.id">{{item.code}}</span>
+                        <input type="text" v-show="slotProps.data.editingId == item.id" v-model="item.code" />
+                    </td>
+                    <td>
+                        <span v-show="slotProps.data.editingId != item.id">{{item.content}}</span>
+                        <input type="text" v-show="slotProps.data.editingId == item.id" v-model="item.content" />
+                    </td>
+                    <td>
+                        <admintable-date-column :item="item" />
+                    </td>
+                    <td>
+                       <span v-show="slotProps.data.editingId != item.id">{{slotProps.data.STAT[item.stat]}}</span>
+
+                        <select v-show="slotProps.data.editingId == item.id" v-model="item.stat" v-model="item.stat" style="width:80px">
+                            <option value="0">正常</option>
+                            <option value="1">已禁用</option>
+                            <option value="2">已删除</option>
+                        </select>
+                    </td>
+
+                    <td>
+                        <admintable-date-edit-btns :item="item"  :data="slotProps.data" />
+                    </td>
+                </tr>  
+                
+                <tr :class="{hide: !slotProps.data.isShowCreate}">
+                    <td></td>
+                    <td><input type="text" v-model="slotProps.data.create.name" placeholder="租户名称" /></td>
+                    <td>
+                        <input type="text" v-model="slotProps.data.create.code" placeholder="租户编码" />
+                        <!--       <select v-model="create.objGroup">
+                        <option v-for="(k, v) in OBJECT_GROUP" :value="v">
+                            {{k}}-{{v}}
+                        </option>
+                    </select> -->
+                    </td>
+                    <td><input type="text" v-model="slotProps.data.create.content" placeholder="租户简介" /></td>
+                    <td></td>
+                    <td></td>
+
+            <!--         <td>
+                        <select v-model="create.combatParty" style="width:80px">
+                            <option value="1">红方-1</option>
+                            <option value="2">蓝方-2</option>
+                            <option value="3">中立（如红十字会医院等）-3</option>
+                            <option value="4">情报（针对拍摄的图片）-4</option>
+                        </select>
+                    </td>
+                    <td>
+                        <input type="text" v-model="create.objTypeImg" placeholder="对象类型图标" style="width:150px" />
+                    </td>
+                    <td>
+                        <input type="number" v-model="create.objTypeNum" placeholder="对象类型预设数量" style="width:50px" />
+                    </td> -->
+                    <td>
+                        <a href="#" @click="$children[0].doCreate">新增</a> | <a href="#" @click="slotProps.data.isShowCreate = false">取消</a>
+                    </td>
                 </tr>
-            </thead>
-            <tr v-for="(item) in mapList">
-                <td>{{item.id}}</td>
-                <td>
-                    <span v-show="editingId != item.id">{{item.name}}</span>
-                    <input type="text" v-show="editingId == item.id" v-model="item.name" />
-                </td>
-                <td>
-                    <span v-show="editingId != item.id">{{item.code}}</span>
-                    <input type="text" v-show="editingId == item.id" v-model="item.code" />
-                </td>
-                <td>
-                    <span v-show="editingId != item.id">{{item.content}}</span>
-                    <input type="text" v-show="editingId == item.id" v-model="item.content" />
-                </td>
-                <td>
-                    {{item.createDate.slice(0, -3)}}
-                </td>
-                <td>
-                    <span v-show="editingId != item.id">{{STAT[item.stat]}}</span>
-
-                    <select v-show="editingId == item.id" v-model="item.stat" v-model="item.stat" style="width:80px">
-                        <option value="0">正常</option>
-                        <option value="1">已禁用</option>
-                        <option value="2">已删除</option>
-                    </select>
-                </td>
-
-                <td>
-                    <a href="#" @click="del(item.id)" v-show="editingId != item.id"><span style="color:red">✖</span>
-                        删除</a>
-                    <a href="#" @click="save(item)" v-show="editingId == item.id"><span style="color:green">✔</span>
-                        保存</a>
-                    |
-                    <a href="#" @click="editingId = item.id" v-show="editingId != item.id">编辑</a>
-                    <a href="#" @click="editingId = 0" v-show="editingId == item.id"> 取消</a>
-                </td>
-            </tr>
-            <tr :class="{hide: !isShowCreate}">
-                <td></td>
-                <td><input type="text" v-model="create.name" /></td>
-                <td>
-                    <!--       <select v-model="create.objGroup">
-                    <option v-for="(k, v) in OBJECT_GROUP" :value="v">
-                        {{k}}-{{v}}
-                    </option>
-                </select> -->
-                </td>
-
-                <td>
-                    <select v-model="create.combatParty" style="width:80px">
-                        <option value="1">红方-1</option>
-                        <option value="2">蓝方-2</option>
-                        <option value="3">中立（如红十字会医院等）-3</option>
-                        <option value="4">情报（针对拍摄的图片）-4</option>
-                    </select>
-                </td>
-                <td>
-                    <input type="text" v-model="create.objTypeImg" placeholder="对象类型图标" style="width:150px" />
-                </td>
-                <td>
-                    <input type="number" v-model="create.objTypeNum" placeholder="对象类型预设数量" style="width:50px" />
-                </td>
-                <td>
-                    <a href="#" @click="doCreate">新增</a> | <a href="#" @click="isShowCreate = false">取消</a>
-                </td>
-            </tr>
-
-        </table>
-        <div class="pagination">
-            <!-- Display paginated data -->
-            <a @click="prevPage" :class="{ disabled: page.currentPage === 1 }" href="javascript:void(0)">Previous</a>
-            <a v-for="p in totalPages" :key="p" @click="goToPage(p)"
-                :class="{ active: p === page.currentPage }" href="javascript:void(0)">
-                {{ p }}
-            </a>
-            <a @click="nextPage" :class="{ disabled: page.currentPage === totalPages }"
-                href="javascript:void(0)">Next</a>
-            <span>第 {{ page.currentPage }} 页，共 {{ totalPages }} 页</span>，共 {{page.totalCount}} 条数据
-        </div>
+            </template>
+        </admintable>
     </div>
 
-    <script src="tenant.js"></script>
+    <script src="common/component.js"></script>
+    <script>
+        new Vue({
+            el: '#vue'
+        });
+    </script>
 </body>
 
 </html>
