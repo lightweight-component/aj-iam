@@ -31,7 +31,8 @@ public class IamUtils {
      */
     public static void responseHTML(HttpServletResponse resp, String html) {
         // 设置响应的Content-Type为text/html，告知客户端将要接收的內容类型。
-        resp.setContentType("text/html");
+        resp.setContentType("text/html; charset=UTF-8");
+        resp.setCharacterEncoding("UTF-8");
 
         try {
             // 通过响应对象的getWriter方法获取到输出流，然后将HTML字符串写入到输出流中。

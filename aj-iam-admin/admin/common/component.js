@@ -100,7 +100,7 @@ Vue.component('admintable', {
         this.page.totalCount = json.data.totalCount;
       }, {
         header: {
-          Authorization: 'Bearer ' + accessToken,
+          // Authorization: 'Bearer ' + accessToken,
           'auth-tenant-id': localStorage.getItem('tenantId') || ''
         }
       });
@@ -135,7 +135,7 @@ Vue.component('admintable', {
         }
       }, {
         header: {
-          Authorization: 'Bearer ' + accessToken
+          // Authorization: 'Bearer ' + accessToken
         }
       });
     },
@@ -148,7 +148,7 @@ Vue.component('admintable', {
           }
         }, {
           header: {
-            Authorization: 'Bearer ' + accessToken
+            // Authorization: 'Bearer ' + accessToken
           }
         });
       }
@@ -164,7 +164,7 @@ Vue.component('admintable', {
         }
       }, {
         header: {
-          Authorization: 'Bearer ' + accessToken
+          // Authorization: 'Bearer ' + accessToken
         }
       });
     }

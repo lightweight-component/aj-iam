@@ -59,8 +59,8 @@
     <dependencies>
         <dependency>
             <groupId>com.ajaxjs</groupId>
-            <artifactId>aj-iam-common</artifactId>
-            <version>1.0</version>
+            <artifactId>aj-iam-client</artifactId>
+            <version>1.1</version>
         </dependency>
 
         <dependency>

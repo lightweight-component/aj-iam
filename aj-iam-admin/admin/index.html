@@ -48,11 +48,29 @@
         <iframe src="welcome.html" name="iframe"></iframe>
     </div>
     <div class="userInfo">
-        Amdin 已登录，<a href="#"
-            onclick="localStorage.removeItem('accessToken');localStorage.removeItem('userInfo');location.assign('.')">登出</a>。
+        <a href="#" class="username"></a> 已登录，<a href="#" onclick="logout()">登出</a>。
         切换租户 <select class="tenantSelect" onchange="changeTenant(this)"></select>
 
         <script>
+            ; (() => {
+                const userInfo = JSON.parse(localStorage.getItem('userInfo') || '{}');
+                const usernameEl = document.querySelector('.username');
+                usernameEl.textContent = userInfo.loginId || '未登录';
+            })();
+
+            function logout() {
+                aj.xhr.postForm('../../iam_api/user/logout', {}, json => {
+                    if (json.status) {
+                        localStorage.removeItem('accessToken');
+                        localStorage.removeItem('userInfo');
+
+                        location.assign('../../iam_api/client/to_login?web_url=' + encodeURIComponent(location.href));
+                    } else {
+                        alert('登出失败：' + json.message);
+                    }
+                });
+            }
+
             setTimeout(() => {
                 // 显示选中项
                 var tenantId = localStorage.getItem("tenantId");
@@ -92,7 +110,7 @@
                 });
             }, {
                 header: {
-                    Authorization: 'Bearer ' + accessToken
+                    // Authorization: 'Bearer ' + accessToken
                 }
             });
 

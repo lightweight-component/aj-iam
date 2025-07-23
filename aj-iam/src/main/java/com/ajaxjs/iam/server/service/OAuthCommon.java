@@ -4,17 +4,15 @@ import com.ajaxjs.framework.model.BusinessException;
 import com.ajaxjs.iam.server.common.IamConstants;
 import com.ajaxjs.iam.server.common.IamUtils;
 import com.ajaxjs.iam.server.model.AccessToken;
+import com.ajaxjs.iam.server.model.JwtAccessToken;
 import com.ajaxjs.iam.server.model.po.AccessTokenPo;
 import com.ajaxjs.iam.server.model.po.App;
 import com.ajaxjs.iam.user.common.session.UserSession;
 import com.ajaxjs.iam.user.model.User;
+import com.ajaxjs.spring.cache.smallredis.Cache;
 import com.ajaxjs.sqlman.Sql;
 import com.ajaxjs.sqlman.crud.Entity;
-import com.ajaxjs.util.EncodeTools;
-import com.ajaxjs.util.MessageDigestHelper;
-import com.ajaxjs.util.RandomTools;
-import com.ajaxjs.spring.cache.smallredis.Cache;
-import com.ajaxjs.util.StrUtil;
+import com.ajaxjs.util.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.util.StringUtils;
@@ -25,7 +23,9 @@ import java.util.Calendar;
 import java.util.Date;
 
 public abstract class OAuthCommon implements IamConstants {
-    static final String NOT_LOGIN_TEXT = "<meta http-equiv=\"refresh\" content=\"2;url=%s\" /> 用户尚未登录，两秒后跳转到登录页面……";
+    static final String NOT_LOGIN_TEXT = " <meta charset=\"UTF-8\" /><meta http-equiv=\"refresh\" content=\"2;url=%s\" /> " +
+            "User Not login, wait 2 seconds to redirect the login page...<br />" +
+            "用户尚未登录，两秒后跳转到登录页面……";
 
     @Autowired
     UserSession userSession;
@@ -42,7 +42,14 @@ public abstract class OAuthCommon implements IamConstants {
         if (user == null) { // 未登录
             // 返回一段 HTML
             String qs = req.getQueryString();
-            String html = String.format(NOT_LOGIN_TEXT, "../login?" + qs);
+
+            // 根据 appId 获取登录地址
+            String loginPage = Sql.newInstance().input("SELECT login_page FROM app WHERE stat = 0 AND client_id = ?", clientId).queryOne(String.class);
+
+            if (StrUtil.isEmptyText(loginPage))
+                throw new BusinessException("应用或登录地址不存在");
+
+            String html = String.format(NOT_LOGIN_TEXT, loginPage + "?" + qs);
             IamUtils.responseHTML(resp, html);
         } else {// 已登录，发送授权码
             StringBuilder sb = new StringBuilder();
@@ -51,9 +58,11 @@ public abstract class OAuthCommon implements IamConstants {
             String code = MessageDigestHelper.getSHA1(clientId + RandomTools.generateRandomString(6));
             sb.append("&code=").append(code);
 
-            if (StringUtils.hasText(webUrl)) sb.append("&web_url=").append(webUrl);
+            if (StringUtils.hasText(webUrl))
+                sb.append("&web_url=").append(webUrl);
 
-            if (!StringUtils.hasText(scope)) scope = "DEFAULT_SCOPE";
+            if (!StringUtils.hasText(scope))
+                scope = "DEFAULT_SCOPE";
 
             if (user.getTenantId() != null)
                 scope += ";tenantId=" + user.getTenantId();
@@ -122,10 +131,14 @@ public abstract class OAuthCommon implements IamConstants {
         return minutes * 60 * 1000;
     }
 
+    public void createToken(AccessToken accessToken, App app, String grantType) {
+        createToken(accessToken, app, grantType, null);
+    }
+
     /**
      * 创建 Token
      */
-    public void createToken(AccessToken accessToken, App app, String grantType) {
+    public void createToken(AccessToken accessToken, App app, String grantType, User user) {
         accessToken.setAccess_token(RandomTools.uuid(false));
         accessToken.setRefresh_token(RandomTools.uuid(false));
 
@@ -140,6 +153,14 @@ public abstract class OAuthCommon implements IamConstants {
         save.setGrantType(grantType);
         save.setClientId(app.getClientId());
         save.setCreateDate(new Date());
+
+        if (user != null) {
+            save.setUserId(user.getId());
+            save.setUserName(user.getLoginId());
+        }
+
+        if (accessToken instanceof JwtAccessToken)
+            save.setJwtToken(JsonUtil.toJson(accessToken));
 
         Entity.newInstance().input(save).create(Long.class);
     }

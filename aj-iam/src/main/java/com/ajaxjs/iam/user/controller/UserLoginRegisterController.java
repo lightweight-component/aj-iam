@@ -3,10 +3,10 @@ package com.ajaxjs.iam.user.controller;
 //import com.ajaxjs.framework.filter.google_captcha.GoogleCaptchaCheck;
 
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.util.Map;
 
 /**
@@ -39,7 +39,7 @@ public interface UserLoginRegisterController {
      * 用户登出
      */
     @PostMapping("/logout")
-    ModelAndView logout(@RequestParam(required = false) String returnUrl);
+    boolean logout(@RequestParam(required = false) String returnUrl, HttpServletResponse resp, HttpSession session);
 
     /**
      * 用户注册

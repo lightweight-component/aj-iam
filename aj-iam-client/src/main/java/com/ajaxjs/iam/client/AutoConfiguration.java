@@ -53,7 +53,7 @@ public class AutoConfiguration implements WebMvcConfigurer {
                     else
                         log.info("IAM 服务连接成功");
                 } catch (Throwable e) {
-                    e.printStackTrace();
+                    log.warn("testIamConnection", e);
                 }
             });
         }

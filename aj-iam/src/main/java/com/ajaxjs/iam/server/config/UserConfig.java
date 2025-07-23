@@ -24,14 +24,14 @@ public class UserConfig {
         return e::md5salt;
     }
 
-    @Value("${User.oidc.jwtSecretKey:Df87sD#$%#A}")
-    private String jwtSecretKey;
-
-    @Bean
-    JWebTokenMgr jWebTokenMgr() {
-        JWebTokenMgr mgr = new JWebTokenMgr();
-        mgr.setSecretKey(jwtSecretKey);
-
-        return mgr;
-    }
+//    @Value("${User.oidc.jwtSecretKey:Df87sD#$%#A}")
+//    private String jwtSecretKey;
+//
+//    @Bean
+//    JWebTokenMgr jWebTokenMgr() {
+//        JWebTokenMgr mgr = new JWebTokenMgr();
+//        mgr.setSecretKey(jwtSecretKey);
+//
+//        return mgr;
+//    }
 }

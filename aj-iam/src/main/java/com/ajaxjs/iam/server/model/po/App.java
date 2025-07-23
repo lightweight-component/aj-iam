@@ -46,7 +46,12 @@ public class App extends BaseModel {
     private String logo;
 
     /**
+     * 登录页面的 URL 地址
+     */
+    private String loginPage;
+
+    /**
      * 租户 id
      */
-    private Long tenantId;
+    private Integer tenantId;
 }

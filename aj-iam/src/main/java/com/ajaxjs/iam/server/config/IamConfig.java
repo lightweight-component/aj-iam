@@ -3,7 +3,7 @@ package com.ajaxjs.iam.server.config;
 import com.ajaxjs.base.Sdk;
 import com.ajaxjs.framework.database.DataBaseConnection;
 
-import com.ajaxjs.iam.server.controller.UserInterceptor;
+//import com.ajaxjs.iam.server.controller.UserInterceptor;
 import com.ajaxjs.iam.server.service.OidcService;
 import com.ajaxjs.iam.user.common.session.ServletUserSession;
 import com.ajaxjs.iam.user.common.session.UserSession;
@@ -87,27 +87,27 @@ public class IamConfig implements WebMvcConfigurer {
 //        return g;
 //    }
 
-    @Bean
-    UserInterceptor authInterceptor() {
-        return new UserInterceptor();
-    }
+//    @Bean
+//    UserInterceptor authInterceptor() {
+//        return new UserInterceptor();
+//    }
 
     /**
      * 加入认证拦截器
      */
-    @Override
-    public void addInterceptors(InterceptorRegistry registry) {
-        log.info("初始化 SSO 拦截器");
-        InterceptorRegistration interceptorRegistration = registry.addInterceptor(authInterceptor()).order(2);
-//        registry.addInterceptor(googleCaptchaMvcInterceptor());
-        interceptorRegistration.addPathPatterns("/**").excludePathPatterns("/favicon.ico"); // 拦截所有
-
-        // 不需要的拦截路径
-        if (StrUtil.hasText(excludes)) {
-            String[] arr = excludes.split(",|\\|");
-            interceptorRegistration.excludePathPatterns(arr);
-        }
-    }
+//    @Override
+//    public void addInterceptors(InterceptorRegistry registry) {
+//        log.info("初始化 SSO 拦截器");
+//        InterceptorRegistration interceptorRegistration = registry.addInterceptor(authInterceptor()).order(2);
+////        registry.addInterceptor(googleCaptchaMvcInterceptor());
+//        interceptorRegistration.addPathPatterns("/**").excludePathPatterns("/favicon.ico"); // 拦截所有
+//
+//        // 不需要的拦截路径
+//        if (StrUtil.hasText(excludes)) {
+//            String[] arr = excludes.split(",|\\|");
+//            interceptorRegistration.excludePathPatterns(arr);
+//        }
+//    }
 
     @Bean
     Cache<String, Object> simpleJvmCache() {

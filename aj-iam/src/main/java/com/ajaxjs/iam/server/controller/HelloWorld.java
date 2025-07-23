@@ -16,9 +16,9 @@ public class HelloWorld {
     @AllowAccess
     ResponseResultWrapper sayHi() {
         ResponseResultWrapper result = new ResponseResultWrapper();
+        result.setStatus(1);
         result.setData("Hello World");
 
-        ResponseEntity l;
         return result;
     }
 }

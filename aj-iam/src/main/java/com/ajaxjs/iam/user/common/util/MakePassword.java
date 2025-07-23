@@ -1,5 +1,7 @@
 package com.ajaxjs.iam.user.common.util;
 
+import com.ajaxjs.util.StrUtil;
+
 import java.util.Random;
 
 /**
@@ -70,7 +72,7 @@ public class MakePassword {
      */
     public static String randomPassword(int length) {
         if (length < 4)
-            return "";
+            return StrUtil.EMPTY_STRING;
 
         char[] chars = new char[length];
         Random rnd = new Random();

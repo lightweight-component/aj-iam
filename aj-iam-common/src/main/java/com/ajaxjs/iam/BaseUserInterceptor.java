@@ -1,5 +1,6 @@
 package com.ajaxjs.iam;
 
+import com.ajaxjs.util.StrUtil;
 import com.ajaxjs.util.WebUtils;
 import lombok.extern.slf4j.Slf4j;
 
@@ -63,10 +64,10 @@ public abstract class BaseUserInterceptor {
 
             if (token == null) {
 
-                token = WebUtils.getCookie(request, "token");
+                token = WebUtils.getCookie(request, UserConstants.ACCESS_TOKEN_KEY);
                 // 如果从请求头的"token"字段提取不到token，尝试从请求参数的"access_token"字段提取
                 if (token == null) {
-                    token = request.getParameter("access_token");
+                    token = request.getParameter(UserConstants.ACCESS_TOKEN_KEY);
 
                     // 如果上述方式都提取不到 token，记录警告日志
                     if (token == null)
@@ -75,7 +76,10 @@ public abstract class BaseUserInterceptor {
             }
         }
 
-        if(token.toLowerCase().startsWith(BEARER_TYPE))
+        if (StrUtil.isEmptyText(token))
+            return null;
+
+        if (token.toLowerCase().startsWith(BEARER_TYPE))
             token = token.substring(7).trim();
 
         return token;

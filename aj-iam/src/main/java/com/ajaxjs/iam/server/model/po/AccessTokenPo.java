@@ -26,6 +26,11 @@ public class AccessTokenPo {
     private String refreshToken;
 
     /**
+     * JWT Token JSON 格式，以便复用
+     */
+    private String jwtToken;
+
+    /**
      * 关联的用户 id
      */
     private Long userId;

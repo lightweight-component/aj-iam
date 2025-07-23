@@ -1,5 +1,6 @@
 package com.ajaxjs.iam.user.common.util;
 
+import com.ajaxjs.util.StrUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.StringUtils;
 
@@ -13,21 +14,16 @@ import java.util.StringJoiner;
  */
 @Slf4j
 public class StarHandleUtils {
-    /**
-     * 空的字符串（""）
-     */
-    public static final String BLANK = "";
-
     public static String ip(String ip) {
         if (!StringUtils.hasText(ip))
-            return BLANK;
+            return StrUtil.EMPTY_STRING;
 
         String[] array = ip.split("\\.");
 
         if (array.length == 4)
             return String.format("%s.%s.*.*", array[0], array[1]);
 
-        return BLANK;
+        return StrUtil.EMPTY_STRING;
     }
 
     /**
@@ -41,7 +37,7 @@ public class StarHandleUtils {
      */
     public static String phone(String phone) {
         if (!StringUtils.hasText(phone))
-            return BLANK;
+            return StrUtil.EMPTY_STRING;
 
         if (phone.length() == 11) {
             String left = getLeft(phone, 3);
@@ -50,7 +46,7 @@ public class StarHandleUtils {
             return left + star + right;
         }
 
-        return BLANK;
+        return StrUtil.EMPTY_STRING;
     }
 
     /**
@@ -61,7 +57,7 @@ public class StarHandleUtils {
      */
     public static String email(String email) {
         if (!StringUtils.hasText(email))
-            return BLANK;
+            return StrUtil.EMPTY_STRING;
 
         int index = email.lastIndexOf("@");
 
@@ -74,7 +70,7 @@ public class StarHandleUtils {
             return left + star + right;
         }
 
-        return BLANK;
+        return StrUtil.EMPTY_STRING;
     }
 
     /**
@@ -101,10 +97,10 @@ public class StarHandleUtils {
      */
     public static String idCardNo(String idCardNo, int leftLength, int rightLength) {
         if (!StringUtils.hasText(idCardNo))
-            return BLANK;
+            return StrUtil.EMPTY_STRING;
 
         if (idCardNo.length() <= leftLength + rightLength)
-            return BLANK;
+            return StrUtil.EMPTY_STRING;
 
         String leftString = getLeft(idCardNo, leftLength);
         String rightString = getRight(idCardNo, rightLength);
@@ -137,7 +133,7 @@ public class StarHandleUtils {
      */
     public static String realName(String realName) {
         if (!StringUtils.hasText(realName))
-            return BLANK;
+            return StrUtil.EMPTY_STRING;
 
         if (realName.length() == 2) {
             String right = getRight(realName, 1);
@@ -162,7 +158,7 @@ public class StarHandleUtils {
      * @return 生成一个指定长度的星号（*）字符串
      */
     public static String generateStar(int length) {
-        StringJoiner sj = new StringJoiner("", "", "");
+        StringJoiner sj = new StringJoiner(StrUtil.EMPTY_STRING, StrUtil.EMPTY_STRING, StrUtil.EMPTY_STRING);
 
         for (int i = 0; i < length; i++)
             sj.add("*");

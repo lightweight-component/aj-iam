@@ -9,9 +9,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @ComponentScan("com.ajaxjs.iam")
 public class IamServerApp {
     public static void main(String[] args) {
-        WebMvcConfigurer l;
         SpringApplication.run(IamServerApp.class, args);
-        System.out.println("(♥◠‿◠)ﾉﾞ  AJ-IAM-Server 启动成功   ლ(´ڡ`ლ)ﾞ  \n" +
-                "=========================================【AJ-IAM-Server】==================================================");
+        System.out.println("=========================================(♥◠‿◠)ﾉﾞ 【AJ-IAM-Server 启动成功】ლ(´ڡ`ლ)ﾞ==================================================");
     }
 }

@@ -70,7 +70,6 @@ public class OAuthClientController {
         String savedState = (String) session.getAttribute(ClientUtils.OAUTH_STATE);
 
         if (!state.equals(savedState)) { // 检查返回的 state 值是否与之前保存的值匹配
-
             ClientUtils.returnForbidden(resp);
         }
 

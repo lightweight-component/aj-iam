@@ -4,6 +4,8 @@ package com.ajaxjs.iam;
  * 用户常量
  */
 public interface UserConstants {
+    String ACCESS_TOKEN_KEY = "access_token";
+
     String REDIS_PREFIX = "USER:";
 
     String USER_KEY_IN_REQUEST = "USER_KEY_IN_REQUEST";

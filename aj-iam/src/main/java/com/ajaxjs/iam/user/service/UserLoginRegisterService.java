@@ -17,6 +17,7 @@ import com.ajaxjs.sqlman.crud.Entity;
 import com.ajaxjs.sqlman.util.SnowflakeId;
 import com.ajaxjs.sqlman.util.Utils;
 import com.ajaxjs.util.RandomTools;
+import com.ajaxjs.util.StrUtil;
 import com.ajaxjs.util.WebUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,10 +25,11 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
-import org.springframework.web.servlet.ModelAndView;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
@@ -50,7 +52,14 @@ public class UserLoginRegisterService implements UserLoginRegisterController, Us
     @Override
 //    @GoogleCaptchaCheck
     public boolean login(String loginId, String password, String returnUrl, HttpServletRequest req, HttpServletResponse resp) {
-        User user = getUserLoginByPassword(loginId, password, 0L);
+        Integer tenantId;
+
+        if ("admin".equals(loginId)) // 超级管理员不属于任何租户
+            tenantId = 0;
+        else
+            tenantId = TenantService.getTenantId();
+
+        User user = getUserLoginByPassword(loginId, password, tenantId);
 
         // 会员登录之后的动作，会保存 userId 和 userName 在 Session 中
         userSession.put(UserSession.SESSION_KEY + user.getId() + "-" + RandomTools.generateRandomString(4), user); // 同一个用户多端登录，加随机码区分
@@ -81,7 +90,7 @@ public class UserLoginRegisterService implements UserLoginRegisterController, Us
     /**
      * 密码支持帐号、邮件、手机作为身份凭证
      */
-    public User getUserLoginByPassword(String loginId, String password, Long tenantId) {
+    public User getUserLoginByPassword(String loginId, String password, Integer tenantId) {
         loginId = loginId.trim();
         password = password.trim();
 
@@ -106,8 +115,21 @@ public class UserLoginRegisterService implements UserLoginRegisterController, Us
     }
 
     @Override
-    public ModelAndView logout(String returnUrl) {
-        return null;
+    public boolean logout(String returnUrl, HttpServletResponse resp, HttpSession session) {
+        session.invalidate(); // 销毁会话
+        // 清除 HttpOnly Cookie
+        Cookie cookie = new Cookie(UserConstants.ACCESS_TOKEN_KEY, StrUtil.EMPTY_STRING);
+        cookie.setHttpOnly(true);
+        cookie.setSecure(false);
+        cookie.setPath("/");
+        cookie.setMaxAge(0);
+        resp.addCookie(cookie);
+
+        if (StrUtil.hasText(returnUrl)) {
+
+        }
+
+        return true;
     }
 
     @Override

@@ -2,6 +2,7 @@ package com.ajaxjs.iam.client;
 
 import com.ajaxjs.iam.jwt.JwtAccessToken;
 import com.ajaxjs.util.JsonUtil;
+import com.ajaxjs.util.ObjectHelper;
 import com.ajaxjs.util.RandomTools;
 import com.ajaxjs.util.http_request.Post;
 import com.ajaxjs.util.http_request.SkipSSL;
@@ -10,11 +11,7 @@ import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.*;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.ModelAndView;
@@ -26,7 +23,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
 @Data
 @Slf4j
@@ -53,20 +49,20 @@ public abstract class BaseOidcClientUserController {
     /**
      * 获取重定向视图，用于认证流程中的第一步：跳转到登录页面。
      *
-     * @param session       HttpSession 对象，用于保存和管理用户会话信息。
-     * @param userLoginCode 用户登录代码，通常是登录页面的 URL 后缀。
-     * @param clientId      客户端 ID，用于识别请求 OAuth 服务的应用。
-     * @param websiteUrl    应用的网站 URL，授权服务器完成授权后会重定向到该 URL 的回调接口。
-     * @param webUrl        前端页面地址，用于跳到这里以便获取 Token。
+     * @param session           HttpSession 对象，用于保存和管理用户会话信息。
+     * @param userLoginCode     用户登录代码，通常是登录页面的 URL 后缀。
+     * @param clientId          客户端 ID，用于识别请求 OAuth 服务的应用。
+     * @param clientCallbackUrl 应用的网站 URL，授权服务器完成授权后会重定向到该 URL 的回调接口。
+     * @param webUrl            前端页面地址，用于跳到这里以便获取 Token。
      * @return RedirectView 返回一个重定向视图对象，包含了构造的重定向 URL。
      */
-    public RedirectView loginPageUrl(HttpSession session, String userLoginCode, String clientId, String websiteUrl, String webUrl) {
+    public RedirectView loginPageUrl(HttpSession session, String userLoginCode, String clientId, String clientCallbackUrl, String webUrl) {
         String state = RandomTools.generateRandomString(5);
         session.setAttribute(ClientUtils.OAUTH_STATE, state);// 将 state 值保存到会话中
         log.info("set state code:" + state);
 
         String url = userLoginCode + "?response_type=code&client_id=" + clientId;
-        url += "&redirect_uri=" + urlEncode(websiteUrl + "/user/callback");
+        url += "&redirect_uri=" + urlEncode(clientCallbackUrl);
         url += "&state=" + state;
 
         if (StringUtils.hasText(webUrl))
@@ -97,7 +93,7 @@ public abstract class BaseOidcClientUserController {
     /**
      * 用 AccessToken 可用的时候
      */
-    public abstract JwtAccessToken onAccessTokenGot(JwtAccessToken token, HttpSession session);
+    public abstract JwtAccessToken onAccessTokenGot(JwtAccessToken token, HttpServletResponse resp, HttpSession session);
 
     public ModelAndView callbackToken(String clientId, String clientSecret, String code, String state, String webUrl, HttpSession session, HttpServletResponse resp) {
         // 从会话中获取之前保存的 state 值
@@ -111,36 +107,44 @@ public abstract class BaseOidcClientUserController {
         } else
             session.removeAttribute(ClientUtils.OAUTH_STATE);
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-        headers.setBasicAuth(clientId, clientSecret);
+//        HttpHeaders headers = new HttpHeaders();
+//        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+//        headers.setBasicAuth(clientId, clientSecret);
+//
+//        MultiValueMap<String, String> bodyParams = new LinkedMultiValueMap<>();
+//        bodyParams.add("grant_type", "authorization_code");
+//        bodyParams.add("code", code);
+//        bodyParams.add("state", state);
 
-        MultiValueMap<String, String> bodyParams = new LinkedMultiValueMap<>();
-        bodyParams.add("grant_type", "authorization_code");
-        bodyParams.add("code", code);
-        bodyParams.add("state", state);
-
-        RestTemplate restTemplate = getRestTemplate();
         log.info("code:" + code);
         log.info("state:" + state);
         log.info("clientId:" + clientId);
         log.info("clientSecret:" + clientSecret);
-        ResponseEntity<JwtAccessToken> responseEntity = restTemplate.exchange(getTokenApi(), HttpMethod.POST,
-                new HttpEntity<>(bodyParams, headers), new ParameterizedTypeReference<JwtAccessToken>() {
-                });
+//        RestTemplate restTemplate = getRestTemplate();
+//        ResponseEntity<JwtAccessToken> responseEntity = restTemplate.exchange(getTokenApi(), HttpMethod.POST,
+//                new HttpEntity<>(bodyParams, headers), new ParameterizedTypeReference<JwtAccessToken>() {
+//                });
 
-        if (responseEntity.getStatusCode().is2xxSuccessful()) {// 处理授权成功的逻辑，例如解析并保存访问令牌和刷新令牌等
-            JwtAccessToken jwt = onAccessTokenGot(Objects.requireNonNull(responseEntity.getBody()), session);
 
-            if (StringUtils.hasText(webUrl)) {
-//                String jwtJson = Utils.bean2json(jwt);
+        Map<String, String> params = ObjectHelper.mapOf("grant_type", "authorization_code", "code", code, "state", state);
+        Map<String, Object> result = Post.api(getTokenApi(), params, conn -> conn.setRequestProperty("Authorization", ClientCredentials.encodeClient(clientId, clientSecret)));
 
-                return new ModelAndView(new RedirectView(webUrl + "?token=" + urlEncode(jwt.getId_token())));
-            } else
-                return new ModelAndView("redirect:/");
+        if (result != null) {// 处理授权成功的逻辑，例如解析并保存访问令牌和刷新令牌等
+            if ((int) result.get("status") == 1) {
+                JwtAccessToken jwt = JsonUtil.map2pojo((Map<String, Object>) result.get("data"), JwtAccessToken.class);
+                onAccessTokenGot(jwt, resp, session);
+
+                if (StringUtils.hasText(webUrl)) {
+
+                    return new ModelAndView(new RedirectView(webUrl + "?token=" + urlEncode(jwt.getId_token())));
+                } else
+                    return new ModelAndView("redirect:/");
+            } else {
+                log.info("error:" + result);
+                throw new SecurityException("获取 JWT Token 失败，原因: " + result.get("message"));
+            }
         } else {
-            log.info("error:" + responseEntity.getBody());
-            System.out.println(responseEntity);
+
 //			 处理授权失败的逻辑
             throw new SecurityException("获取 JWT Token 失败");
         }
