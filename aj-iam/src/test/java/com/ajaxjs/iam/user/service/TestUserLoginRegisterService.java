@@ -37,7 +37,7 @@ public class TestUserLoginRegisterService extends BaseTest {
 
     @Test
     public void testGetUserLoginByPassword() {
-        User admin = userLoginRegisterService.getUserLoginByPassword("admin", "123123", 0L);
+        User admin = userLoginRegisterService.getUserLoginByPassword("admin", "123123", 0);
         assertNotNull(admin);
 
         HttpSession s = mock(HttpSession.class);

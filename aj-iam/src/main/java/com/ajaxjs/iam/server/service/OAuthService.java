@@ -7,7 +7,7 @@ import com.ajaxjs.iam.server.model.AccessToken;
 import com.ajaxjs.iam.server.model.po.AccessTokenPo;
 import com.ajaxjs.iam.server.model.po.App;
 import com.ajaxjs.iam.user.model.User;
-import com.ajaxjs.spring.cache.smallredis.Cache;
+import com.ajaxjs.framework.cache.smallredis.Cache;
 import com.ajaxjs.sqlman.Sql;
 import com.ajaxjs.sqlman.crud.Entity;
 import com.ajaxjs.util.RandomTools;

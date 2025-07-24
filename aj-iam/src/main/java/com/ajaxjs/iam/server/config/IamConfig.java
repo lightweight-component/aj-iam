@@ -1,28 +1,22 @@
 package com.ajaxjs.iam.server.config;
 
 import com.ajaxjs.base.Sdk;
-import com.ajaxjs.framework.database.DataBaseConnection;
 
 //import com.ajaxjs.iam.server.controller.UserInterceptor;
 import com.ajaxjs.iam.server.service.OidcService;
 import com.ajaxjs.iam.user.common.session.ServletUserSession;
 import com.ajaxjs.iam.user.common.session.UserSession;
-import com.ajaxjs.spring.cache.smallredis.Cache;
-import com.ajaxjs.spring.cache.smallredis.ExpiryCache;
+import com.ajaxjs.framework.cache.smallredis.Cache;
+import com.ajaxjs.framework.cache.smallredis.ExpiryCache;
 import com.ajaxjs.util.JsonUtil;
-import com.ajaxjs.util.StrUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.servlet.config.annotation.CorsRegistry;
-import org.springframework.web.servlet.config.annotation.InterceptorRegistration;
-import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-import javax.sql.DataSource;
 import java.util.function.Function;
 
 import static com.ajaxjs.iam.server.common.IamConstants.JWT_TOKEN_USER_KEY;
