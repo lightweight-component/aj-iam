@@ -1,7 +1,6 @@
 package com.ajaxjs.iam.client;
 
 
-import com.ajaxjs.iam.jwt.JwtUtils;
 import com.ajaxjs.util.EncodeTools;
 import lombok.Data;
 import org.springframework.http.*;

@@ -5,15 +5,10 @@ import com.ajaxjs.util.JsonUtil;
 import com.ajaxjs.util.ObjectHelper;
 import com.ajaxjs.util.RandomTools;
 import com.ajaxjs.util.http_request.Post;
-import com.ajaxjs.util.http_request.SkipSSL;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.util.StringUtils;
-import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.view.RedirectView;
 
@@ -27,24 +22,16 @@ import java.util.Map;
 @Data
 @Slf4j
 public abstract class BaseOidcClientUserController {
-    @Value("${user.tokenApi}")
-    private String tokenApi;
+    @Value("${auth.iam_service: }")
+    private String iamService;
 
-    @Autowired(required = false)
-    RestTemplate restTemplate;
+    @Value("${auth.clientId}")
+    String clientId;
 
-    public RestTemplate getRestTemplate() {
-        if (restTemplate == null) {
-            SkipSSL.init(); // 忽略 SSL 证书
-            restTemplate = new RestTemplate();
+    @Value("${auth.clientSecret}")
+    String clientSecret;
 
-            MappingJackson2HttpMessageConverter converter = new MappingJackson2HttpMessageConverter();
-            converter.setObjectMapper(new ObjectMapper());
-            restTemplate.getMessageConverters().add(converter);
-        }
-
-        return restTemplate;
-    }
+    static Map<String, Object> TEMP_CACHE = new HashMap<>();
 
     /**
      * 获取重定向视图，用于认证流程中的第一步：跳转到登录页面。
@@ -58,7 +45,9 @@ public abstract class BaseOidcClientUserController {
      */
     public RedirectView loginPageUrl(HttpSession session, String userLoginCode, String clientId, String clientCallbackUrl, String webUrl) {
         String state = RandomTools.generateRandomString(5);
-        session.setAttribute(ClientUtils.OAUTH_STATE, state);// 将 state 值保存到会话中
+//        session.setAttribute(ClientUtils.OAUTH_STATE, state);// 将 state 值保存到会话中
+        TEMP_CACHE.put(ClientUtils.OAUTH_STATE, state);
+
         log.info("set state code:" + state);
 
         String url = userLoginCode + "?response_type=code&client_id=" + clientId;
@@ -97,7 +86,8 @@ public abstract class BaseOidcClientUserController {
 
     public ModelAndView callbackToken(String clientId, String clientSecret, String code, String state, String webUrl, HttpSession session, HttpServletResponse resp) {
         // 从会话中获取之前保存的 state 值
-        String savedState = (String) session.getAttribute(ClientUtils.OAUTH_STATE);
+//        String savedState = (String) session.getAttribute(ClientUtils.OAUTH_STATE);
+        String savedState = (String) TEMP_CACHE.get(ClientUtils.OAUTH_STATE);
 
         if (!state.equals(savedState)) { // 检查返回的 state 值是否与之前保存的值匹配
             ClientUtils.returnForbidden(resp);
@@ -107,27 +97,14 @@ public abstract class BaseOidcClientUserController {
         } else
             session.removeAttribute(ClientUtils.OAUTH_STATE);
 
-//        HttpHeaders headers = new HttpHeaders();
-//        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-//        headers.setBasicAuth(clientId, clientSecret);
-//
-//        MultiValueMap<String, String> bodyParams = new LinkedMultiValueMap<>();
-//        bodyParams.add("grant_type", "authorization_code");
-//        bodyParams.add("code", code);
-//        bodyParams.add("state", state);
-
         log.info("code:" + code);
         log.info("state:" + state);
         log.info("clientId:" + clientId);
         log.info("clientSecret:" + clientSecret);
-//        RestTemplate restTemplate = getRestTemplate();
-//        ResponseEntity<JwtAccessToken> responseEntity = restTemplate.exchange(getTokenApi(), HttpMethod.POST,
-//                new HttpEntity<>(bodyParams, headers), new ParameterizedTypeReference<JwtAccessToken>() {
-//                });
-
+        String tokenApi = getIamService() + "/oidc/token";
 
         Map<String, String> params = ObjectHelper.mapOf("grant_type", "authorization_code", "code", code, "state", state);
-        Map<String, Object> result = Post.api(getTokenApi(), params, conn -> conn.setRequestProperty("Authorization", ClientCredentials.encodeClient(clientId, clientSecret)));
+        Map<String, Object> result = Post.api(tokenApi, params, conn -> conn.setRequestProperty("Authorization", ClientCredentials.encodeClient(clientId, clientSecret)));
 
         if (result != null) {// 处理授权成功的逻辑，例如解析并保存访问令牌和刷新令牌等
             if ((int) result.get("status") == 1) {
@@ -135,8 +112,8 @@ public abstract class BaseOidcClientUserController {
                 onAccessTokenGot(jwt, resp, session);
 
                 if (StringUtils.hasText(webUrl)) {
-
-                    return new ModelAndView(new RedirectView(webUrl + "?token=" + urlEncode(jwt.getId_token())));
+//                    return new ModelAndView(new RedirectView(webUrl + "?token=" + urlEncode(jwt.getId_token())));
+                    return new ModelAndView(new RedirectView(webUrl));// 不要这样发送 token，改 cookie
                 } else
                     return new ModelAndView("redirect:/");
             } else {
@@ -150,15 +127,6 @@ public abstract class BaseOidcClientUserController {
         }
     }
 
-    @Value("${user.clientId}")
-    String clientId;
-
-    @Value("${user.clientSecret}")
-    String clientSecret;
-
-    @Value("${user.tenantId}")
-    Integer tenantId;
-
     public JwtAccessToken ropcLogin(String username, String password) {
         Map<String, Object> bodyParams = new HashMap<>();
         bodyParams.put("grant_type", "password");
@@ -166,7 +134,8 @@ public abstract class BaseOidcClientUserController {
         bodyParams.put("password", password);
         bodyParams.put("client_id", clientId);
         bodyParams.put("client_secret", clientSecret);
-        Map<String, Object> result = Post.api(getTokenApi(), bodyParams);
+        String tokenApi = getIamService() + "/oidc/token";
+        Map<String, Object> result = Post.api(tokenApi, bodyParams);
 
         if (result == null)
             throw new RuntimeException("获取 JWT Token 失败");
@@ -180,34 +149,5 @@ public abstract class BaseOidcClientUserController {
                 return token;
             }
         }
-
-//        HttpHeaders headers = new HttpHeaders();
-//        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-//
-//        MultiValueMap<String, String> bodyParams = new LinkedMultiValueMap<>();
-//        bodyParams.add("grant_type", "password");
-//        bodyParams.add("username", username);
-//        bodyParams.add("password", password);
-//        bodyParams.add("client_id", clientId);
-//        bodyParams.add("client_secret", clientSecret);
-//
-//        RestTemplate restTemplate = getRestTemplate();
-//        ResponseEntity<JwtAccessToken> responseEntity = null;
-//
-//        try {
-//            responseEntity = restTemplate.exchange(getTokenApi(), HttpMethod.POST,
-//                    new HttpEntity<>(bodyParams, headers), new ParameterizedTypeReference<JwtAccessToken>() {
-//                    });
-//
-//            System.out.println(responseEntity);
-//        } catch (HttpServerErrorException e) {
-//            log.error("ropcLogin:::", e);
-//            String json = e.getResponseBodyAsString();
-//            System.out.println(json);
-//            Map<String, Object> map = JsonUtil.json2map(json);
-//
-//            if (map.containsKey("message"))
-//                throw new RuntimeException(map.get("message").toString());
-//        }
     }
 }

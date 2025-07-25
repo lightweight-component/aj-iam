@@ -195,6 +195,13 @@ fieldset.fieldset-box li {
     /* 字体大小 */
 }
 
+.button-1.small {
+    width: 120px;
+    /* 宽度 */
+    height: 30px;
+    font-size: 15px;
+}
+
 .button-1:hover {
     /* 鼠标移入按钮范围时改变颜色 */
     background: #5599FF;
@@ -218,7 +225,8 @@ select {
 
 input[type=text],
 input[type=password],
-input[type=number] {
+input[type=number],
+textarea {
     padding: 0 6px;
     height: 28px;
     font-size: 14px;
@@ -229,10 +237,11 @@ input[type=number] {
     transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
 }
 
-input[type=text]:focus ,
-input[type=password]:focus ,
-input[type=number]:focus {
- border-color: gray;
+input[type=text]:focus,
+input[type=password]:focus,
+input[type=number]:focus,
+textarea:focus {
+    border-color: gray;
 }
 
 select:focus {
@@ -241,8 +250,11 @@ select:focus {
 
 
 
- .ellipsis {
-    white-space: nowrap; /* 强制文本在一行内显示 */
-    overflow: hidden; /* 隐藏超出宽度的内容 */
-    text-overflow: ellipsis; /* 当文本溢出时显示省略号 */
-  }
+.ellipsis {
+    white-space: nowrap;
+    /* 强制文本在一行内显示 */
+    overflow: hidden;
+    /* 隐藏超出宽度的内容 */
+    text-overflow: ellipsis;
+    /* 当文本溢出时显示省略号 */
+}

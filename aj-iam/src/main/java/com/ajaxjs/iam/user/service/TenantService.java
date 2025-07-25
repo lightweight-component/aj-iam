@@ -24,7 +24,7 @@ public class TenantService {
         return Objects.requireNonNull(DiContextUtil.getRequest()).getHeader(AUTH_TENANT_CODE);
     }
 
-    public static final String AUTH_TENANT_ID = "auth_tenant_id";
+    public static final String AUTH_TENANT_ID = "auth-tenant-id";
 
     /**
      * 从 HTTP 头中获取租户 id

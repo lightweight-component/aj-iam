@@ -3,7 +3,6 @@ package com.ajaxjs.iam.server.controller;
 import com.ajaxjs.iam.UserConstants;
 import com.ajaxjs.iam.client.BaseOidcClientUserController;
 import com.ajaxjs.iam.jwt.JwtAccessToken;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -39,20 +38,14 @@ public class ClientController extends BaseOidcClientUserController {
         return token;
     }
 
-    @Value("${user.clientId}")
-    private String clientId;
-
-    @Value("${user.clientSecret}")
-    private String clientSecret;
-
     @GetMapping("/to_login")
     public RedirectView loginPageUrl(HttpSession session, @RequestParam(required = false) String web_url) {
-        return loginPageUrl(session, "/iam_api/oidc/authorization", clientId, "/iam_api/client/callback", web_url);
+        return loginPageUrl(session, "/iam_api/oidc/authorization", getClientId(), "/iam_api/client/callback", web_url);
     }
 
     @GetMapping("/callback")
     public ModelAndView callbackToken(@RequestParam String code, @RequestParam String state, @RequestParam(required = false) String web_url, HttpSession session, HttpServletResponse resp) {
-        return callbackToken(clientId, clientSecret, code, state, web_url, session, resp);
+        return callbackToken(getClientId(), getClientSecret(), code, state, web_url, session, resp);
     }
 
 }

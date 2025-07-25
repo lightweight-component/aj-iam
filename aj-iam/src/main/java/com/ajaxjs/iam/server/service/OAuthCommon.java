@@ -1,5 +1,6 @@
 package com.ajaxjs.iam.server.service;
 
+import com.ajaxjs.framework.cache.smallredis.Cache;
 import com.ajaxjs.framework.model.BusinessException;
 import com.ajaxjs.iam.server.common.IamConstants;
 import com.ajaxjs.iam.server.common.IamUtils;
@@ -9,7 +10,7 @@ import com.ajaxjs.iam.server.model.po.AccessTokenPo;
 import com.ajaxjs.iam.server.model.po.App;
 import com.ajaxjs.iam.user.common.session.UserSession;
 import com.ajaxjs.iam.user.model.User;
-import com.ajaxjs.framework.cache.smallredis.Cache;
+import com.ajaxjs.iam.user.service.TenantService;
 import com.ajaxjs.sqlman.Sql;
 import com.ajaxjs.sqlman.crud.Entity;
 import com.ajaxjs.util.*;
@@ -43,8 +44,12 @@ public abstract class OAuthCommon implements IamConstants {
             // 返回一段 HTML
             String qs = req.getQueryString();
 
+            String loginPage;
+
             // 根据 appId 获取登录地址
-            String loginPage = Sql.newInstance().input("SELECT login_page FROM app WHERE stat = 0 AND client_id = ?", clientId).queryOne(String.class);
+//            loginPage = Sql.newInstance().input("SELECT login_page FROM app WHERE stat = 0 AND client_id = ?", clientId).queryOne(String.class);
+            // 根据 租户 获取登录地址
+            loginPage = Sql.newInstance().input("SELECT login_page FROM tenant WHERE stat = 0 AND id = ?", TenantService.getTenantId()).queryOne(String.class);
 
             if (StrUtil.isEmptyText(loginPage))
                 throw new BusinessException("应用或登录地址不存在");
@@ -153,6 +158,9 @@ public abstract class OAuthCommon implements IamConstants {
         save.setGrantType(grantType);
         save.setClientId(app.getClientId());
         save.setCreateDate(new Date());
+
+        if (TenantService.getTenantId() != null)
+            save.setTenantId(TenantService.getTenantId());
 
         if (user != null) {
             save.setUserId(user.getId());

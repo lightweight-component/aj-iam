@@ -37,4 +37,6 @@ public class LogLogin extends BaseModel {
      * 登录 ip
      */
     private String ip;
+
+    private Integer tenantId;
 }

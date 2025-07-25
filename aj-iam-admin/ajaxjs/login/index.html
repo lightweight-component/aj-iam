@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8" />
+    <title>活映统一用户登录</title>
+    <link rel="stylesheet" href="../../common/common.css" />
+    <script src="../../common/common.js"></script>
+    <style>
+        html,
+        body {
+            height: 100%;
+            overflow: hidden;
+        }
+    </style>
+</head>
+
+<body>
+    <table width="100%" style="height:100%;">
+        <tr>
+            <td align="center" valign="middle">
+                <fieldset class="fieldset-box" style="width:350px;">
+                    <legend>活映统一用户登录</legend>
+
+                    <input class="text-input-1" type="text" name="userName" placeholder="用户名" />
+                    <br />
+                    <br />
+                    <input class="text-input-1" type="password" name="password" placeholder="密码" />
+                    <br />
+                    <br />
+                    <div id="captcha-el"></div>
+                    <br />
+                    <button class="button-1" onclick="login();return false;">登录</button>
+                    <br />
+                    <br />
+                    <a href="../register">注册用户</a>
+                </fieldset>
+                <br />
+                <br />
+                <br />
+                <br />
+                <br />
+                <br />
+            </td>
+        </tr>
+    </table>
+</body>
+<script>
+    function login() {
+        let userName = document.querySelector('*[name=userName]').value;
+        let password = document.querySelector('*[name=password]').value;
+
+        aj.xhr.postForm('../../iam_api/user/login', { loginId: userName, password: password }, json => {
+            if (json.status && json.data) {// 登录成功，再次访问 authorization，这时是获取授权码
+                location.assign('../../iam_api/oidc/authorization' + location.search);
+            }
+        });
+    }
+
+    // 监听回车键事件
+    document.addEventListener('keydown', function (event) {
+        if (event.key === 'Enter' || event.keyCode === 13) {
+            // 阻止可能的默认行为（如页面刷新）
+            event.preventDefault();
+
+            // 触发按钮点击
+            document.querySelector('button.button-1').click();
+        }
+    });
+</script>
+
+</html>

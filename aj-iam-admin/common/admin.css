@@ -181,6 +181,7 @@ button {
 
 .userInfo {
     position: fixed;
+    text-align: center;
     top: 0;
     right: 0;
     height: 40px;
@@ -194,4 +195,35 @@ button {
 .userInfo select {
     width: 130px;
     height: 25px !important;
+}
+
+.userInfo .userInfoPanel {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    min-width: 650px;
+    min-height: 100px;
+    background-color: #e8e9e9;
+    text-align: center;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    box-shadow: 3px 3px 5px #3123235c;
+    padding: 20px;
+}
+
+
+.userInfo .userInfoPanel table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px auto;
+}
+
+.userInfo .userInfoPanel td {
+    max-width: 200px;
+    padding: 0px 10px;
+    text-align: left;
+    height: 30px;
+    vertical-align: top;
 }

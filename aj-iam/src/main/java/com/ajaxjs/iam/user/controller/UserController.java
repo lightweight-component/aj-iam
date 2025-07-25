@@ -10,6 +10,14 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/user")
 public interface UserController {
     /**
+     * 获取当前用户详情
+     *
+     * @return 用户详情
+     */
+    @GetMapping("/info")
+    User currentUserInfo();
+
+    /**
      * 获取用户详情
      *
      * @param id 用户 id

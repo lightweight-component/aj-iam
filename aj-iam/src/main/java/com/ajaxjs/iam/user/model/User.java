@@ -23,11 +23,18 @@ public class User extends BaseModel implements UserConstants, IBaseModel {
      */
     private Long tenantId;
 
+    private String tenantName;
+
     /**
      * 登录名、用户登录 id，不可重复
      */
     @NotNull
     private String loginId;
+
+    /**
+     * 用户名称/昵称
+     */
+    private String username;
 
     /**
      * 用户真实姓名

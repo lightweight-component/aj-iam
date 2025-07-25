@@ -101,7 +101,7 @@ Vue.component('admintable', {
       }, {
         header: {
           // Authorization: 'Bearer ' + accessToken,
-          'auth-tenant-id': localStorage.getItem('tenantId') || ''
+          // 'auth-tenant-id': localStorage.getItem('tenantId') || ''
         }
       });
     },

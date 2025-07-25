@@ -9,40 +9,5 @@
 <script src="common/component.js"></script>
 
 <script>
-    const urlParams = new URLSearchParams(window.location.search);
 
-    if (urlParams.has('token')) {
-        const token = urlParams.get('token');// 读取 JWT token
-        const payload = JSON.parse(atob(token.split('.')[1]));// 解析 JWT（仅解码 payload，不验证签名）
-
-        // 提取用户信息（根据你的 JWT payload 结构）
-        const userInfo = {
-            id: payload.sub || '',
-            loginId: payload.name || '',
-            email: payload.email || ''
-        };
-
-        // 保存到 localStorage
-        localStorage.setItem('userInfo', JSON.stringify(userInfo));
-
-        // 清除 token 参数，跳转到当前页面
-        urlParams.delete('token');
-        const newUrl = window.location.pathname + (urlParams.toString() ? `?${urlParams.toString()}` : '');
-        window.location.href = newUrl;
-    }
-
-    const accessToken = localStorage.getItem("accessToken");
-    const userInfo = localStorage.getItem("userInfo");
-
-    if (!userInfo) {
-        if (confirm('你未登录！是否跳转到登录页面？')) {
-            // location.assign(`../../iam_api/oidc/authorization?response_type=code&client_id=lKi9p9FyicBd6eA` +
-            //     `&state=${Math.random().toString(36).substring(2, 15)}` +
-            //     `&nonce=${Math.random().toString(36).substring(2, 15)}` +
-            //     `&web_uri=${encodeURIComponent(location.href)}` +
-            //     `&redirect_uri=${encodeURIComponent('../../iam_api/client/callback')}`);
-
-            location.assign(`../../iam_api/client/to_login?web_url=${encodeURIComponent(location.href)}`);
-        }
-    }
 </script>

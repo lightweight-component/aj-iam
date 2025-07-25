@@ -15,8 +15,14 @@
     <packaging>jar</packaging>
 
     <dependencies>
-        <!-- RedisTemplate -->
         <dependency>
+            <groupId>com.ajaxjs</groupId>
+            <artifactId>ajaxjs-util</artifactId>
+            <version>1.2.6</version>
+        </dependency>
+
+        <!-- RedisTemplate -->
+<!--        <dependency>
             <groupId>org.springframework.data</groupId>
             <artifactId>spring-data-redis</artifactId>
             <version>2.7.18</version>
@@ -26,13 +32,7 @@
             <groupId>io.lettuce</groupId>
             <artifactId>lettuce-core</artifactId>
             <version>6.2.3.RELEASE</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.ajaxjs</groupId>
-            <artifactId>aj-iam-common</artifactId>
-            <version>1.0</version>
-        </dependency>
+        </dependency>-->
 
         <dependency>
             <groupId>org.springframework</groupId>

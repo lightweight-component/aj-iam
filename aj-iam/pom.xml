@@ -31,7 +31,7 @@
                     <execution>
                         <id>upload-deploy</id>
                         <!-- 运行package打包的同时运行upload-single和sshexec -->
-                        <phase>package</phase>
+                        <phase>install</phase>
                         <goals>
                             <goal>upload-single</goal>
                             <goal>sshexec</goal>
@@ -67,19 +67,6 @@
             <groupId>com.ajaxjs</groupId>
             <artifactId>aj-dataservice</artifactId>
             <version>1.0</version>
-        </dependency>
-
-        <!-- RedisTemplate -->
-        <dependency>
-            <groupId>org.springframework.data</groupId>
-            <artifactId>spring-data-redis</artifactId>
-            <version>2.7.18</version>
-        </dependency>
-
-        <dependency>
-            <groupId>io.lettuce</groupId>
-            <artifactId>lettuce-core</artifactId>
-            <version>6.2.3.RELEASE</version>
         </dependency>
 
         <!-- JSP 页面所需 -->

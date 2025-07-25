@@ -50,6 +50,8 @@ public class AccessTokenPo {
      */
     private Date expiresDate;
 
+    private Integer tenantId;
+
     /**
      * 授权类型，比如：authorization_code
      */

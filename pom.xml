@@ -8,7 +8,6 @@
     <packaging>pom</packaging>
 
     <modules>
-        <module>aj-iam-common</module>
         <module>aj-iam-client</module>
         <module>aj-iam</module>
     </modules>

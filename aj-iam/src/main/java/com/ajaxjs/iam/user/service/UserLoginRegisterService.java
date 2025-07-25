@@ -3,6 +3,7 @@ package com.ajaxjs.iam.user.service;
 
 import com.ajaxjs.framework.database.EnableTransaction;
 import com.ajaxjs.framework.model.BusinessException;
+import com.ajaxjs.framework.spring.DiContextUtil;
 import com.ajaxjs.iam.UserConstants;
 import com.ajaxjs.iam.server.common.IamUtils;
 import com.ajaxjs.iam.user.common.UserUtils;
@@ -11,7 +12,6 @@ import com.ajaxjs.iam.user.common.util.CheckStrength;
 import com.ajaxjs.iam.user.controller.UserLoginRegisterController;
 import com.ajaxjs.iam.user.model.User;
 import com.ajaxjs.iam.user.model.UserAccount;
-import com.ajaxjs.framework.spring.DiContextUtil;
 import com.ajaxjs.sqlman.Sql;
 import com.ajaxjs.sqlman.crud.Entity;
 import com.ajaxjs.sqlman.util.SnowflakeId;
@@ -54,7 +54,7 @@ public class UserLoginRegisterService implements UserLoginRegisterController, Us
     public boolean login(String loginId, String password, String returnUrl, HttpServletRequest req, HttpServletResponse resp) {
         Integer tenantId;
 
-        if ("admin".equals(loginId)) // 超级管理员不属于任何租户
+        if ("admin".equals(loginId) && TenantService.getTenantId() == null) // 超级管理员不属于任何租户
             tenantId = 0;
         else
             tenantId = TenantService.getTenantId();

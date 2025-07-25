@@ -1,6 +1,5 @@
 package com.ajaxjs.iam.server.config;
 
-import com.ajaxjs.iam.jwt.JWebTokenMgr;
 import com.ajaxjs.iam.user.common.PasswordEncoder;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
