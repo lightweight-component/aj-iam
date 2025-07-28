@@ -3,9 +3,9 @@
     <head>
         <meta charset="utf-8"/>
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
-        <title>AJ IAM /{{ title }}</title>
-        <meta name="description" content="轻量级用户认证系统 {{description}}"/>
-        <meta name="keywords" content="用户, 认证, 会员系统, IAM, AJ-IAM, {{tags}}"/>
+        <title>AJ IAM /部署 IAM 程序</title>
+        <meta name="description" content="轻量级用户认证系统 部署 IAM 程序"/>
+        <meta name="keywords" content="用户, 认证, 会员系统, IAM, AJ-IAM, 部署"/>
         <meta name="viewport" content="width=device-width, initial-scale=1"/>
         <link rel="stylesheet" href="/asset/style/main.css"/>
         <link rel="icon" type="image/png" href="/asset/favicon.ico"/>
@@ -27,7 +27,7 @@
         </nav>
         <div>
             <menu>
-                {# <h3>AJ Framework 简介</h3> #}
+                
                 <ul>
                     <li class="selected">
                         <a href="/cn">首页</a>
@@ -45,7 +45,7 @@
                 <h3>使用方法</h3>
                 <ul>
                       <li>
-                           <a href="/handbook/deploy-cn">部署方式</a>
+                           <a href="/handbook/deploy">部署方式</a>
                       </li>
                 </ul>
 
@@ -55,7 +55,23 @@
                 </ul>
             </menu>
             <article>
-                {{ content | safe }}
+                <h1>部署 IAM 程序</h1>
+<p>我们通过源码检出和 IDEA 来完整 IAM 程序的部署，目标是 Linux 的服务器。</p>
+<h2>配置文件</h2>
+<p>Git checkout 源码后默认是没有任何有效的配置文件，——除了一个<code>application.yaml</code>演示文件，
+位于<code>profiles</code>目录下。我们在 <code>profiles</code>目录中新建<code>dev</code>、<code>prod</code>、<code>test</code>子目录，分别对应着开发、生产、测试环境。
+如不满足还可以自定义更多的子目录。</p>
+<p><img src="/asset/imgs/iam-yaml-dirs.jpg" alt=""></p>
+<h1>同一个域下面工作</h1>
+<p>整合 IAM 的业务系统，建议与 IAM 放在同一个域下工作。</p>
+<h1>租户</h1>
+<p>IAM 通过租户<code>tenant</code>来区分用户体系。一个租户下的用户 id（<code>login_id</code>）不能重复。涉及的租户的数据库表、API 接口均有保存<code>tenant_id</code>的字段或入参。
+怎么入参比较优雅呢（相对于调接口都要传参<code>tenant_id</code>）？我们采用域名区分的方法来划分租户。</p>
+<ul>
+<li>首先分配一个域名给某个租户，例如 bar.foo.com 但不是根据这个域名关联那个租户</li>
+<li>在 Nginx 代理中加入自定义头<code>auth-tenant-id</code>，表示某个组件，这样就是能在每个接口中获取租户了</li>
+</ul>
+
             </article>
         </div>
         <footer>

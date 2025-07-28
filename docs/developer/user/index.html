@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8"/>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+        <title>AJ MCP SDK/MCP Server SDK Usage</title>
+        <meta name="description" content="A lightweight Java 8 Model Context Protocol (MCP) SDK. MCP Server SDK Usage"/>
+        <meta name="keywords" content="mcp, mcp sdk, java mcp, mcp client, mcp server, java8 mcp, MCP Server SDK Usage"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1"/>
+        <link rel="stylesheet" href="/asset/style/main.css"/>
+        <link rel="icon" type="image/png" href="/asset/favicon.ico"/>
+        <script src="/asset/common.js"></script>
+    </head>
+    <body>
+        <nav>
+            <div>
+                <div class="links">
+                    <a href="/">🏠 Home</a>
+                    | ⚙️ Source:
+                    <a target="_blank" href="https://github.com/lightweight-component/aj-mcp">Github</a>/<a target="_blank" href="https://gitcode.com/lightweight-component/aj-mcp">Gitcode</a>
+                    |
+                    <a href="/cn">Chinese Version</a>
+                </div>
+                <h1>AJ MCP SDK</h1>
+                <h3>User Manual</h3>
+            </div>
+        </nav>
+        <div>
+            <menu>
+                
+                <ul>
+                    <li class="selected">
+                        <a href="/">Home</a>
+                    </li>
+                    <li>
+                        <a href="/architecture/index">Architecture</a>
+                    </li>
+                </ul>
+                <h3>MCP Client SDK</h3>
+                <ul>
+                    <li>
+                        <a href="/client/setup-client">Client SDK Setup</a>
+                    </li>
+                    <li>
+                       <a href="/client/initialization">Initialization</a>
+                    </li>
+                    <li>
+                       <a href="/client/resource">Resources Usage</a>
+                    </li>
+                     <li>
+                       <a href="/client/prompt">Prompts Usage</a>
+                    </li>
+                     <li>
+                       <a href="/client/tool">Tools Usage</a>
+                    </li>
+                </ul>
+                <h3>MCP Server SDK</h3>
+                <ul>
+                      <li>
+                           <a href="/server/usage-server">Server SDK Usage</a>
+                      </li>
+                      <li>
+                           <a href="/server/res-server">Resources Usage</a>
+                      </li>
+                      <li>
+                           <a href="/server/pro-server">Prompts Usage</a>
+                      </li>
+                      <li>
+                             <a href="/server/tool-server">Tools Usage</a>
+                       </li>
+                      <li>
+                         <a href="/server/sample">Integration Samples</a>
+                      </li>
+                </ul>
+
+                <h3>Misc</h3>
+                <ul>
+                    <li><a href="/misc/versions">Release History</a></li>
+                    <li><a href="/misc/contact">Contact</a></li>
+                </ul>
+            </menu>
+            <article>
+                <h1>User System</h1>
+<p>As part of a user system, the following core modules are essential and cannot be overlooked:</p>
+<ul>
+<li>User registration</li>
+<li>User login and logout</li>
+<li>User management</li>
+</ul>
+<h2>Designing a Reusable User System</h2>
+<p>Almost every application requires a user system, and it's clearly inefficient — if not impractical — to reimplement one from scratch for each new project. Doing so would result in redundant work and inconsistent implementations across systems.</p>
+<p>Therefore, the natural approach is to design a reusable user module that can be applied across multiple applications. The key question then becomes: What is the best architectural approach for such a system?</p>
+<p>There are two common strategies:</p>
+<h2>User SDK Approach</h2>
+<p>Provide a user system as an SDK (Software Development Kit) that can be integrated directly into each application. In this model:</p>
+<ul>
+<li>Each application manages its own user data, or shares it with a central source.</li>
+<li>Authentication and user management logic are encapsulated within the SDK.</li>
+<li>This approach offers tight integration and flexibility, especially useful when different applications have slightly different user requirements.</li>
+</ul>
+<h2>User Center (Centralized Service) Approach</h2>
+<p>Design a standalone User Center that operates independently of any specific application:</p>
+<ul>
+<li>It runs as a separate service, maintaining its own user data store but on top of view it's Unified Data.</li>
+<li>Applications access user-related functionality through standardized interfaces such as HTTP APIs or RPC calls.</li>
+<li>This decouples user management from business applications, enabling centralized control, unified authentication, and easier scaling.</li>
+</ul>
+<p>When using the SDK approach, implementing Single Sign-On (SSO) can be challenging, as user data is typically managed independently within each application. This decentralized nature makes it difficult to maintain a unified identity across services.</p>
+<p>On the other hand, most modern user systems are implemented as centralized services, which provide a single source of truth for user data and authentication. Based on this observation, we have decided to adopt the centralized service approach for our user system.</p>
+<p>That said, this doesn’t mean the SDK approach is without merit.
+In certain modules such as access control or permission management, an SDK-based solution may still be a better fit, depending on the system’s architecture and integration requirements.</p>
+<p>In the following sections, we will discuss these modules in detail, along with related components and their
+integration with AJ-IAM.</p>
+<h2>User Registration</h2>
+<p>User registration refers to the process of creating a new user account for an application. In a centralized user center architecture, the application itself does not store core user data such as username, email, phone number, or password. Instead, this data is managed and stored exclusively by the user center.</p>
+<p>The user center is responsible for handling user registration, authentication (login), and access control. It verifies whether a user is valid and communicates this information back to the application.
+However, a common challenge arises when the database schema of the user center <em><strong>does not meet the specific needs</strong></em> of the application. Since the structure of the user center's database is often fixed, it may not be feasible to adapt or extend its fields to match the application’s requirements.</p>
+<p>One possible workaround is to add a JSON-type field in the user table to store arbitrary data. While this can be useful for unstructured or dynamic data, it is <strong>not ideal for structured data</strong>, as it sacrifices query performance, type safety, and maintainability.</p>
+<h3>Recommended Solution</h3>
+<p>A better approach is to store the <strong>application-specific user information locally</strong> within the application's own database after the user has been registered in the user center. To link the local user data with the central user record, you can include a field such as <code>iam_id</code> that references the user ID from the user center.</p>
+<p>This way:</p>
+<ul>
+<li>The core identity and authentication remain under the control of the user center.</li>
+<li>The application can store and manage extended user attributes tailored to its business needs. Since the core user information is accessed easily, you don't have much remote calls to the user center.</li>
+<li>There is a clean separation between identity management and application-specific data.</li>
+</ul>
+
+            </article>
+        </div>
+        <footer>
+            AJ MCP SDK, a part of
+            <a href="https://framework.ajaxjs.com" target="_blank">AJ-Framework</a>
+            open source. Mail:frank@ajaxjs.com, visit
+            <a href="https://blog.csdn.net/zhangxin09" target="_blank">my blog(In Chinese)</a>. <br/> <br/> Copyright © 2025 Frank Cheung. All rights reserved.
+        </footer>
+    </body>
+</html>
