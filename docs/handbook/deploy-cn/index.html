@@ -17,7 +17,7 @@
                 <div class="links">
                     <a href="/">🏠 首页</a>
                     | ⚙️ 源码:
-                    <a target="_blank" href="https://github.com/lightweight-component/aj-mcp">Github</a>/<a target="_blank" href="https://gitcode.com/lightweight-component/aj-mcp">Gitcode</a>
+                    <a target="_blank" href="https://github.com/lightweight-component/aj-iam">Github</a>/<a target="_blank" href="https://gitcode.com/lightweight-component/aj-iam">Gitcode</a>
                     |
                     <a href="/">英文版本</a>
                 </div>
@@ -65,9 +65,94 @@
 <p>把<code>application.yaml</code>复制并改名<code>application.yml</code>到具体的<code>dev</code>、<code>prod</code>、<code>test</code>目录中，然后修改你具体的配置。</p>
 <h2>一键部署</h2>
 <p>如果你采用原始的 JAR 发布机制（而非 Jenkins/Docker/K8S），那么可以使用我们准备的“一键部署”。</p>
-<h1>同一个域下面工作</h1>
-<p>整合 IAM 的业务系统，建议与 IAM 放在同一个域下工作。</p>
-<h1>租户</h1>
+<p>技巧：你可以使用源码中<code>/src/startup.sh</code>的 SHELL 脚本快速启动程序</p>
+<h1>划分域（Domain）来进行部署</h1>
+<p>首先 IAM 是一套中间件程序，这套程序也符合常规前后端分离的 Web 程序，即：</p>
+<ul>
+<li>前端（Web）UI，纯 HTML/CSS/JS 程序，其实就是 IAM 的管理程序界面</li>
+<li>后端 API 程序，SpringBoot 服务端程序</li>
+</ul>
+<p>然后跟你的应用程序进行对接整合。具体整合通过 SDK 或者纯接口都可以。
+但这里有一个特殊的程序需要与 IAM 在用一个域（Domain）下面部署，就是<strong>用户的登录页面</strong>。为什么登录页面要单独“拎”出来还要和 IAM 一起部署呢？
+这是因为安装 OAuth/OIDC 规范，登录操作不能跨域的缘故，一句话就是为了安全起见的。同时，登录页面在 SSO 语境中通常也被认为是统一登录，即不单单为某个程序所使用，而是多个程序使用这一个登录入口。</p>
+<p>由此，关于是否跨域，我们可以稍作整理一下：</p>
+<ul>
+<li>IAM 程序本身，前端后端固然在一个域下</li>
+<li>业务系统的用户登录页面，与 IAM 在一个域下</li>
+<li>业务系统，访问或者调用 IAM，不跟 IAM 一个域，即跨域调用（更多的是后端调用，于是是否跨域无所谓了）</li>
+</ul>
+<p>理解好之后便不难写出 Nginx 配置了。</p>
+<h2>为 IAM 配置 Nginx</h2>
+<p>假设域名 iam.service.com 是为 IAM 所准备的。把登陆页面、IAM 管理 UI、IAM API 放置同一个域下面。</p>
+<pre><code>server {
+    listen       80;
+    server_name  iam.service.com;
+
+    location / {
+        ssi on;
+        root   html;
+        index  index.html index.htm;
+    }
+
+    location /login/ { # 登录页面
+        alias D:/sp42/dev/nginx-1.29.0/login/;
+        autoindex on;  # 可选，显示目录列表
+    }
+    
+    location /iam/ { # IAM 管理页面
+        ssi on;
+        alias D:/sp42/code/ajaxjs/aj-iam/aj-iam-admin/;  # 注意路径斜杠
+        index index.html index.htm; # 默认首页
+        try_files $uri $uri/ /index.html; # 支持单页应用（SPA）路由
+
+    }
+
+    location /iam_api/ { # IAM 后端 API
+        proxy_pass http://localhost:8082/; # 代理到后端 API
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
+</code></pre>
+<p>当然 IAM 管理页面的登录也走统一一套的那个登录页面。</p>
+<h2>前端开发环境的跨域</h2>
+<p>如果是简单的 HTML 开发，那么很简单，通过 Nginx 轻松配置在一个域下。但是如果是复杂的前端开发，比如基于 Node 的 React/Vue 开发，
+一般都是开启 Node 代理来避免跨域问题的。</p>
+<p>前端工程<code>vue.config.js</code>配置代理例子如下。</p>
+<pre><code class="language-json">devServer: {
+    proxy: {
+        '/login': {
+            target: 'http://local.ajaxjs.com', // 登录页面的实际地址
+            changeOrigin: true,               // 如果目标是一个域名而不是IP，请设置为true
+            pathRewrite: {
+                '^/login': ''                 // 重写路径，比如将 /api/v1/test -&gt; /v1/test
+            }
+        },
+        '/api': {
+            target: 'http://local.ajaxjs.com/dataservice_api', // 后端服务的实际地址
+            changeOrigin: true,                     
+            pathRewrite: {
+                '^/api': ''                            
+            }
+        },
+        '/iam_api': {
+            target: 'http://local.ajaxjs.com/iam_api', // IAM 后端服务的实际地址
+            changeOrigin: true,                     
+            pathRewrite: {
+                '^/iam_api': ''                             
+            }
+        }
+    }
+},
+</code></pre>
+<p>宏观上讲，这等于在 Nginx 代理上又套了一层 NodeJS 的代理。——没关系，请谨记，我们最终的 URL 是以 Node 所运行的 URL 为准，
+也就是，我们把所有涉及 IAM 的 URL 都改为 NodeJS 的即可。</p>
+<p>至于最终打包后的前端程序，无须 NodeJS 代理，那么就是普通的 HTML 程序，按照前面的方法部署一起即可。</p>
+<h1>多租户支持</h1>
+<p>IAM 支持多租户模式，即一个租户一个域，不论多少个租户呈现，但背后只有一套程序在运行——这有点像套马甲的样子。</p>
+<h2>租户</h2>
 <p>IAM 通过租户<code>tenant</code>来区分用户体系。一个租户下的用户 id（<code>login_id</code>）不能重复。涉及的租户的数据库表、API 接口均有保存<code>tenant_id</code>的字段或入参。
 怎么入参比较优雅呢（相对于调接口都要传参<code>tenant_id</code>）？我们采用域名区分的方法来划分租户。</p>
 <ul>
@@ -78,7 +163,7 @@
             </article>
         </div>
         <footer>
-             AJ-Util，开源框架 <a href="https://framework.ajaxjs.com" target="_blank">AJ-Framework</a> 的一部分。联系方式：
+             AJ-IAM，开源框架 <a href="https://framework.ajaxjs.com" target="_blank">AJ-Framework</a> 的一部分。联系方式：
              frank@ajaxjs.com，<a href="https://blog.csdn.net/zhangxin09" target="_blank">作者博客</a>
              <br />
              <br />
