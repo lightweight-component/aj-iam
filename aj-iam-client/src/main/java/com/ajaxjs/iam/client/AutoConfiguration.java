@@ -48,8 +48,8 @@ public class AutoConfiguration implements WebMvcConfigurer {
                 try {
                     Map<String, Object> api = Get.api(iamService);
 
-                    if (api == null || (int) api.get("status") != 1)
-                        log.warn("IAM 服务连接失败或异常");
+                    if (api == null || !api.containsKey("status") || (int) api.get("status") != 1)
+                        log.warn("IAM 服务连接失败或异常。你的认证服务或不可用。");
                     else
                         log.info("IAM 服务连接成功");
                 } catch (Throwable e) {
