@@ -134,7 +134,7 @@ public abstract class BaseOidcClientUserController {
         bodyParams.put("password", password);
         bodyParams.put("client_id", clientId);
         bodyParams.put("client_secret", clientSecret);
-        String tokenApi = getIamService() + "/oidc/token";
+        String tokenApi = getIamService() + "/oidc/ropc_token";
         Map<String, Object> result = Post.api(tokenApi, bodyParams);
 
         if (result == null)

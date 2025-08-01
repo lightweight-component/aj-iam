@@ -24,9 +24,9 @@ import java.util.Calendar;
 import java.util.Date;
 
 public abstract class OAuthCommon implements IamConstants {
-    static final String NOT_LOGIN_TEXT = " <meta charset=\"UTF-8\" /><meta http-equiv=\"refresh\" content=\"2;url=%s\" /> " +
-            "User Not login, wait 2 seconds to redirect the login page...<br />" +
-            "用户尚未登录，两秒后跳转到登录页面……";
+    static final String NOT_LOGIN_TEXT = " <meta charset=\"UTF-8\" /><meta http-equiv=\"refresh\" content=\"1;url=%s\" /> " +
+            "User Not login, wait 1 seconds to redirect the login page...<br />" +
+            "用户尚未登录，现在跳转到登录页面……";
 
     @Autowired
     UserSession userSession;

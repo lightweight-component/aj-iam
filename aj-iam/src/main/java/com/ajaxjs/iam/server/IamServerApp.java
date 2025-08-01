@@ -11,6 +11,6 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 public class IamServerApp {
     public static void main(String[] args) {
         SpringApplication.run(IamServerApp.class, args);
-        PrintBanner.showOk("AJ-IAM-Server 启动成功");
+        PrintBanner.showOk("AJ-IAM-Server");
     }
 }

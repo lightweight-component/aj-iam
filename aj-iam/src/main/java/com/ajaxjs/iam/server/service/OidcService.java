@@ -96,7 +96,7 @@ public class OidcService extends OAuthCommon implements OidcController {
     @Override
     public JwtAccessToken ropcToken(String grant_type, String username, String password, String client_id, String client_secret, String scope) {
         if (!"password".equals(grant_type))
-            throw new IllegalArgumentException("参数 grant_type 只能是 authorization_code");
+            throw new IllegalArgumentException("参数 grant_type 只能是 password");
 
         App app = Sql.instance().input("SELECT * FROM app WHERE stat != 1 AND client_id = ? AND client_secret = ?", client_id, client_secret).query(App.class);
 
