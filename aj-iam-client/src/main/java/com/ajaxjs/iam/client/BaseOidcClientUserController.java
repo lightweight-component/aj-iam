@@ -37,20 +37,20 @@ public abstract class BaseOidcClientUserController {
      * 获取重定向视图，用于认证流程中的第一步：跳转到登录页面。
      *
      * @param session           HttpSession 对象，用于保存和管理用户会话信息。
-     * @param userLoginCode     用户登录代码，通常是登录页面的 URL 后缀。
+     * @param getAuthCodeUrl    获取授权码的 URL，指 IAM 提供的 endpoint。
      * @param clientId          客户端 ID，用于识别请求 OAuth 服务的应用。
      * @param clientCallbackUrl 应用的网站 URL，授权服务器完成授权后会重定向到该 URL 的回调接口。
      * @param webUrl            前端页面地址，用于跳到这里以便获取 Token。
      * @return RedirectView 返回一个重定向视图对象，包含了构造的重定向 URL。
      */
-    public RedirectView loginPageUrl(HttpSession session, String userLoginCode, String clientId, String clientCallbackUrl, String webUrl) {
+    public RedirectView loginPageUrl(HttpSession session, String getAuthCodeUrl, String clientId, String clientCallbackUrl, String webUrl) {
         String state = RandomTools.generateRandomString(5);
 //        session.setAttribute(ClientUtils.OAUTH_STATE, state);// 将 state 值保存到会话中
         TEMP_CACHE.put(ClientUtils.OAUTH_STATE, state);
 
         log.info("set state code:" + state);
 
-        String url = userLoginCode + "?response_type=code&client_id=" + clientId;
+        String url = getAuthCodeUrl + "?response_type=code&client_id=" + clientId;
         url += "&redirect_uri=" + urlEncode(clientCallbackUrl);
         url += "&state=" + state;
 
