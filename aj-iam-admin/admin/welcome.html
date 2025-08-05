@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-cn">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="UTF-8" />
     <title>Welcome</title>
-    <script src="common/common-head.js"></script>
+    <!--#include file="common/head.html" -->
     <style>
         html, body, body>table {
             height: 100%;
@@ -25,6 +25,8 @@
             width: 100%;
             margin: 20px 0;
         }
+
+        th,td{text-align:center;padding:1%;}
     </style>
 </head>
 <body>
@@ -35,15 +37,7 @@
         <br />
         <br />
         <h1>欢迎使用 SSO 管理中心 Welcome</h1>
-
-       <!-- "SELECT "+
-        "(SELECT COUNT(id) FROM user_login_log) AS loginTimes,"+
-        "(SELECT COUNT(id) FROM user) AS userNum,"+
-        "(SELECT COUNT(id) FROM system_app) AS clientNum,"+
-        "(SELECT COUNT(id) FROM oauth_access_token) AS onlineNum,"+
-        "(SELECT COUNT(id) FROM tenant) AS tenantNum";-->
         <table class="aj-table even tj">
-
             <tr>
                 <th>租户数</th>
                 <th>客户端数</th>
@@ -53,14 +47,30 @@
             </tr>
 
             <tr>
-                <td>${info.tenantNum}</td>
-                <td>${info.clientNum}</td>
-                <td>${info.userNum}</td>
-                <td>${info.onlineNum}</td>
-                <td>${info.loginTimes}</td>
+                <td>{{info.tenantNum}}</td>
+                <td>{{info.clientNum}}</td>
+                <td>{{info.userNum}}</td>
+                <td>{{info.onlineNum}}</td>
+                <td>{{info.loginTimes}}</td>
             </tr>
         </table>
     </div>
 </div>
+<script>
+     new Vue({
+        el: '.aj-table',
+        data: {
+            info: {},
+        },
+        mounted() {
+            aj.xhr.get('../../iam_api/admin/welcome', json => {
+                if (json.status && json.data) {
+                    console.log(json.data)
+                    this.info = json.data;
+                }
+            });
+        }
+     });
+</script>
 </body>
 </html>

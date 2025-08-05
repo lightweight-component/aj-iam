@@ -101,7 +101,7 @@ public abstract class BaseOidcClientUserController {
         log.info("state:" + state);
         log.info("clientId:" + clientId);
         log.info("clientSecret:" + clientSecret);
-        String tokenApi = getIamService() + "/oidc/token";
+        String tokenApi = getIamService() + "/iam_api/oidc/token";
 
         Map<String, String> params = ObjectHelper.mapOf("grant_type", "authorization_code", "code", code, "state", state);
         Map<String, Object> result = Post.api(tokenApi, params, conn -> conn.setRequestProperty("Authorization", ClientCredentials.encodeClient(clientId, clientSecret)));

@@ -122,7 +122,7 @@
             },
             mounted() {
                 // 调接口判断是否已经登录
-                aj.xhr.get('../iam_api/user/info', json => {
+                aj.xhr.get('../../iam_api/user/info', json => {
                     if (json.status && json.data) {
                         console.log(json.data)
 

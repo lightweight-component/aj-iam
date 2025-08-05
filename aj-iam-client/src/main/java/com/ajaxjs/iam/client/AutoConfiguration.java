@@ -5,16 +5,12 @@ import com.ajaxjs.iam.jwt.JWebTokenMgr;
 import com.ajaxjs.util.StrUtil;
 import com.ajaxjs.util.http_request.Get;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.aop.interceptor.SimpleTraceInterceptor;
-import org.springframework.beans.factory.BeanFactoryUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.context.support.ServletRequestHandledEvent;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -44,15 +40,11 @@ public class AutoConfiguration implements WebMvcConfigurer {
         return mgr;
     }
 
-
-
     private void testIamConnection() {
-        ResponseEntityExceptionHandler l;
-        ServletRequestHandledEvent k;
         if (StrUtil.hasText(iamService)) {
             CompletableFuture.runAsync(() -> {        // 异步执行任务
                 try {
-                    Map<String, Object> api = Get.api(iamService);
+                    Map<String, Object> api = Get.api(iamService + "/iam_api/");
 
                     if (api == null || !api.containsKey("status") || (int) api.get("status") != 1)
                         log.warn("IAM 服务连接失败或异常。你的认证服务或不可用。");
