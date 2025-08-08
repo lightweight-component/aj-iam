@@ -2,6 +2,7 @@ package com.ajaxjs.iam.client.filter;
 
 import com.ajaxjs.iam.UserConstants;
 import com.ajaxjs.iam.annotation.AllowAccess;
+import com.ajaxjs.iam.client.ClientUtils;
 import com.ajaxjs.iam.jwt.JWebToken;
 import com.ajaxjs.iam.jwt.JWebTokenMgr;
 import com.ajaxjs.iam.model.SimpleUser;
@@ -22,7 +23,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.lang.reflect.Method;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.Enumeration;
@@ -57,12 +57,10 @@ public class UserInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
-        if (handler instanceof HandlerMethod) {
-            Method method = ((HandlerMethod) handler).getMethod();
+        boolean isAllowAccess = handler instanceof HandlerMethod && (ClientUtils.getAnnotationFromMethod((HandlerMethod) handler, AllowAccess.class) != null);
 
-            if (method.isAnnotationPresent(AllowAccess.class))
-                return true;
-        }
+        if (isAllowAccess)
+            return true;
 
         if (Version.isDebug && "1".equals(request.getParameter("allow"))) // 方便开发
             return true;

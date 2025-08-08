@@ -39,7 +39,7 @@ public class LogLoginService implements LogLoginController, UserConstants {
             log.warn("更新会员登录日志出错");
     }
 
-    void saveIp(LogLogin bean, HttpServletRequest req) {
+    void  saveIp(LogLogin bean, HttpServletRequest req) {
         if (req == null)
             return;
 

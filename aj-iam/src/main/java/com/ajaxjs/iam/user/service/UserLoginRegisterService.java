@@ -24,14 +24,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.function.Function;
 
 @Service
@@ -132,6 +132,9 @@ public class UserLoginRegisterService implements UserLoginRegisterController, Us
         return true;
     }
 
+    @Value("${auth.user.CheckStrength:true}")
+    boolean isCheckPasswordStrength;
+
     @Override
     @EnableTransaction
     public Boolean register(Map<String, Object> params) {
@@ -144,7 +147,16 @@ public class UserLoginRegisterService implements UserLoginRegisterController, Us
         }
 
         // 校验
-        if (isNull(params, "tenantId"))
+        int tenantId;
+
+        if (!isNull(params, "tenantId"))
+            tenantId = Integer.parseInt(params.get("tenantId").toString());
+        else {
+            tenantId = TenantService.getTenantId() == null ? 0 : TenantService.getTenantId();
+            params.put("tenantId", tenantId);
+        }
+
+        if (tenantId == 0)
             throw new IllegalArgumentException("租户 id 不能为空");
 
         if (isNull(params, "password"))
@@ -153,8 +165,6 @@ public class UserLoginRegisterService implements UserLoginRegisterController, Us
         boolean hasNoUsername = isNull(params, "loginId"), hasNoEmail = isNull(params, "email"), hasNoPhone = isNull(params, "phone");
         if (hasNoUsername && hasNoEmail && hasNoPhone)
             throw new IllegalArgumentException("没有用户标识， loginId/email/phone 至少填一种");
-
-        int tenantId = Integer.parseInt(params.get("tenantId").toString());
 
         // 是否重复
         if (!hasNoUsername && isRepeat("login_id", params.get("loginId").toString(), tenantId))
@@ -166,15 +176,45 @@ public class UserLoginRegisterService implements UserLoginRegisterController, Us
         if (!hasNoPhone && isRepeat("phone", params.get("phone").toString(), tenantId))
             throw new IllegalArgumentException("手机: " + params.get("phone").toString() + " 重复");
 
+        // 获取业务自定义的字段，存在 extract json 中
+        Map<String, Object> extract = new HashMap<>();
+        List<String> basicFields = Arrays.asList("loginId", "email", "phone", "password", "tenantId");
+//        final Map<String, Object> _params = new HashMap<>(params);
+//
+//        _params.forEach((key, value) -> {
+//            if (!basicFields.contains(key)) {
+//                _params.remove(key);
+//                extract.put(key, value);
+//            }
+//        });
+
+        params.entrySet().removeIf(entry -> {
+            String key = entry.getKey();
+            Object value = entry.getValue();
+            boolean isRemove = !basicFields.contains(key);
+
+            if (isRemove && value != null && (value instanceof String && StrUtil.hasText(value.toString())))
+                extract.put(key, value);
+
+            return isRemove;
+        });
+
+        if (!ObjectUtils.isEmpty(extract))
+            params.put("extend", extract);
+
+        System.out.println(extract);
+
         // 有些字段不要
         String psw = params.get("password").toString();
         params.remove("password");
 
         // 检测密码强度
-        CheckStrength.LEVEL passwordLevel = CheckStrength.getPasswordLevel(psw);
+        if (isCheckPasswordStrength) {
+            CheckStrength.LEVEL passwordLevel = CheckStrength.getPasswordLevel(psw);
 
-        if (passwordLevel == CheckStrength.LEVEL.EASY)
-            throw new UnsupportedOperationException("密码强度太低");
+            if (passwordLevel == CheckStrength.LEVEL.EASY)
+                throw new UnsupportedOperationException("密码强度太低");
+        }
 
         params = Utils.changeFieldToColumnName(params);
         params.put("uid", SnowflakeId.get());

@@ -1,7 +1,11 @@
 package com.ajaxjs.iam.client;
 
+import org.springframework.web.method.HandlerMethod;
+
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
 
 public class ClientUtils {
     public static final String OAUTH_STATE = "OAUTH_STATE";
@@ -23,5 +27,24 @@ public class ClientUtils {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    /**
+     * Get the annotation from the method or its interface
+     *
+     * @param handlerMethod   The method on the Interface
+     * @param annotationClass The class of annotation
+     * @param <T>             The type of annotation
+     * @return The annotation
+     */
+    public static <T extends Annotation> T getAnnotationFromMethod(HandlerMethod handlerMethod, Class<T> annotationClass) {
+        T annotation = handlerMethod.getMethodAnnotation(annotationClass);
+
+        if (annotation != null)
+            return annotation;
+
+        Method method = handlerMethod.getMethod(); // The real controller method
+
+        return method.getAnnotation(annotationClass);
     }
 }

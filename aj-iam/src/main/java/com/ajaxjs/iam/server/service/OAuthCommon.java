@@ -1,6 +1,6 @@
 package com.ajaxjs.iam.server.service;
 
-import com.ajaxjs.framework.cache.smallredis.Cache;
+import com.ajaxjs.framework.cache.Cache;
 import com.ajaxjs.framework.model.BusinessException;
 import com.ajaxjs.iam.server.common.IamConstants;
 import com.ajaxjs.iam.server.common.IamUtils;

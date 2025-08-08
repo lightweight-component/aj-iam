@@ -1,6 +1,6 @@
 package com.ajaxjs.iam.server.service;
 
-import com.ajaxjs.framework.cache.smallredis.Cache;
+import com.ajaxjs.framework.cache.Cache;
 import com.ajaxjs.iam.jwt.JWebTokenMgr;
 import com.ajaxjs.iam.jwt.JwtUtils;
 import com.ajaxjs.iam.server.controller.OidcController;
