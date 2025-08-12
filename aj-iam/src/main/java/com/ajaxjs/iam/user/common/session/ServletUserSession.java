@@ -1,7 +1,7 @@
 package com.ajaxjs.iam.user.common.session;
 
 import com.ajaxjs.iam.user.model.User;
-import com.ajaxjs.framework.spring.DiContextUtil;
+import com.ajaxjs.spring.DiContextUtil;
 
 import javax.servlet.http.HttpSession;
 import java.util.Enumeration;

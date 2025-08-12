@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8"/>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+        <title>AJ IAM /资源所有者密码凭证（ROPC）</title>
+        <meta name="description" content="轻量级用户认证系统 资源所有者密码凭证（ROPC）"/>
+        <meta name="keywords" content="用户, 认证, 会员系统, IAM, AJ-IAM, ROPC"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1"/>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@200..900&family=Noto+Serif:ital,wght@0,100..900;1,100..900&display=swap&family=Noto+Sans+SC:wght@100..900&display=swap" />
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@100..900&family=Noto+Serif:ital,wght@0,100..900;1,100..900&display=swap" />
+        <link rel="stylesheet" href="https://framework.ajaxjs.com/static/font/font.css" />
+        <link rel="stylesheet" href="/asset/main.css"/>
+        <link rel="icon" type="image/x-icon" href="https://framework.ajaxjs.com/aj-logo/logo.ico"/>
+        <script src="https://framework.ajaxjs.com/static/aj-docs/common.js"></script>
+        <script>
+            var _hmt = _hmt || [];
+            (function() {
+              var hm = document.createElement("script");
+              hm.src = "https://hm.baidu.com/hm.js?54c70624d18784ca7539c358f583133d";
+              var s = document.getElementsByTagName("script")[0];
+              s.parentNode.insertBefore(hm, s);
+            })();
+        </script>
+    </head>
+    <body>
+        <nav>
+            <div>
+                <div class="links">
+                    <a href="/">🏠 首页</a>
+                    | ⚙️ 源码:
+                    <a target="_blank" href="https://github.com/lightweight-component/aj-iam">Github</a>/<a target="_blank" href="https://gitcode.com/lightweight-component/aj-iam">Gitcode</a>
+                    |
+                    <a href="/">英文版本</a>
+                </div>
+                <h1><img src="https://framework.ajaxjs.com/aj-logo/logo.png" style="vertical-align: middle;height: 45px;margin-bottom: 6px;" /> AJ IAM</h1>
+                <h3>轻量级用户认证系统</h3>
+            </div>
+        </nav>
+        <div>
+            <menu>
+                
+                <ul>
+                    <li class="selected">
+                        <a href="/cn">首页</a>
+                    </li>
+                </ul>
+                <h3>开发心得</h3>
+                <ul>
+                    <li>
+                        <a href="/developer/user-cn">用户系统</a>
+                    </li>
+                    <li>
+                        <a href="/developer/model-cn">用户权限模型</a>
+                    </li>
+                </ul>
+                <h3>部署</h3>
+                <ul>
+                      <li>
+                           <a href="/handbook/deploy-cn">部署方式</a>
+                      </li>
+                      <li>
+                           <a href="/handbook/dev-cn">开发环境部署</a>
+                      </li>
+                </ul>
+
+                <h3>其他</h3>
+                <ul>
+                    <li><a href="/misc/contact-cn">联系方式</a></li>
+                </ul>
+            </menu>
+            <article>
+                <h1>资源所有者密码凭证（ROPC）</h1>
+<p>OAuth 规范中除了常见的授权模式外，还有一种密码凭证模式，即 Resource Owner Password Credentials（ROPC）。
+这种模式只能在高度信任的情况下使用，说白了就是登录页不与 IAM Server 在一起，而是跟业务系统一起。这是一种不得已的情况，一般不推荐，在新版 OAuth 中被弃用。</p>
+<p>虽然但是，有时候还是需要的。那么我们来看看 ROPC 在 IAM 中怎办使用。</p>
+<p>首先在你应用程序本地设置控制器：</p>
+<pre><code class="language-java">import com.ajaxjs.iam.annotation.AllowAccess;
+import com.zoomtech2008.rdd.model.dto.RddUserDTO;
+import com.zoomtech2008.rdd.model.vo.RddUserTokenVo;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+/**
+ * 用戶
+ */
+@RestController
+@RequestMapping(&quot;/user&quot;)
+public interface UserController {
+    /**
+     * 注册用戶
+     *
+     * @param user 用戶
+     * @return 是否成功
+     */
+    @PostMapping
+    @AllowAccess
+    boolean register(@RequestBody RddUserDTO user);
+
+    /**
+     * 登录 
+     * 
+     * @param user 用戶
+     */
+    @PostMapping(&quot;/login&quot;)
+    RddUserTokenVo login(@RequestBody RddUserDTO user);
+
+    /**
+     * 登出
+     *
+     * @return 是否成功
+     */
+    @PostMapping(&quot;/logout&quot;)
+    @AllowAccess
+    boolean logout();
+}
+</code></pre>
+<p>实现它。</p>
+<pre><code class="language-java">import com.ajaxjs.framework.database.IgnoreDataBaseConnect;
+import com.ajaxjs.iam.annotation.AllowAccess;
+import com.ajaxjs.iam.client.BaseOidcClientUserController;
+import com.ajaxjs.iam.jwt.JWebToken;
+import com.ajaxjs.iam.jwt.JWebTokenMgr;
+import com.ajaxjs.iam.jwt.JwtAccessToken;
+import com.zoomtech2008.rdd.controller.UserController;
+import com.zoomtech2008.rdd.model.dto.RddUserDTO;
+import com.zoomtech2008.rdd.model.vo.RddUserTokenVo;
+import org.springframework.stereotype.Service;
+
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+@Service
+public class UserService extends BaseOidcClientUserController implements UserController {
+    @Override
+    public boolean register(RddUserDTO user) {
+        throw new UnsupportedOperationException(&quot;请直接调用 IAM 接口&quot;);
+    }
+
+    @Override
+    @IgnoreDataBaseConnect
+    public RddUserTokenVo login(RddUserDTO user) {
+        JwtAccessToken token = ropcLogin(user.getUsername(), user.getPassword());
+
+        // u can get the user info. via the token by HTTP API, but JWT token contains that user info.
+        JWebTokenMgr mgr = new JWebTokenMgr();
+        JWebToken jwt = mgr.parse(token.getId_token());
+
+        RddUserTokenVo vo = new RddUserTokenVo();
+        vo.setToken(token.getId_token());
+        vo.setUserId(jwt.getPayload().getSub());
+
+        return vo;
+    }
+
+    @Override
+    @IgnoreDataBaseConnect
+    @AllowAccess
+    public boolean logout() {
+        return true;
+    }
+
+    @Override
+    public JwtAccessToken onAccessTokenGot(JwtAccessToken token, HttpServletResponse resp, HttpSession session) {
+        return null;
+    }
+}
+</code></pre>
+<p>如上主要是调用 IAM-SDK 的<code>ropcLogin()</code>获取 Token 返回返回。
+整个过程还是比较简单直接的，远没有授权码那样多次跳转那么麻烦（当然牺牲了安全性）。</p>
+
+            </article>
+        </div>
+        <footer>
+             AJ-IAM，开源框架 <a href="https://framework.ajaxjs.com" target="_blank">AJ-Framework</a> 的一部分。联系方式：
+             frank@ajaxjs.com，<a href="https://blog.csdn.net/zhangxin09" target="_blank">作者博客</a>
+             <br />
+             <br />
+             Copyright © 2025 Frank Cheung. All rights reserved.
+         </footer>
+    </body>
+</html>

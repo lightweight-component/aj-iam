@@ -1,6 +1,6 @@
 package com.ajaxjs.iam.user.service;
 
-import com.ajaxjs.framework.spring.DiContextUtil;
+import com.ajaxjs.spring.DiContextUtil;
 import com.ajaxjs.util.Version;
 import org.springframework.util.StringUtils;
 

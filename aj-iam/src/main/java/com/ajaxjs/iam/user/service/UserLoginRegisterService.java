@@ -3,7 +3,7 @@ package com.ajaxjs.iam.user.service;
 
 import com.ajaxjs.framework.database.EnableTransaction;
 import com.ajaxjs.framework.model.BusinessException;
-import com.ajaxjs.framework.spring.DiContextUtil;
+import com.ajaxjs.spring.DiContextUtil;
 import com.ajaxjs.iam.UserConstants;
 import com.ajaxjs.iam.server.common.IamUtils;
 import com.ajaxjs.iam.user.common.UserUtils;

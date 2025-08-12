@@ -32,6 +32,31 @@
         </url>
     
         <url>
+            <loc>https://iam.ajaxjs.com/handbook/deploy/</loc>
+            <lastmod>2022-01-05T00:00:00.000Z</lastmod>
+        </url>
+    
+        <url>
+            <loc>https://iam.ajaxjs.com/handbook/dev-cn/</loc>
+            <lastmod>2022-01-05T00:00:00.000Z</lastmod>
+        </url>
+    
+        <url>
+            <loc>https://iam.ajaxjs.com/handbook/install-cn/</loc>
+            <lastmod>2022-01-05T00:00:00.000Z</lastmod>
+        </url>
+    
+        <url>
+            <loc>https://iam.ajaxjs.com/handbook/install/</loc>
+            <lastmod>2022-01-05T00:00:00.000Z</lastmod>
+        </url>
+    
+        <url>
+            <loc>https://iam.ajaxjs.com/handbook/ropc-cn/</loc>
+            <lastmod>2022-01-05T00:00:00.000Z</lastmod>
+        </url>
+    
+        <url>
             <loc>https://iam.ajaxjs.com/</loc>
             <lastmod>2022-01-05T00:00:00.000Z</lastmod>
         </url>
@@ -57,22 +82,7 @@
         </url>
     
         <url>
-            <loc>https://iam.ajaxjs.com/baidu_verify_codeva-05U1Ak03ZG/</loc>
-            <lastmod>2025-06-25T01:24:54.888Z</lastmod>
-        </url>
-    
-        <url>
-            <loc>https://iam.ajaxjs.com/google9ecf72d780b8e5c8/</loc>
-            <lastmod>2025-06-25T01:24:54.891Z</lastmod>
-        </url>
-    
-        <url>
-            <loc>https://iam.ajaxjs.com/asset/style/common.css</loc>
-            <lastmod>2025-06-25T01:24:54.927Z</lastmod>
-        </url>
-    
-        <url>
-            <loc>https://iam.ajaxjs.com/asset/style/main.css</loc>
+            <loc>https://iam.ajaxjs.com/asset/main.css</loc>
             <lastmod>2025-06-25T01:24:54.929Z</lastmod>
         </url>
     

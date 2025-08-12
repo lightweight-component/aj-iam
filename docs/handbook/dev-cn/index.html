@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8"/>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+        <title>AJ IAM /开发环境的准备</title>
+        <meta name="description" content="轻量级用户认证系统 开发环境的准备"/>
+        <meta name="keywords" content="用户, 认证, 会员系统, IAM, AJ-IAM, dev"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1"/>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@200..900&family=Noto+Serif:ital,wght@0,100..900;1,100..900&display=swap&family=Noto+Sans+SC:wght@100..900&display=swap" />
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@100..900&family=Noto+Serif:ital,wght@0,100..900;1,100..900&display=swap" />
+        <link rel="stylesheet" href="https://framework.ajaxjs.com/static/font/font.css" />
+        <link rel="stylesheet" href="/asset/main.css"/>
+        <link rel="icon" type="image/x-icon" href="https://framework.ajaxjs.com/aj-logo/logo.ico"/>
+        <script src="https://framework.ajaxjs.com/static/aj-docs/common.js"></script>
+        <script>
+            var _hmt = _hmt || [];
+            (function() {
+              var hm = document.createElement("script");
+              hm.src = "https://hm.baidu.com/hm.js?54c70624d18784ca7539c358f583133d";
+              var s = document.getElementsByTagName("script")[0];
+              s.parentNode.insertBefore(hm, s);
+            })();
+        </script>
+    </head>
+    <body>
+        <nav>
+            <div>
+                <div class="links">
+                    <a href="/">🏠 首页</a>
+                    | ⚙️ 源码:
+                    <a target="_blank" href="https://github.com/lightweight-component/aj-iam">Github</a>/<a target="_blank" href="https://gitcode.com/lightweight-component/aj-iam">Gitcode</a>
+                    |
+                    <a href="/">英文版本</a>
+                </div>
+                <h1><img src="https://framework.ajaxjs.com/aj-logo/logo.png" style="vertical-align: middle;height: 45px;margin-bottom: 6px;" /> AJ IAM</h1>
+                <h3>轻量级用户认证系统</h3>
+            </div>
+        </nav>
+        <div>
+            <menu>
+                
+                <ul>
+                    <li class="selected">
+                        <a href="/cn">首页</a>
+                    </li>
+                </ul>
+                <h3>开发心得</h3>
+                <ul>
+                    <li>
+                        <a href="/developer/user-cn">用户系统</a>
+                    </li>
+                    <li>
+                        <a href="/developer/model-cn">用户权限模型</a>
+                    </li>
+                </ul>
+                <h3>部署</h3>
+                <ul>
+                      <li>
+                           <a href="/handbook/deploy-cn">部署方式</a>
+                      </li>
+                      <li>
+                           <a href="/handbook/dev-cn">开发环境部署</a>
+                      </li>
+                </ul>
+
+                <h3>其他</h3>
+                <ul>
+                    <li><a href="/misc/contact-cn">联系方式</a></li>
+                </ul>
+            </menu>
+            <article>
+                <h1>开发环境的准备</h1>
+<p>本文阐述了基于 Node 大型前端开发环境配搭 AJ-IAM 在开发者本地的准备，一般是 VSCode + Eclipse/IDEA + Nginx 的环境。
+假设你的前端程序是 React/VueJs 的大型前端环境，那么本文正好适合你。下面介绍所需的工具环境。</p>
+<ul>
+<li>VS Code 或其他前端，基于 Node/NPM 的前端开发环境，开发阶段透过 Node 代理后台接口</li>
+<li>Eclipse/IDEA 或其他后端，基于 SpringBoot 的后端开发环境</li>
+<li>如果需要多租户开发，那么需要 Nginx 配置多租户（代理后台 API）</li>
+</ul>
+<p>相对于纯 HTML 前端（打包后的 React/Vue 亦算），开发环境的配置是比较复杂的，所以请耐心陪同我在下面的教程中了解如何搭建。、</p>
+<h2>下载源码运行 IAM</h2>
+<p>这一步就不详细说了，执行<code>main()</code>函数运行 SpringBoot 程序，端口号默认是 8082。
+访问接口<code>http://localhost:8082/iam_api/</code>返回 JSON：</p>
+<pre><code class="language-json">{
+    &quot;status&quot;: 1,
+    &quot;errorCode&quot;: null,
+    &quot;traceId&quot;: &quot;E9395E4765E244CE8080A44137296E4D&quot;,
+    &quot;message&quot;: null,
+    &quot;data&quot;: &quot;Hello World&quot;
+}
+</code></pre>
+<p>该接口仅仅是用于测试的接口，只返回 Hello World。</p>
+<h2>域名映射 IP</h2>
+<p>就是修改本地 hosts 文件，将域名映射到 IP。下面以 windows 系统为例子，打开<code>C:\Windows\System32\drivers\etc\hosts</code>文件。
+增加一笔域名的映射，例如：</p>
+<pre><code>127.0.0.1       local.foo.com
+</code></pre>
+<h2>Nginx</h2>
+<pre><code>server {
+    listen       80;
+    server_name  local.foo.com;
+
+    location / { # 登录页面
+        ssi on;
+        alias D:/sp42/code/ajaxjs/aj-iam/aj-iam-admin/;  # 注意路径斜杠
+        index index.html index.htm; # 默认首页
+        try_files $uri $uri/ /index.html; # 支持单页应用（SPA）路由
+        autoindex on;  # 可选，显示目录列表
+    }
+
+    location /iam_api/ {# 代理到后端 API
+        proxy_pass http://localhost:8082/iam_api/; 
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header auth-tenant-id 8; # 添加租户ID
+    }      
+}
+</code></pre>
+<p>这样加了第一层的代理，就可以<code>local.foo.com</code>访问 IAM 接口，在 Postman 里面测试下。</p>
+<p><img src="/asset/imgs/nginx-iam.jpg" alt=""></p>
+<h2>Client 配置</h2>
+<p>IAM 配置好之后，将 IAM 访问地址配置到 Client 端，所谓 Client 就是你的业务系统，整合了 iam-client SDK 的。</p>
+<p>在 yaml 文件中配置<code>auth.iam_service</code>及<code>auth.self_url</code>。<code>iam_service</code>是刚才我们配好的 Nginx 代理地址；<code>self_url</code>是 client 就是业务系统本身的地址，
+因为当前我们在 nodejs 的开发环境中，须使用代理的地址：<code>http://localhost:3000</code>而不是在 IDEA 运行的那个地址</p>
+<p><img src="/asset/imgs/client-iam.jpg" alt=""></p>
+<p>配置好之后 Client 运行起来，让前端可以访问。</p>
+<h1>访问 IAM User API</h1>
+<h2>问题的出现</h2>
+<p>像 IAM 这样的认证中心，管理着用户相关的接口，比如获取用户信息，修改用户信息，修改用户密码等的接口。
+认证中心是独立的进程和有自己的域 Domain，业务系统本身没有用户管理功能，而是通过 IAM SDK 与 IAM 整合。
+当业务系统需要获取用户信息，修改用户信息，修改用户密码的时候，应该怎么和 IAM 整合比较好，
+因为涉及跨域调用，这样的话把 AccessToken 存储在 httponly 的 cookie 则无用，但又不能显式存储 Token 在 localStorage 这类地方（安全性的缘故）。</p>
+<p>我想到一个方法，就是在业务系统搞一个类似 Nginx 的转发代理，
+专门针对 获取用户信息，修改用户信息，修改用户密码等的业务，转发到 IAM，把本地的认证信息（cookie 传入）提取 token 再转发到 IAM。</p>
+<p>实际上这属于BFF（Backend For Frontend）/后端代理的思路。</p>
+<h2>开发环境</h2>
+<p>这里以 Vue3 的 Vite 开发环境为例子，其他 React 的大同小异。
+首先规定前端访问前缀的<code>/rdd/rdd_api/iam_user</code>都是访问 IAM User API的，那么接着就在 Vite 添加一条路由转发规则：</p>
+<pre><code class="language-js">const init: ProxyTargetList = {
+    &quot;/rdd/rdd_api/iam_user&quot;: iamProxyOptions as ProxyTargetList,
+    [env.VITE_APP_BASE_API]: commonProxyOptions as ProxyTargetList, // 这是业务系统 API
+}
+</code></pre>
+<p>注意顺序越靠前的优先级越高，IAM 的在非 IAM 签名前面。再看看 IAM 的代理配置：</p>
+<pre><code class="language-js">  let iamProxyOptions: ProxyOptions = {
+    target: env.VITE_APP_IAM_URL, // 'http://local.foo.com/iam_api'
+    changeOrigin: true,
+    rewrite: (path: string) =&gt; {
+      return path.replace(/\/rdd\/rdd_api\/iam_user/, '');
+    },
+  };
+</code></pre>
+<p>开始以为 Cookie 的<code>SameSite = strict</code>限制跨域，IAM API 不能接受，但实际测试发现，Cookie 也可以直接传，不需要转换。</p>
+<p>如果 IAM API 不能接受，那么也可以通过 Vite 的<code>configure</code>的<code>proxy.on('proxyReq')</code>事件转换 Cookie 为 HTTP Head 给 IAM。</p>
+<h2>线上环境</h2>
+<p>这里注意两点，原先 IAM 的 HTTPS 经过 Nginx 转发不行，于是改用非 HTTPS 的；另外 HOST 已强制指定，否则 404。</p>
+<pre><code>location /rdd/rdd_api/iam_user/ { # 代理 IAM User
+    proxy_pass http://iamtest.ajaxjs.com/iam_api/; # 不要 SSL，证书不行
+    proxy_set_header Host iamtest.ajaxjs.com; # 自定义 host
+}
+</code></pre>
+<p>开始以为 Cookie 的<code>SameSite = strict</code>限制跨域，IAM API 不能接受，但实际测试发现，Cookie 也可以直接传，不需要转换。</p>
+<p>如果 IAM API 不能接受，那么也可以通过 Nginx 转换 Cookie 为 HTTP Head 给 IAM。</p>
+
+            </article>
+        </div>
+        <footer>
+             AJ-IAM，开源框架 <a href="https://framework.ajaxjs.com" target="_blank">AJ-Framework</a> 的一部分。联系方式：
+             frank@ajaxjs.com，<a href="https://blog.csdn.net/zhangxin09" target="_blank">作者博客</a>
+             <br />
+             <br />
+             Copyright © 2025 Frank Cheung. All rights reserved.
+         </footer>
+    </body>
+</html>
