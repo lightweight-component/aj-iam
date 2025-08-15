@@ -1,11 +1,15 @@
 package com.ajaxjs.iam.user.service;
 
+import com.ajaxjs.framework.spring.SimpleTemplate;
 import com.ajaxjs.iam.user.common.UserUtils;
 import com.ajaxjs.iam.user.common.util.CheckStrength;
-import com.ajaxjs.iam.user.common.util.SendEmail;
 import com.ajaxjs.iam.user.controller.ResetPasswordController;
 import com.ajaxjs.iam.user.model.User;
 import com.ajaxjs.iam.user.model.UserAccount;
+import com.ajaxjs.iam.user.service.resetpsw.ResetPasswordByEmailCode;
+import com.ajaxjs.iam.user.service.resetpsw.ResetPasswordBySmsCode;
+import com.ajaxjs.message.email.Email;
+import com.ajaxjs.message.email.ISendEmail;
 import com.ajaxjs.sqlman.Sql;
 import com.ajaxjs.sqlman.crud.Entity;
 import com.ajaxjs.util.EncodeTools;
@@ -24,9 +28,6 @@ import java.util.function.Function;
 
 @Service
 public class ResetPasswordService implements ResetPasswordController {
-    @Autowired
-    private SendEmail sendEmail;
-
     @Autowired
     @Qualifier("passwordEncode")
     Function<String, String> passwordEncode;
@@ -47,14 +48,16 @@ public class ResetPasswordService implements ResetPasswordController {
      */
     private final static String FIND_BY_EMAIL = "/user/reset_password/findByEmail/";
 
-    User findUserBy(String type, Object value, Integer tenantId) {
+    public static User findUserBy(String type, Object value, Integer tenantId) {
         String sql = "SELECT * FROM user WHERE %s = ? AND stat != 1";
         sql = String.format(sql, type);
+        User user;
 
-        if (tenantId != null && tenantId != 0)
-            sql += " AND tenant_id = " + tenantId;
-
-        User user = Sql.newInstance().input(sql, value).query(User.class);
+        if (tenantId != null && tenantId != 0) {
+            sql += " AND tenant_id = ?";
+            user = Sql.newInstance().input(sql, value, tenantId).query(User.class);
+        } else
+            user = Sql.newInstance().input(sql, value).query(User.class);
 
         if (user == null)
             throw new IllegalAccessError("该 " + type + ": " + value + " 的用户不存在！");
@@ -78,21 +81,49 @@ public class ResetPasswordService implements ResetPasswordController {
         map.put("link", url);
         map.put("desc", title);
         map.put("timeout", String.valueOf(TOKEN_TIMEOUT));
-        String content = sendEmail.getEmailContent(map);
+        String content = SimpleTemplate.render(BY_LINK_HTML, map);
 
-        return sendEmail.send(email, title, content);
+        return sendEmail(email, title, content);
+    }
+
+    @Autowired
+    ResetPasswordByEmailCode resetPasswordByEmailCode;
+
+    @Override
+    public boolean sendCodeEmail(String email) {
+        return resetPasswordByEmailCode.sendCode(email);
     }
 
     @Override
-    public boolean sendRestPhone(String phone) {
-        if (!StringUtils.hasText(phone) || !UserUtils.isValidPhone(phone))
-            throw new IllegalArgumentException("请提交有效的手机");
+    public boolean verifyEmailUpdatePsw(String code, String newPsw, String email) {
+        return resetPasswordByEmailCode.verifyCodeUpdatePsw(code, newPsw, email);
+    }
 
-        User user = findUserBy("phone", phone, TenantService.getTenantId());
-//        String code = sendSMS.getRandomCodeAndSave(phone, String.valueOf(user.getId()), user.getUsername());
-//
-//        return sendSMS.send(phone, code);
-        return true;
+    @Autowired
+    ISendEmail send;
+
+    /**
+     * 发送邮件
+     */
+    public boolean sendEmail(String to, String subject, String content) {
+        return send.sendEmail(new Email().setTo(to).setFrom("onboarding@resend.dev").setSubject(subject).setContent(content));
+    }
+
+    /**
+     * 邮件模板
+     */
+    // @formatter:off
+     final static String BY_LINK_HTML = "用户 ${username} 您好：<br />&nbsp;&nbsp;&nbsp;&nbsp;请点击下面的链接进行${desc}：<br />"
+            + "&nbsp;&nbsp;&nbsp;&nbsp;<a href=\"${link}\" target=\"_blank\">${link}</a>。"
+            + "<br /> &nbsp;&nbsp;&nbsp;&nbsp;提示：1）请勿回复本邮件；2）本邮件超过 ${timeout} 小时的话链接将会失效，需要重新申请${desc}；3）如不能打开，请复制该链接到浏览器。";
+    // @formatter:on
+
+    @Autowired
+    ResetPasswordBySmsCode resetPasswordBySmsCode;
+
+    @Override
+    public boolean sendRestPhone(String phone) {
+        return resetPasswordBySmsCode.sendCode(phone);
     }
 
     @Override
@@ -130,7 +161,8 @@ public class ResetPasswordService implements ResetPasswordController {
      */
     public String makeEmailToken(String email, Integer tenantId) {
         String expireHex = Long.toHexString(System.currentTimeMillis());
-        String emailToken = MessageDigestHelper.getSHA1(encryptKey + email), timeToken = AesCrypto.getInstance().AES_encode(expireHex, encryptKey);
+        String emailToken = MessageDigestHelper.getSHA1(encryptKey + email),
+                timeToken = AesCrypto.getInstance().AES_encode(expireHex, encryptKey);
 
         return emailToken + timeToken;
     }

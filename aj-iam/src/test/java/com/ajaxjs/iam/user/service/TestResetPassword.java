@@ -1,28 +1,29 @@
 package com.ajaxjs.iam.user.service;
 
-import com.ajaxjs.iam.server.BaseTest;
-import com.ajaxjs.iam.user.common.util.SendEmail;
-
+import com.ajaxjs.framework.spring.SimpleTemplate;
+import com.ajaxjs.iam.BaseTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.ajaxjs.iam.user.service.ResetPasswordService.BY_LINK_HTML;
+import static com.ajaxjs.iam.user.service.TenantService.AUTH_TENANT_ID;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class TestResetPassword extends BaseTest {
     @Autowired
     ResetPasswordService resetPasswordService;
 
-    @Autowired
-    SendEmail sendEmail;
-
     @Test
     public void testSendEmail() {
-        assertTrue(sendEmail.send("sp42@qq.com", "test", "dsds<br>我希望可以<b>跟你做</b>朋友34354344"));
+        assertTrue(resetPasswordService.sendEmail("sp42@qq.com", "test", "dsds<br>我希望可以<b>跟你做</b>朋友34354344"));
     }
 
     @Test
@@ -42,19 +43,19 @@ public class TestResetPassword extends BaseTest {
     @Test
     public void testTpl() {
         // 设置文字模板，其中 #{} 表示表达式的起止，#user 是表达式字符串，表示引用一个变量。
-        String template = "ddd#{#user}，早上好";
+        String template = "Hi，${user}，早上好";
 
         Map<String, String> map = new HashMap<>();
         map.put("user", "黎明");
 
-        String result = SendEmail.simpleTemplate(template, map);
-        assertEquals("ddd黎明，早上好", result);
+        String result = SimpleTemplate.render(template, map);
+        assertEquals("Hi，黎明，早上好", result);
 
         map = new HashMap<>(16);
         map.put("username", "黎明");
         map.put("timeout", "12");
 
-        result = sendEmail.getEmailContent(map);
+        result = SimpleTemplate.render(BY_LINK_HTML, map);
         System.out.println(result);
     }
 
@@ -62,6 +63,8 @@ public class TestResetPassword extends BaseTest {
 
     @Test
     public void sendRestPswEmail() {
+        when(req.getHeader(AUTH_TENANT_ID)).thenReturn("1");
+        RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(req));
         assertNotNull(resetPasswordService.sendRestEmail("sp42@qq.com"));
     }
 

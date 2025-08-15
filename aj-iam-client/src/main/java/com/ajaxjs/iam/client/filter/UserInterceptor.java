@@ -231,7 +231,7 @@ public class UserInterceptor implements HandlerInterceptor {
 
                     // 如果上述方式都提取不到 token，记录警告日志
                     if (token == null)
-                        log.warn("Token not found in request parameters. Not an OAuth2 request. path: " + request.getRequestURI());
+                        log.warn("Token not found in request parameters. Not an OAuth2 request. The path: " + request.getRequestURI());
                 }
             }
         }
