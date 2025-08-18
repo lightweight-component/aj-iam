@@ -2,7 +2,6 @@ package com.ajaxjs.iam.user.service.resetpsw;
 
 import com.ajaxjs.iam.BaseTest;
 import com.ajaxjs.iam.user.model.User;
-import com.ajaxjs.iam.user.service.ResetPasswordService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -22,6 +21,11 @@ public class TestResetPasswordByEmailCode extends BaseTest {
     ResetPasswordByEmailCode resetPasswordByEmailCode;
 
     @Test
+    void testSendEmail() {
+        assertTrue(resetPasswordByEmailCode.sendEmail("sp42@qq.com", "test", "dsds<br>我希望可以<b>跟你做</b>朋友34354344"));
+    }
+
+    @Test
     void testSendCodeEmail() {
         when(req.getHeader(AUTH_TENANT_ID)).thenReturn("1");
         RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(req));
@@ -35,10 +39,10 @@ public class TestResetPasswordByEmailCode extends BaseTest {
         when(req.getHeader(AUTH_TENANT_ID)).thenReturn("1");
         RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(req));
 
-        User user = ResetPasswordService.findUserBy("email", "sp42@qq.com", 1);
+        User user = BaseResetPasswordService.findUserBy("email", "sp42@qq.com", 1);
         String code = resetPasswordByEmailCode.saveCode(user, "sp42@qq.com", 1);
 
-        boolean b = resetPasswordByEmailCode.verifyCodeUpdatePsw(code, "nba1234a", "sp42@qq.com");
+        boolean b = resetPasswordByEmailCode.verifyCodeUpdatePsw(code, "nba1234b", "sp42@qq.com");
         assertTrue(b);
     }
 }

@@ -2,7 +2,6 @@ package com.ajaxjs.iam.user.service.resetpsw;
 
 import com.ajaxjs.framework.cache.Cache;
 import com.ajaxjs.iam.user.model.User;
-import com.ajaxjs.iam.user.service.ResetPasswordService;
 import com.ajaxjs.iam.user.service.TenantService;
 import com.ajaxjs.spring.DiContextUtil;
 import com.ajaxjs.sqlman.Sql;
@@ -16,6 +15,8 @@ public interface ByCode {
     String saveCode(User user, String any, Integer tenantId);
 
     boolean verifyCodeUpdatePsw(String code, String newPsw, String any);
+
+    boolean updatePwd(Map<String, Object> user, String newPassword);
 
     default boolean _verifyCodeUpdatePsw(Cache<String, Object> cache, String code, String CACHE_PREFIX, String any, String newPsw) {
         Integer tenantId = TenantService.getTenantId();
@@ -36,6 +37,6 @@ public interface ByCode {
         Map<String, Object> user = Sql.newInstance().input(
                 "SELECT u.*, a.id AS auth_id, a.password FROM user u LEFT JOIN user_account a ON u.id = a.user_id WHERE u.id = ?", userId).query();
 
-        return DiContextUtil.getBean(ResetPasswordService.class).updatePwd(user, newPsw);
+        return updatePwd(user, newPsw);
     }
 }

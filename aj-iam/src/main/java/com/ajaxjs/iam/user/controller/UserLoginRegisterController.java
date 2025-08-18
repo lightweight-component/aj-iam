@@ -2,7 +2,7 @@ package com.ajaxjs.iam.user.controller;
 
 //import com.ajaxjs.framework.filter.google_captcha.GoogleCaptchaCheck;
 
-import com.ajaxjs.iam.annotation.AllowAccess;
+import com.ajaxjs.iam.annotation.AllowOpenAccess;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -51,7 +51,7 @@ public interface UserLoginRegisterController {
      * @return 是否成功
      */
     @PostMapping
-    @AllowAccess
+    @AllowOpenAccess
     Boolean register(@RequestBody Map<String, Object> params);
 
     /**

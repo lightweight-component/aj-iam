@@ -3,7 +3,6 @@ package com.ajaxjs.iam.user.service.resetpsw;
 import com.ajaxjs.framework.cache.Cache;
 import com.ajaxjs.iam.user.common.UserUtils;
 import com.ajaxjs.iam.user.model.User;
-import com.ajaxjs.iam.user.service.ResetPasswordService;
 import com.ajaxjs.iam.user.service.TenantService;
 import com.ajaxjs.util.RandomTools;
 import com.ajaxjs.util.StrUtil;
@@ -15,7 +14,7 @@ import org.springframework.util.StringUtils;
 
 @Service
 @Slf4j
-public class ResetPasswordBySmsCode implements ByCode {
+public class ResetPasswordBySmsCode  extends BaseResetPasswordService implements ByCode {
     @Autowired
     @Qualifier("localCache")
     Cache<String, Object> cache;
@@ -36,7 +35,7 @@ public class ResetPasswordBySmsCode implements ByCode {
             throw new IllegalArgumentException("请提交有效的手机");
 
         Integer tenantId = TenantService.getTenantId();
-        User user = ResetPasswordService.findUserBy("phone", phone, tenantId);
+        User user = BaseResetPasswordService.findUserBy("phone", phone, tenantId);
         String code = saveCode(user, phone, tenantId);
 //        sendSMS.send(phone, code);
 

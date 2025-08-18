@@ -4,7 +4,6 @@ import com.ajaxjs.framework.cache.Cache;
 import com.ajaxjs.framework.spring.SimpleTemplate;
 import com.ajaxjs.iam.user.common.UserUtils;
 import com.ajaxjs.iam.user.model.User;
-import com.ajaxjs.iam.user.service.ResetPasswordService;
 import com.ajaxjs.iam.user.service.TenantService;
 import com.ajaxjs.message.email.Email;
 import com.ajaxjs.message.email.ISendEmail;
@@ -21,7 +20,7 @@ import java.util.Map;
 
 @Service
 @Slf4j
-public class ResetPasswordByEmailCode implements ByCode {
+public class ResetPasswordByEmailCode extends BaseResetPasswordService implements ByCode {
     @Autowired
     @Qualifier("localCache")
     Cache<String, Object> cache;
@@ -45,7 +44,7 @@ public class ResetPasswordByEmailCode implements ByCode {
             throw new IllegalArgumentException("请提交有效的邮件地址");
 
         Integer tenantId = TenantService.getTenantId();
-        User user = ResetPasswordService.findUserBy("email", email, tenantId);
+        User user = BaseResetPasswordService.findUserBy("email", email, tenantId);
         String code = saveCode(user, email, tenantId);
 
         String title = "重置密码";
@@ -67,7 +66,8 @@ public class ResetPasswordByEmailCode implements ByCode {
 
             code = _radAndUserId[0];
         } else {
-            code = RandomTools.generateRandomString(6).toUpperCase(); // 6 位随机码
+//            code = RandomTools.generateRandomString(6).toUpperCase(); // 6 位随机码
+            code = String.valueOf(RandomTools.generateRandomNumber(4));
             Long userId = user.getId();
             String loginId = user.getLoginId();
             radAndUserId = code + "_" + userId + "_" + loginId;
