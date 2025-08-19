@@ -4,6 +4,7 @@ import com.ajaxjs.iam.annotation.AllowOpenAccess;
 import com.ajaxjs.iam.user.service.resetpsw.ResetPasswordByEmailCode;
 import com.ajaxjs.iam.user.service.resetpsw.ResetPasswordByEmailLink;
 import com.ajaxjs.iam.user.service.resetpsw.ResetPasswordBySmsCode;
+import com.ajaxjs.security.captcha.image.ImageCaptchaCheck;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,6 +27,7 @@ public class ResetPasswordController {
      * @return true 表示发送成功
      */
     @PostMapping("/send_reset_email_code/{email}")
+    @ImageCaptchaCheck
     public boolean sendCodeEmail(@PathVariable String email) {
         return resetPasswordByEmailCode.sendCode(email);
     }

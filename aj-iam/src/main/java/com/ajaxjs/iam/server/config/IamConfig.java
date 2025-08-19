@@ -8,6 +8,8 @@ import com.ajaxjs.iam.user.common.session.ServletUserSession;
 import com.ajaxjs.iam.user.common.session.UserSession;
 import com.ajaxjs.message.email.ISendEmail;
 import com.ajaxjs.message.email.resend.Resend;
+import com.ajaxjs.security.captcha.image.ImageCaptchaConfig;
+import com.ajaxjs.security.captcha.image.impl.SimpleCaptchaImage;
 import com.ajaxjs.util.JsonUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -23,20 +25,6 @@ import static com.ajaxjs.iam.server.common.IamConstants.JWT_TOKEN_USER_KEY;
 @Configuration
 @Slf4j
 public class IamConfig implements WebMvcConfigurer {
-    @Value("${db.url}")
-    private String url;
-
-    @Value("${db.user}")
-    private String user;
-
-    @Value("${db.psw}")
-    private String psw;
-
-//    @Bean(value = "dataSource", destroyMethod = "close")
-//    DataSource getDs() {
-//        return DataBaseConnection.setupMySqlJdbcPool(url, user, psw);
-//    }
-
     /**
      * 用户全局拦截器
      */
@@ -96,6 +84,21 @@ public class IamConfig implements WebMvcConfigurer {
         return new LRUCache<>(500);
     }
 
+    @Bean
+    ImageCaptchaConfig imageCaptchaConfig() {
+        Cache<String, Object> cache = initLocalCache();
+        ImageCaptchaConfig config = new ImageCaptchaConfig();
+        config.setCaptchaImageProvider(new SimpleCaptchaImage());
+        config.setSaveToRam(cache::put);
+        config.setCaptchaCodeFromRam(key -> {
+            Object o = cache.get(key);
+            return o == null ? null : o.toString();
+        });
+        config.setRemoveByKey(cache::remove);
+
+        return config;
+    }
+
     /**
      * 加入认证拦截器
      */
@@ -116,7 +119,6 @@ public class IamConfig implements WebMvcConfigurer {
 //    Cache<String, Object> simpleJvmCache() {
 //        return ExpiryCache.getInstance();
 //    }
-
     @Bean
     UserSession UserSession() {
         return new ServletUserSession();
