@@ -5,7 +5,7 @@ description: 资源所有者密码凭证（ROPC）
 date: 2022-01-05
 tags:
   - ROPC
-layout: layouts/docs-cn.njk
+layout: layouts/docs.njk
 ---
 # 资源所有者密码凭证（ROPC）
 

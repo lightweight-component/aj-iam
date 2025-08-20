@@ -5,7 +5,7 @@ description: Refresh Token
 date: 2022-01-05
 tags:
   - Refresh Token
-layout: layouts/docs-cn.njk
+layout: layouts/docs.njk
 ---
 # Refresh Token
 

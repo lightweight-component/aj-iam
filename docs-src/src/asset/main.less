@@ -1,28 +1,11 @@
 html,
 body {
     height: 100%;
-    font-size: 16px;
 }
 
 body {
-    padding: 0;
-    margin: 0;
-    font-family: "Liberation Serif", "DejaVu serif", "Source Code Pro", Monaco, Menlo, Consolas, monospace;
-    font-family: Lato, "Helvetica Neue", Helvetica, Arial, sans-serif;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
-    font-synthesis: none;
-    text-rendering: optimizeLegibility;
-    font-optical-sizing: auto;
-    font-weight: 400;
-    font-style: normal;
-    font-size: 1rem;
-    line-height: 1.5;
+    font-size: 16px;
     color: #606c71;
-}
-
-body.drak {
-    color: white;
-    background-color: black;
 }
 
 menu,
@@ -69,10 +52,12 @@ body.drak nav {
 nav>div {
     max-width: 1200px;
     margin: 0 auto;
+
 }
 
 nav h1,
 nav h3 {
+    margin: 15px 0;
     display: inline-block;
 }
 
@@ -89,6 +74,7 @@ nav h3 {
 body>div {
     max-width: 1200px;
     margin: 0 auto;
+    overflow: hidden;
 }
 
 .links {
@@ -142,7 +128,6 @@ menu ul li {
 
 menu ul li.selected {
     font-weight: bold;
-
 }
 
 menu ul li.selected a {
@@ -198,30 +183,24 @@ article {
     }
 
     ul {
-        margin-left: 10px;
+        margin-left: 35px;
 
         ul {
             margin-left: 20px;
         }
 
         li {
-            margin-top: 2%;
+            margin-top: 1%;
             // padding-top: 10px;
         }
     }
 
     p {
-        margin-bottom: 3%;
-        text-indent: 2em;
-        text-align: justify;
-        line-height: 160%;
-        padding-right: 1%;
-        // letter-spacing: .5px;
 
         img {
             max-width: 80%;
             display: block;
-            margin: 0 auto;
+            margin: 20px auto;
         }
     }
 
@@ -375,6 +354,7 @@ article {
         background: linear-gradient(to right, rgba(251, 251, 251, 1), rgba(251, 251, 251, 0));
         width: 90%;
         overflow-x: auto;
+        line-height: 1.2;
         position: relative;
         // pointer-events: none;
 

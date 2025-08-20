@@ -5,7 +5,7 @@ description: TODO
 date: 2022-01-05
 tags:
   - last one
-layout: layouts/docs-cn.njk
+layout: layouts/docs.njk
 ---
     <h1>联系</h1>
     <br />

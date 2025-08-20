@@ -5,7 +5,7 @@ description: 开发环境的准备
 date: 2022-01-05
 tags:
   - dev
-layout: layouts/docs-cn.njk
+layout: layouts/docs.njk
 ---
 # 开发环境的准备
 

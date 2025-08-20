@@ -5,7 +5,7 @@ description: 用户系统的架构设计与实现策略-用户模型
 date: 2022-01-05
 tags:
   - 用户模型
-layout: layouts/docs-cn.njk
+layout: layouts/docs.njk
 ---
 
 # 用户系统的架构设计与实现策略-用户模型

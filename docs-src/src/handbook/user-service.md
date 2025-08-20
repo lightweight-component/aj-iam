@@ -5,7 +5,7 @@ description: 用户基本服务
 date: 2022-01-05
 tags:
   - 用户基本服务
-layout: layouts/docs-cn.njk
+layout: layouts/docs.njk
 ---
 # 用户基本服务
 
