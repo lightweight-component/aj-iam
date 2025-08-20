@@ -1,7 +1,7 @@
 package com.ajaxjs.iam.client.filter;
 
 import com.ajaxjs.iam.UserConstants;
-import com.ajaxjs.iam.annotation.AllowAccess;
+import com.ajaxjs.iam.annotation.AllowOpenAccess;
 import com.ajaxjs.iam.client.ClientUtils;
 import com.ajaxjs.iam.jwt.JWebToken;
 import com.ajaxjs.iam.jwt.JWebTokenMgr;
@@ -57,7 +57,7 @@ public class UserInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
-        boolean isAllowAccess = handler instanceof HandlerMethod && (ClientUtils.getAnnotationFromMethod((HandlerMethod) handler, AllowAccess.class) != null);
+        boolean isAllowAccess = handler instanceof HandlerMethod && (ClientUtils.getAnnotationFromMethod((HandlerMethod) handler, AllowOpenAccess.class) != null);
 
         if (isAllowAccess)
             return true;
@@ -231,7 +231,7 @@ public class UserInterceptor implements HandlerInterceptor {
 
                     // 如果上述方式都提取不到 token，记录警告日志
                     if (token == null)
-                        log.warn("Token not found in request parameters. Not an OAuth2 request. path: " + request.getRequestURI());
+                        log.warn("Token not found in request parameters. Not an OAuth2 request. The path: " + request.getRequestURI());
                 }
             }
         }

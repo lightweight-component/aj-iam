@@ -19,3 +19,4 @@ fi
 
 echo "启动程序"
 nohup java -Xms512m -Xmx512m -jar ./$process_name >message.log 2>&1 &
+tail -f message.log

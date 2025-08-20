@@ -1,5 +1,6 @@
 package com.ajaxjs.iam.user.controller;
 
+import com.ajaxjs.iam.annotation.AllowOpenAccess;
 import com.ajaxjs.iam.user.model.LogLogin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;

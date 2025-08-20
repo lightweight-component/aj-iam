@@ -45,6 +45,13 @@ public class ClientUtils {
 
         Method method = handlerMethod.getMethod(); // The real controller method
 
-        return method.getAnnotation(annotationClass);
+        annotation = method.getAnnotation(annotationClass);
+
+        if (annotation != null)
+            return annotation;
+
+        Class<?> controllerClass = handlerMethod.getBeanType();// 获取控制器类（方法所在的类）
+
+        return controllerClass.getAnnotation(annotationClass);
     }
 }

@@ -10,6 +10,6 @@ import java.lang.annotation.Target;
  * 表示完全的开放，不作認證
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.METHOD)
-public @interface AllowAccess {
+@Target({ElementType.TYPE, ElementType.METHOD})
+public @interface AllowOpenAccess {
 }

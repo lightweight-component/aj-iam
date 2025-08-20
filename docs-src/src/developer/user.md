@@ -5,7 +5,7 @@ description: MCP Server SDK Usage
 date: 2022-01-05
 tags:
   - MCP Server SDK Usage
-layout: layouts/docs.njk
+layout: layouts/docs-en.njk
 ---
 
 # User System

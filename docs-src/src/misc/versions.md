@@ -5,7 +5,7 @@ description: TODO
 date: 2022-01-05
 tags:
   - last one
-layout: layouts/docs.njk
+layout: layouts/docs-en.njk
 ---
     <h1>Release History</h1>
     <h3>aj-mcp-common v1.5/aj-mcp-client v1.3 /aj-mcp-server v1.2 <span class="release-date">2025-06-10</span></h3>

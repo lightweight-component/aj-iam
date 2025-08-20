@@ -1,7 +1,7 @@
 package com.ajaxjs.iam.server.controller;
 
 import com.ajaxjs.framework.database.IgnoreDataBaseConnect;
-import com.ajaxjs.iam.annotation.AllowAccess;
+import com.ajaxjs.iam.annotation.AllowOpenAccess;
 import com.ajaxjs.framework.mvc.unifiedreturn.ResponseResultWrapper;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class HelloWorld {
     @GetMapping
     @IgnoreDataBaseConnect
-    @AllowAccess
+    @AllowOpenAccess
     @CrossOrigin
     ResponseResultWrapper sayHi() {
         ResponseResultWrapper result = new ResponseResultWrapper();

@@ -5,7 +5,7 @@ description: 部署 IAM 程序
 date: 2022-01-05
 tags:
   - 部署
-layout: layouts/docs.njk
+layout: layouts/docs-en.njk
 ---
 # 部署 IAM 程序
 

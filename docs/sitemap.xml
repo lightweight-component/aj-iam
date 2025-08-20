@@ -2,11 +2,6 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     
         <url>
-            <loc>https://iam.ajaxjs.com/cn/</loc>
-            <lastmod>2022-01-05T00:00:00.000Z</lastmod>
-        </url>
-    
-        <url>
             <loc>https://iam.ajaxjs.com/developer/model-cn/</loc>
             <lastmod>2022-01-05T00:00:00.000Z</lastmod>
         </url>
@@ -52,7 +47,22 @@
         </url>
     
         <url>
+            <loc>https://iam.ajaxjs.com/handbook/refresh-token/</loc>
+            <lastmod>2022-01-05T00:00:00.000Z</lastmod>
+        </url>
+    
+        <url>
             <loc>https://iam.ajaxjs.com/handbook/ropc-cn/</loc>
+            <lastmod>2022-01-05T00:00:00.000Z</lastmod>
+        </url>
+    
+        <url>
+            <loc>https://iam.ajaxjs.com/handbook/user-service/</loc>
+            <lastmod>2022-01-05T00:00:00.000Z</lastmod>
+        </url>
+    
+        <url>
+            <loc>https://iam.ajaxjs.com/index-en/</loc>
             <lastmod>2022-01-05T00:00:00.000Z</lastmod>
         </url>
     

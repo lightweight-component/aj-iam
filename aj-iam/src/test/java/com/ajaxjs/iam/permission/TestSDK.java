@@ -1,6 +1,6 @@
 package com.ajaxjs.iam.permission;
 
-import com.ajaxjs.iam.server.BaseTest;
+import com.ajaxjs.iam.BaseTest;
 import org.junit.jupiter.api.Test;
 
 public class TestSDK extends BaseTest {

@@ -1,20 +1,21 @@
 package com.ajaxjs.iam.server.config;
 
-import com.ajaxjs.base.Sdk;
-
-//import com.ajaxjs.iam.server.controller.UserInterceptor;
+import com.ajaxjs.framework.cache.Cache;
+import com.ajaxjs.framework.cache.delayqueue.ExpiryCache;
+import com.ajaxjs.framework.cache.lru.LRUCache;
 import com.ajaxjs.iam.server.service.OidcService;
 import com.ajaxjs.iam.user.common.session.ServletUserSession;
 import com.ajaxjs.iam.user.common.session.UserSession;
-import com.ajaxjs.framework.cache.Cache;
-import com.ajaxjs.framework.cache.delayqueue.ExpiryCache;
+import com.ajaxjs.message.email.ISendEmail;
+import com.ajaxjs.message.email.resend.Resend;
+import com.ajaxjs.security.captcha.image.ImageCaptchaConfig;
+import com.ajaxjs.security.captcha.image.impl.SimpleCaptchaImage;
 import com.ajaxjs.util.JsonUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.util.function.Function;
@@ -24,20 +25,6 @@ import static com.ajaxjs.iam.server.common.IamConstants.JWT_TOKEN_USER_KEY;
 @Configuration
 @Slf4j
 public class IamConfig implements WebMvcConfigurer {
-    @Value("${db.url}")
-    private String url;
-
-    @Value("${db.user}")
-    private String user;
-
-    @Value("${db.psw}")
-    private String psw;
-
-//    @Bean(value = "dataSource", destroyMethod = "close")
-//    DataSource getDs() {
-//        return DataBaseConnection.setupMySqlJdbcPool(url, user, psw);
-//    }
-
     /**
      * 用户全局拦截器
      */
@@ -45,12 +32,11 @@ public class IamConfig implements WebMvcConfigurer {
 //    UserInterceptor authInterceptor() {
 //        return new UserInterceptor();
 //    }
-
     @Bean
     @Qualifier("getuserfromjvmhash")
     Function<String, String> getUserFromJvmHash() {
         return token -> {
-            Cache<String, Object> cache = simpleJvmCache();
+            Cache<String, Object> cache = ExpiryCache.getInstance();
             String key = JWT_TOKEN_USER_KEY + "-" + token;
             OidcService.TokenUser tokenUser = cache.get(key, OidcService.TokenUser.class);
 
@@ -81,10 +67,37 @@ public class IamConfig implements WebMvcConfigurer {
 //        return g;
 //    }
 
-//    @Bean
-//    UserInterceptor authInterceptor() {
-//        return new UserInterceptor();
-//    }
+    @Value("${aj-framework.message.email.resend.apikey}")
+    private String sendEmailApiKey;
+
+    @Bean
+    ISendEmail initSendMail() {
+        Resend sendEmail = new Resend();
+        sendEmail.setApiKey(sendEmailApiKey);
+
+        return sendEmail;
+    }
+
+    @Bean
+    @Qualifier("localCache")
+    Cache<String, Object> initLocalCache() {
+        return new LRUCache<>(500);
+    }
+
+    @Bean
+    ImageCaptchaConfig imageCaptchaConfig() {
+        Cache<String, Object> cache = initLocalCache();
+        ImageCaptchaConfig config = new ImageCaptchaConfig();
+        config.setCaptchaImageProvider(new SimpleCaptchaImage());
+        config.setSaveToRam(cache::put);
+        config.setCaptchaCodeFromRam(key -> {
+            Object o = cache.get(key);
+            return o == null ? null : o.toString();
+        });
+        config.setRemoveByKey(cache::remove);
+
+        return config;
+    }
 
     /**
      * 加入认证拦截器
@@ -102,12 +115,10 @@ public class IamConfig implements WebMvcConfigurer {
 //            interceptorRegistration.excludePathPatterns(arr);
 //        }
 //    }
-
-    @Bean
-    Cache<String, Object> simpleJvmCache() {
-        return ExpiryCache.getInstance();
-    }
-
+//    @Bean
+//    Cache<String, Object> simpleJvmCache() {
+//        return ExpiryCache.getInstance();
+//    }
     @Bean
     UserSession UserSession() {
         return new ServletUserSession();
@@ -115,15 +126,6 @@ public class IamConfig implements WebMvcConfigurer {
 
     @Value("${BaseService.endPoint: }")
     private String baseServiceEndPoint;
-
-    @Bean
-    Sdk initBaseSDK() {
-        Sdk sdk = new Sdk();
-        sdk.setEndPoint(baseServiceEndPoint);
-        sdk.setRestTemplate(new RestTemplate());
-
-        return sdk;
-    }
 
 //    @Bean
 //    CrossFilter CrossFilter() {

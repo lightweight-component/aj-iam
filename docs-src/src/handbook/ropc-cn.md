@@ -5,7 +5,7 @@ description: 资源所有者密码凭证（ROPC）
 date: 2022-01-05
 tags:
   - ROPC
-layout: layouts/docs-cn.njk
+layout: layouts/docs.njk
 ---
 # 资源所有者密码凭证（ROPC）
 
@@ -17,7 +17,7 @@ OAuth 规范中除了常见的授权模式外，还有一种密码凭证模式�
 首先在你应用程序本地设置控制器：
 
 ```java
-import com.ajaxjs.iam.annotation.AllowAccess;
+import com.ajaxjs.iam.annotation.AllowOpenAccess;
 import com.zoomtech2008.rdd.model.dto.RddUserDTO;
 import com.zoomtech2008.rdd.model.vo.RddUserTokenVo;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -64,7 +64,7 @@ public interface UserController {
 
 ```java
 import com.ajaxjs.framework.database.IgnoreDataBaseConnect;
-import com.ajaxjs.iam.annotation.AllowAccess;
+import com.ajaxjs.iam.annotation.AllowOpenAccess;
 import com.ajaxjs.iam.client.BaseOidcClientUserController;
 import com.ajaxjs.iam.jwt.JWebToken;
 import com.ajaxjs.iam.jwt.JWebTokenMgr;

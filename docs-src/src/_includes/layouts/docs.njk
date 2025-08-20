@@ -3,23 +3,19 @@
     <head>
         <meta charset="utf-8"/>
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
-        <title>AJ IAM/{{ title }}</title>
-        <meta name="description" content="A lightweight User Authentication System for Java. {{description}}"/>
-        <meta name="keywords" content="auth, authentication, lightweight, {{tags}}"/>
+        <title>AJ IAM /{{ title }}</title>
+        <meta name="description" content="轻量级用户认证系统 {{description}}"/>
+        <meta name="keywords" content="用户, 认证, 会员系统, IAM, AJ-IAM, {{tags}}"/>
         <meta name="viewport" content="width=device-width, initial-scale=1"/>
-        <link rel="stylesheet" href="https://framework.ajaxjs.com/static/font/font.css" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@200..900&family=Noto+Serif:ital,wght@0,100..900;1,100..900&display=swap&family=Noto+Sans+SC:wght@100..900&display=swap" />
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@100..900&family=Noto+Serif:ital,wght@0,100..900;1,100..900&display=swap" />
+        <link rel="stylesheet" href="https://framework.ajaxjs.com/static/new-ui/css/common.css" />
         <link rel="stylesheet" href="/asset/main.css"/>
         <link rel="icon" type="image/x-icon" href="https://framework.ajaxjs.com/aj-logo/logo.ico"/>
         <script src="https://framework.ajaxjs.com/static/aj-docs/common.js"></script>
         <script>
-            // 获取用户的默认语言
-            var userLang = navigator.language || navigator.userLanguage;
-
-            // 检查是否为中文环境（包括简体和繁体）
-            if (userLang.startsWith('zh') && location.pathname.indexOf('cn') == -1) {
-                 confirm('欢迎！您可以改为访问中文内容。是否继续？') && location.assign('/cn');  // 如果是中文，则弹出提示
-            }
-
             var _hmt = _hmt || [];
             (function() {
               var hm = document.createElement("script");
@@ -33,57 +29,56 @@
         <nav>
             <div>
                 <div class="links">
-                    <a href="/">🏠 Home</a>
-                    | ⚙️ Source:
+                    <a href="/">🏠 首页</a>
+                    | ⚙️ 源码:
                     <a target="_blank" href="https://github.com/lightweight-component/aj-iam">Github</a>/<a target="_blank" href="https://gitcode.com/lightweight-component/aj-iam">Gitcode</a>
-                    |
-                    <a href="/cn">Chinese Version</a>
                 </div>
                 <h1><img src="https://framework.ajaxjs.com/aj-logo/logo.png" style="vertical-align: middle;height: 45px;margin-bottom: 6px;" /> AJ IAM</h1>
-                <h3>A lightweight User Authentication System</h3>
+                <h3>轻量级用户认证系统</h3>
             </div>
         </nav>
         <div>
             <menu>
-
+                {# <h3>AJ Framework 简介</h3> #}
                 <ul>
                     <li class="selected">
-                        <a href="/">Home</a>
+                        <a href="/">首页</a>
                     </li>
                 </ul>
-                <h3>Developer says</h3>
+                <h3>开发心得</h3>
                 <ul>
                     <li>
-                        <a href="/developer/user">User System</a>
+                        <a href="/developer/user-cn">用户系统</a>
                     </li>
                     <li>
-                       <a href="/developer/model">Authentication Model</a>
+                        <a href="/developer/model-cn">用户权限模型</a>
                     </li>
                 </ul>
-                <h3>Usage</h3>
+                <h3>部署</h3>
                 <ul>
                       <li>
-                           <a href="/handbook/install">Install</a>
+                           <a href="/handbook/deploy-cn">部署方式</a>
                       </li>
                       <li>
-                           <a href="/handbook/deploy">Deploy</a>
+                           <a href="/handbook/dev-cn">开发环境部署</a>
                       </li>
                 </ul>
 
-                <h3>Misc.</h3>
+                <h3>其他</h3>
                 <ul>
-                    <li><a href="/misc/contact">Contact</a></li>
+                    <li><a href="/misc/contact-cn">联系方式</a></li>
                 </ul>
             </menu>
-            <article>
+            <article class="aj-text chinese">
                 {{ content | safe }}
             </article>
         </div>
         <footer>
-            AJ IAM, a part of
-            <a href="https://framework.ajaxjs.com" target="_blank">AJ-Framework</a>
-            open source. Mail:frank@ajaxjs.com, visit
-            <a href="https://blog.csdn.net/zhangxin09" target="_blank">my blog(In Chinese)</a>. <br/> <br/> Copyright © 2025 Frank Cheung. All rights reserved.
-        </footer>
+             AJ-IAM，开源框架 <a href="https://framework.ajaxjs.com" target="_blank">AJ-Framework</a> 的一部分。联系方式：
+             frank@ajaxjs.com，<a href="https://blog.csdn.net/zhangxin09" target="_blank">作者博客</a>
+             <br />
+             <br />
+             Copyright © 2025 Frank Cheung. All rights reserved.
+         </footer>
     </body>
 </html>
