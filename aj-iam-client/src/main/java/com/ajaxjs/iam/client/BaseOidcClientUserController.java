@@ -13,7 +13,6 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.view.RedirectView;
 
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.HashMap;
@@ -31,22 +30,24 @@ public abstract class BaseOidcClientUserController {
     @Value("${auth.clientSecret}")
     String clientSecret;
 
-    static Map<String, Object> TEMP_CACHE = new HashMap<>();
+//    static Map<String, Object> TEMP_CACHE = new HashMap<>(); // TODO
+
+    abstract public CacheProvider getCacheProvider();
+
+    private static int STATE_EXPIRE = 60 * 5;
 
     /**
      * 获取重定向视图，用于认证流程中的第一步：跳转到登录页面。
      *
-     * @param session           HttpSession 对象，用于保存和管理用户会话信息。
      * @param getAuthCodeUrl    获取授权码的 URL，指 IAM 提供的 endpoint。
      * @param clientId          客户端 ID，用于识别请求 OAuth 服务的应用。
      * @param clientCallbackUrl 应用的网站 URL，授权服务器完成授权后会重定向到该 URL 的回调接口。
      * @param webUrl            前端页面地址，用于跳到这里以便获取 Token。
      * @return RedirectView 返回一个重定向视图对象，包含了构造的重定向 URL。
      */
-    public RedirectView loginPageUrl(HttpSession session, String getAuthCodeUrl, String clientId, String clientCallbackUrl, String webUrl) {
+    public RedirectView loginPageUrl(String getAuthCodeUrl, String clientId, String clientCallbackUrl, String webUrl) {
         String state = RandomTools.generateRandomString(5);
-//        session.setAttribute(ClientUtils.OAUTH_STATE, state);// 将 state 值保存到会话中
-        TEMP_CACHE.put(ClientUtils.OAUTH_STATE, state);
+        getCacheProvider().save(ClientUtils.OAUTH_STATE, state, STATE_EXPIRE);
 
         log.info("set state code:" + state);
 
@@ -82,12 +83,12 @@ public abstract class BaseOidcClientUserController {
     /**
      * 用 AccessToken 可用的时候
      */
-    public abstract JwtAccessToken onAccessTokenGot(JwtAccessToken token, HttpServletResponse resp, HttpSession session);
+    public abstract JwtAccessToken onAccessTokenGot(JwtAccessToken token, HttpServletResponse resp);
 
-    public ModelAndView callbackToken(String clientId, String clientSecret, String code, String state, String webUrl, HttpSession session, HttpServletResponse resp) {
+    public ModelAndView callbackToken(String clientId, String clientSecret, String code, String state, String webUrl, HttpServletResponse resp) {
         // 从会话中获取之前保存的 state 值
-//        String savedState = (String) session.getAttribute(ClientUtils.OAUTH_STATE);
-        String savedState = (String) TEMP_CACHE.get(ClientUtils.OAUTH_STATE);
+//        String savedState = (String) TEMP_CACHE.get(ClientUtils.OAUTH_STATE);
+        String savedState = getCacheProvider().get(ClientUtils.OAUTH_STATE);
 
         if (!state.equals(savedState)) { // 检查返回的 state 值是否与之前保存的值匹配
             ClientUtils.returnForbidden(resp);
@@ -95,7 +96,8 @@ public abstract class BaseOidcClientUserController {
 
             return null;
         } else
-            session.removeAttribute(ClientUtils.OAUTH_STATE);
+//            session.removeAttribute(ClientUtils.OAUTH_STATE);
+            getCacheProvider().remove(ClientUtils.OAUTH_STATE);
 
         log.info("code:" + code);
         log.info("state:" + state);
@@ -109,7 +111,7 @@ public abstract class BaseOidcClientUserController {
         if (result != null) {// 处理授权成功的逻辑，例如解析并保存访问令牌和刷新令牌等
             if ((int) result.get("status") == 1) {
                 JwtAccessToken jwt = JsonUtil.map2pojo((Map<String, Object>) result.get("data"), JwtAccessToken.class);
-                onAccessTokenGot(jwt, resp, session);
+                onAccessTokenGot(jwt, resp);
 
                 if (StringUtils.hasText(webUrl)) {
 //                    return new ModelAndView(new RedirectView(webUrl + "?token=" + urlEncode(jwt.getId_token())));
