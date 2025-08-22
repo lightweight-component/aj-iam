@@ -3,6 +3,7 @@ package com.ajaxjs.iam.server.config;
 import com.ajaxjs.framework.cache.Cache;
 import com.ajaxjs.framework.cache.delayqueue.ExpiryCache;
 import com.ajaxjs.framework.cache.lru.LRUCache;
+import com.ajaxjs.iam.client.CacheProvider;
 import com.ajaxjs.iam.server.service.OidcService;
 import com.ajaxjs.iam.user.common.session.ServletUserSession;
 import com.ajaxjs.iam.user.common.session.UserSession;
@@ -97,6 +98,27 @@ public class IamConfig implements WebMvcConfigurer {
         config.setRemoveByKey(cache::remove);
 
         return config;
+    }
+
+    @Bean
+    CacheProvider initCacheProvider() {
+        Cache<String, Object> cache = initLocalCache();
+        return new CacheProvider() {
+            @Override
+            public void save(String key, String value, int expireSeconds) {
+                cache.put(key, value, expireSeconds);
+            }
+
+            @Override
+            public String get(String key) {
+                return cache.get(key, String.class);
+            }
+
+            @Override
+            public void remove(String key) {
+                cache.remove(key);
+            }
+        };
     }
 
     /**

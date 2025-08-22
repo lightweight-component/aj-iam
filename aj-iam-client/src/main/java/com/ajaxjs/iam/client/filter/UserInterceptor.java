@@ -2,14 +2,14 @@ package com.ajaxjs.iam.client.filter;
 
 import com.ajaxjs.iam.UserConstants;
 import com.ajaxjs.iam.annotation.AllowOpenAccess;
+import com.ajaxjs.iam.client.ClientCredentials;
 import com.ajaxjs.iam.client.ClientUtils;
+import com.ajaxjs.iam.client.model.TokenValidDetail;
 import com.ajaxjs.iam.jwt.JWebToken;
 import com.ajaxjs.iam.jwt.JWebTokenMgr;
 import com.ajaxjs.iam.model.SimpleUser;
-import com.ajaxjs.util.JsonUtil;
-import com.ajaxjs.util.StrUtil;
-import com.ajaxjs.util.Version;
-import com.ajaxjs.util.WebUtils;
+import com.ajaxjs.util.*;
+import com.ajaxjs.util.http_request.Post;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -26,6 +26,7 @@ import java.io.PrintWriter;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.Enumeration;
+import java.util.Map;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -54,6 +55,8 @@ public class UserInterceptor implements HandlerInterceptor {
 
     @Autowired(required = false)
     JWebTokenMgr jWebTokenMgr;
+
+    private final static Pattern GET_TENANT_ID_REP = Pattern.compile("tenantId=(\\d+)");
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
@@ -85,28 +88,22 @@ public class UserInterceptor implements HandlerInterceptor {
                         jsonUser = getUserFromJvmHash.apply(token);
                     break;
                 case "jwt":
-//                    JWebTokenMgr mgr = getBean(request, JWebTokenMgr.class);
-
                     JWebToken jwt = jWebTokenMgr.parse(token);
+                    TokenValidDetail tokenValidDetail = jWebTokenMgr.validAndDetail(jwt);
+//                    boolean isValid = jWebTokenMgr.isValid(jwt);
+                    RefreshJWT refreshJWT = new RefreshJWT(tokenValidDetail, request, response, this);
 
-                    if (jWebTokenMgr.isValid(jwt)) {
-                        jsonUser = "{\"id\": %s, \"name\": \"%s\", \"tenantId\":%s}";
-
-                        Integer tenantId = null;
-                        String aud = jwt.getPayload().getAud();
-
-                        if (StringUtils.hasText(aud)) {
-                            Matcher matcher = Pattern.compile("tenantId=(\\d+)").matcher(aud);
-
-                            if (matcher.find())
-                                tenantId = Integer.parseInt(matcher.group(1));
-                        }
-
-                        jsonUser = String.format(jsonUser, jwt.getPayload().getSub(), jwt.getPayload().getName(), tenantId);
+                    if (tokenValidDetail.isValid()) {
+                        jsonUser = getJsonUser(jwt);
+                        refreshJWT.checkAlmostExpire();
                     } else {
-                        returnErrorMsg(403, response);
+                        if (tokenValidDetail.isExpired() && refreshJWT.expiredRefresh()) {// 只是超时，而非非法的令牌，可以走 refresh token
+                            jsonUser = getJsonUser(jwt);
+                        } else {
+                            returnErrorMsg(403, response);
 
-                        return false;
+                            return false;
+                        }
                     }
                     break;
                 default:
@@ -116,8 +113,6 @@ public class UserInterceptor implements HandlerInterceptor {
             }
 
             if (StringUtils.hasText(jsonUser)) {
-                log.debug(jsonUser);
-                log.debug(new SimpleUser().toString());
                 SimpleUser user = JsonUtil.fromJson(jsonUser, SimpleUser.class);
                 request.setAttribute(UserConstants.USER_KEY_IN_REQUEST, user);
 
@@ -126,6 +121,24 @@ public class UserInterceptor implements HandlerInterceptor {
                 return returnErrorMsg(401, response);
         } else
             return true; // 关掉了认证
+    }
+
+    private static String getJsonUser(JWebToken jwt) {
+        String jsonUser = "{\"id\": %s, \"name\": \"%s\", \"tenantId\":%s}";
+
+        Integer tenantId = null;
+        String aud = jwt.getPayload().getAud();
+
+        if (StringUtils.hasText(aud)) {
+            Matcher matcher = GET_TENANT_ID_REP.matcher(aud);
+
+            if (matcher.find())
+                tenantId = Integer.parseInt(matcher.group(1));
+        }
+
+        jsonUser = String.format(jsonUser, jwt.getPayload().getSub(), jwt.getPayload().getName(), tenantId);
+
+        return jsonUser;
     }
 
     /**
@@ -270,5 +283,23 @@ public class UserInterceptor implements HandlerInterceptor {
         if (commaIndex > 0) authHeaderValue = authHeaderValue.substring(0, commaIndex);
 
         return authHeaderValue;
+    }
+
+    @Value("${auth.iam_service: }")
+    private String iamService;
+
+    @Value("${auth.clientId}")
+    String clientId;
+
+    @Value("${auth.clientSecret}")
+    String clientSecret;
+
+    public Map<String, Object> refreshToken(String refreshToken) {
+        String tokenApi = iamService + "/iam_api/oauth/refresh_token";
+
+        Map<String, String> params = ObjectHelper.mapOf("grant_type", "refresh_token", "refresh_token", refreshToken);
+        Map<String, Object> result = Post.api(tokenApi, params, conn -> conn.setRequestProperty("Authorization", ClientCredentials.encodeClient(clientId, clientSecret)));
+
+        return result;
     }
 }

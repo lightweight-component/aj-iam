@@ -50,6 +50,11 @@ public class AccessTokenPo {
      */
     private Date expiresDate;
 
+    /**
+     * Refresh Token 过期的具体时间
+     */
+    private Date refreshExpires;
+
     private Integer tenantId;
 
     /**

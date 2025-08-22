@@ -5,6 +5,7 @@ package com.ajaxjs.iam;
  */
 public interface UserConstants {
     String ACCESS_TOKEN_KEY = "access_token";
+    String REFRESH_TOKEN_KEY = "refresh_token";
 
     String REDIS_PREFIX = "USER:";
 

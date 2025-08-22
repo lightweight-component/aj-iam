@@ -120,6 +120,12 @@ public abstract class OAuthCommon implements IamConstants {
     private Integer clientExpires;
 
     /**
+     * Refresh Token 的有效期，单位：天，默认 7 天
+     * 放 yml 配置没意义，因为多租户
+     */
+    private static final int refreshExpires = 7;
+
+    /**
      * 获取令牌的过期时间（以毫秒为单位）。
      * <p>
      * 根据应用的设置确定令牌的过期时间。如果应用设置了具体的过期分钟数，则使用该值；
@@ -136,12 +142,24 @@ public abstract class OAuthCommon implements IamConstants {
         return minutes * 60 * 1000;
     }
 
+    /**
+     * 创建访问令牌
+     *
+     * @param accessToken 访问令牌对象，用于存储令牌信息
+     * @param app         应用程序对象，表示当前授权的应用
+     * @param grantType   授权类型，指定令牌的授权方式
+     */
     public void createToken(AccessToken accessToken, App app, String grantType) {
         createToken(accessToken, app, grantType, null);
     }
 
     /**
-     * 创建 Token
+     * 创建访问令牌
+     *
+     * @param accessToken 访问令牌对象，用于存储令牌信息
+     * @param app         应用程序对象，表示当前授权的应用
+     * @param grantType   授权类型，指定令牌的授权方式
+     * @param user        用户对象
      */
     public void createToken(AccessToken accessToken, App app, String grantType, User user) {
         accessToken.setAccess_token(RandomTools.uuid(false));
@@ -149,12 +167,14 @@ public abstract class OAuthCommon implements IamConstants {
 
         Integer minutes = app.getExpires() == null ? clientExpires : app.getExpires();
         accessToken.setExpires_in(minutes * 60);
+        int refreshExpiresDays = app.getRefreshExpires() == null ? refreshExpires : app.getRefreshExpires();
 
         // 保存 token
         AccessTokenPo save = new AccessTokenPo();
         save.setAccessToken(accessToken.getAccess_token());
         save.setRefreshToken(accessToken.getRefresh_token());
         save.setExpiresDate(calculateExpirationDate(minutes));
+        save.setRefreshExpires(calculateExpirationDate(refreshExpiresDays * 1440));
         save.setGrantType(grantType);
         save.setClientId(app.getClientId());
         save.setCreateDate(new Date());

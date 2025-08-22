@@ -1,21 +1,25 @@
 CREATE TABLE `access_token` (
-	`id` INT(10) NOT NULL AUTO_INCREMENT COMMENT '主键 id，自增',
+	`id` INT NOT NULL AUTO_INCREMENT COMMENT '主键 id，自增',
 	`access_token` VARCHAR(255) NOT NULL COMMENT 'Access Token' COLLATE 'utf8mb4_unicode_ci',
 	`refresh_token` VARCHAR(255) NULL DEFAULT NULL COMMENT 'Refresh Token' COLLATE 'utf8mb4_unicode_ci',
-	`user_id` INT(10) NULL DEFAULT NULL COMMENT '关联的用户 id',
+	`jwt_token` VARCHAR(500) NULL DEFAULT NULL COMMENT 'JWT Token JSON 格式，以便复用' COLLATE 'utf8mb4_unicode_ci',
+	`user_id` INT NULL DEFAULT NULL COMMENT '关联的用户 id',
 	`user_name` VARCHAR(100) NULL DEFAULT NULL COMMENT '用户名（冗余的）' COLLATE 'utf8mb4_unicode_ci',
 	`client_id` VARCHAR(50) NULL DEFAULT NULL COMMENT '接入的客户端ID' COLLATE 'utf8mb4_unicode_ci',
 	`expires_date` DATETIME NULL DEFAULT NULL COMMENT '过期的具体时间',
+	`refresh_expires` DATETIME NULL DEFAULT NULL COMMENT 'Refresh Token 过期的具体时间',
 	`grant_type` VARCHAR(50) NULL DEFAULT NULL COMMENT '授权类型，比如：authorization_code' COLLATE 'utf8mb4_unicode_ci',
+	`tenant_id` INT NULL DEFAULT NULL,
 	`scope` VARCHAR(100) NULL DEFAULT NULL COMMENT '可被访问的用户的权限范围，比如：basic、super' COLLATE 'utf8mb4_unicode_ci',
 	`creator` VARCHAR(50) NULL DEFAULT NULL COMMENT '创建人名称（可冗余的）' COLLATE 'utf8mb4_bin',
-	`creator_id` INT(10) NULL DEFAULT NULL COMMENT '创建人 id',
-	`create_date` DATETIME NOT NULL DEFAULT 'CURRENT_TIMESTAMP' COMMENT '创建日期',
-	`update_date` DATETIME NULL DEFAULT 'CURRENT_TIMESTAMP' ON UPDATE CURRENT_TIMESTAMP COMMENT '修改时间',
+	`creator_id` INT NULL DEFAULT NULL COMMENT '创建人 id',
+	`create_date` DATETIME NOT NULL DEFAULT (CURRENT_TIMESTAMP) COMMENT '创建日期',
+	`update_date` DATETIME NULL DEFAULT (CURRENT_TIMESTAMP) ON UPDATE CURRENT_TIMESTAMP COMMENT '修改时间',
 	PRIMARY KEY (`id`) USING BTREE,
 	UNIQUE INDEX `id_UNIQUE` (`id`) USING BTREE
 )
 COMMENT='AccessToken 令牌信息'
+COLLATE='utf8mb4_unicode_ci'
 
 
 CREATE TABLE `app` (

@@ -97,12 +97,15 @@ public class OAuthService extends OAuthCommon implements OAuthController {
 
         if (GrantType.CLIENT_CREDENTIALS.equals(accessTokenPO.getGrantType())) {
             // 客户端的 token
-            if (!app.getClientId().equals(accessTokenPO.getClientId())) throw new BusinessException("ClientId 不一致");
+            if (!app.getClientId().equals(accessTokenPO.getClientId()))
+                throw new BusinessException("ClientId 不一致");
 
             minutes = app.getExpires();
 
-            if (minutes == null) minutes = 120; // default value
-        } else minutes = userExpires;// 用户
+            if (minutes == null)
+                minutes = 120; // default value
+        } else
+            minutes = userExpires;// 用户
 
         accessToken.setExpires_in(minutes * 60);
 

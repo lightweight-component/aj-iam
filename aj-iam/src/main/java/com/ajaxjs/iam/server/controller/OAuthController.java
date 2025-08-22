@@ -38,7 +38,6 @@ public interface OAuthController {
     @PostMapping("/token")
     AccessToken token(@RequestHeader String authorization, @RequestParam("grant_type") String grantType, @RequestParam String code, @RequestParam String state);
 
-
     /**
      * 通过 Refresh Token 刷新 Access Token
      * 这是通过头传输 client_id/client_secret

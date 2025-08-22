@@ -1,13 +1,17 @@
 package com.ajaxjs.iam.client;
 
+import com.ajaxjs.iam.UserConstants;
 import com.ajaxjs.iam.jwt.JwtAccessToken;
 import com.ajaxjs.util.JsonUtil;
 import com.ajaxjs.util.ObjectHelper;
 import com.ajaxjs.util.RandomTools;
+import com.ajaxjs.util.StrUtil;
 import com.ajaxjs.util.http_request.Post;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.view.RedirectView;
@@ -151,5 +155,28 @@ public abstract class BaseOidcClientUserController {
                 return token;
             }
         }
+    }
+
+    public void doLogout(HttpServletResponse resp) {
+        ResponseCookie cookie = ResponseCookie.from(UserConstants.ACCESS_TOKEN_KEY, StrUtil.EMPTY_STRING)
+                .httpOnly(true)
+                .secure(false) // TODO for prod
+                .path("/")
+                .sameSite("Strict") // 设置 SameSite 属性
+                .maxAge(0)
+                .build();
+
+        resp.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+
+        ResponseCookie refreshCookie = ResponseCookie.from(UserConstants.REFRESH_TOKEN_KEY, StrUtil.EMPTY_STRING)
+                .httpOnly(true)
+                .secure(false) // TODO for prod
+                .path("/")
+                .sameSite("Strict") // 设置 SameSite 属性
+                .maxAge(0)
+                .build();
+
+        resp.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+        resp.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
     }
 }

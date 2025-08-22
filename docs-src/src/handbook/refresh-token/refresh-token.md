@@ -113,6 +113,5 @@ axios.interceptors.response.use(
 ## 后端刷新
 前面介绍的是前端刷新机制，后端也可以做到，那样就不必修改前端了。
 
-
 ## 小结
-无论前端方案还是后端方案，都要求生成 JWT 时候一起生成 Refresh Token。在缺乏 Refresh Token 的场合，例如通过 HTTP Head/QueryString 传递 Token，我们框架也是支持的，那么这时候由于没传 Refresh Token，所以刷新 Token 失败，就会跳转到登录页。
+无论前端方案还是后端方案，都要求生成 JWT 时候一起生成 Refresh Token。传递 Token 的时候也要把 Refresh Token 一并传过来，包括通过 HTTP Head/QueryString 传递 Token，否则如果由于没有 Refresh Token，所以刷新 Token 失败，就会跳转到登录页。

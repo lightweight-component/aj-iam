@@ -1,7 +1,7 @@
 package com.ajaxjs.iam.jwt;
 
 
-
+import com.ajaxjs.iam.client.model.TokenValidDetail;
 import com.ajaxjs.util.EncodeTools;
 import com.ajaxjs.util.JsonUtil;
 import com.ajaxjs.util.MessageDigestHelper;
@@ -77,6 +77,35 @@ public class JWebTokenMgr {
 
             return !isExp && isMatch;
         }
+    }
+
+    public TokenValidDetail validAndDetail(JWebToken token) {
+        String _token = signature(token);
+        boolean isMatch = token.getSignature().equals(_token); // signature matched
+        Long exp = token.getPayload().getExp();
+
+        TokenValidDetail detail = new TokenValidDetail();
+
+        if (exp == 0L) { /* 0 表示永不过期，不用检查是否超时 */
+            detail.setValid(true);
+            detail.setExpired(false);
+            detail.setExpiredTime(0L);
+        } else {
+            boolean isExp = exp < JwtUtils.now(); // true = token expired
+
+            if (isExp) {
+                log.debug("超时:" + exp + ", now:" + JwtUtils.now());
+                log.debug("超时:" + JwtUtils.toRealTime(exp) + ", now:" + JwtUtils.toRealTime(JwtUtils.now()));
+            }
+
+            boolean isValid = !isExp && isMatch;
+
+            detail.setValid(isValid);
+            detail.setExpired(isExp);
+            detail.setExpiredTime(exp);
+        }
+
+        return detail;
     }
 
     /**
