@@ -6,7 +6,6 @@ import com.ajaxjs.framework.model.BusinessException;
 import com.ajaxjs.iam.jwt.JWebTokenMgr;
 import com.ajaxjs.iam.jwt.JwtUtils;
 import com.ajaxjs.iam.server.controller.OidcController;
-import com.ajaxjs.iam.server.model.AccessToken;
 import com.ajaxjs.iam.server.model.JwtAccessToken;
 import com.ajaxjs.iam.server.model.po.AccessTokenPo;
 import com.ajaxjs.iam.server.model.po.App;
@@ -15,7 +14,7 @@ import com.ajaxjs.iam.user.model.User;
 import com.ajaxjs.iam.user.service.UserLoginRegisterService;
 import com.ajaxjs.sqlman.Sql;
 import com.ajaxjs.sqlman.crud.Entity;
-import com.ajaxjs.util.RandomTools;
+import com.ajaxjs.util.JsonUtil;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +24,7 @@ import org.springframework.util.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.Date;
 
 @Service
 @Slf4j
@@ -73,19 +73,14 @@ public class OidcService extends OAuthCommon implements OidcController {
             JwtAccessToken accessToken = new JwtAccessToken();
             // 生成 JWT Token
             // TODO user.getName() 中文名会乱码
-            String jWebToken = jWebTokenMgr.tokenFactory(String.valueOf(user.getId()), user.getLoginId(), scope, JwtUtils.setExpire(jwtExpireHours)).toString();
+
+            String jWebToken = jWebTokenMgr.tokenFactory(String.valueOf(user.getId()), user.getLoginId(), scope, getJwtExpireTimeStamp(app)).toString();
             accessToken.setId_token(jWebToken);
 
             createToken(accessToken, app, GrantType.OIDC, user);
 
             // 保存 token 在缓存
-            TokenUser tokenUser = new TokenUser();
-            tokenUser.setUserId(user.getId());
-            tokenUser.setAccessToken(accessToken);
-
-            String key = JWT_TOKEN_USER_KEY + "-" + jWebToken;
-            cache.put(key, tokenUser, getTokenExpires(app));
-            log.info("save user {} to cache, key: {}", tokenUser, key);
+            saveTokenToCache(user, accessToken, app);
 
             // 删除缓存
             cache.remove(code + ":scope");
@@ -100,43 +95,52 @@ public class OidcService extends OAuthCommon implements OidcController {
     @EnableTransaction
     public JwtAccessToken refreshToken(String grantType, String authorization, String refreshToken) {
         if (!GrantType.REFRESH_TOKEN.equals(grantType))
-            throw new IllegalArgumentException("grantType must be 'refresh_token'");
+            throw new IllegalArgumentException("GrantType must be 'refresh_token'.");
 
         App app = getAppByAuthHeader(authorization);
-
         AccessTokenPo accessTokenPO = Sql.newInstance().input("SELECT * FROM access_token WHERE refresh_token = ?", refreshToken).query(AccessTokenPo.class);
 
         if (accessTokenPO == null)
             throw new BusinessException("找不到 RefreshToken " + refreshToken);
 
+        User user = Sql.instance().input("SELECT * FROM user WHERE id = ? AND stat != 1", accessTokenPO.getUserId()).query(User.class);
         // 生成 Access Token
         JwtAccessToken accessToken = new JwtAccessToken();
         // 生成 JWT Token
         // TODO user.getName() 中文名会乱码
-        String jWebToken = jWebTokenMgr.tokenFactory(String.valueOf(user.getId()), user.getLoginId(), scope, JwtUtils.setExpire(jwtExpireHours)).toString();
+        String jWebToken = jWebTokenMgr.tokenFactory(String.valueOf(user.getId()), user.getLoginId(), DEFAULT_SCOPE, getJwtExpireTimeStamp(app)).toString();
         accessToken.setId_token(jWebToken);
 
-        createToken(accessToken, app, GrantType.OIDC, user);
+        Date[] arr= createToken(accessToken, app);
 
         // 保存 token 在缓存
-        TokenUser tokenUser = new TokenUser();
-        tokenUser.setUserId(user.getId());
-        tokenUser.setAccessToken(accessToken);
-
-        String key = JWT_TOKEN_USER_KEY + "-" + jWebToken;
-        cache.put(key, tokenUser, getTokenExpires(app));
-        log.info("save user {} to cache, key: {}", tokenUser, key);
+        saveTokenToCache(user, accessToken, app);
 
         // 修改旧的
         AccessTokenPo updated = new AccessTokenPo();
         updated.setId(accessTokenPO.getId());
         updated.setAccessToken(accessToken.getAccess_token());
         updated.setRefreshToken(accessToken.getRefresh_token());
-        updated.setExpiresDate(calculateExpirationDate(minutes));
+        updated.setExpiresDate(arr[0]);
+        updated.setRefreshExpires(arr[1]);
+        updated.setJwtToken(JsonUtil.toJson(accessToken));
 
         Entity.newInstance().input(updated).update();
 
         return accessToken;
+    }
+
+    /**
+     * 保存 token 在缓存
+     */
+    void saveTokenToCache(User user, JwtAccessToken accessToken, App app) {
+        TokenUser tokenUser = new TokenUser();
+        tokenUser.setUserId(user.getId());
+        tokenUser.setAccessToken(accessToken);
+
+        String key = JWT_TOKEN_USER_KEY + "-" + accessToken.getId_token();
+        cache.put(key, tokenUser, getTokenExpires(app));
+        log.info("save user {} to cache, key: {}", tokenUser, key);
     }
 
     @Autowired

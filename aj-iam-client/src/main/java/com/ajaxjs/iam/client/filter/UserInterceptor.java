@@ -10,6 +10,7 @@ import com.ajaxjs.iam.jwt.JWebTokenMgr;
 import com.ajaxjs.iam.model.SimpleUser;
 import com.ajaxjs.util.*;
 import com.ajaxjs.util.http_request.Post;
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -31,10 +32,15 @@ import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static com.ajaxjs.iam.UserConstants.TOKEN;
+import static com.ajaxjs.util.EncodeTools.UTF8_SYMBOL;
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
+
 /**
  * 资源拦截器
  */
 @Slf4j
+@Data
 public class UserInterceptor implements HandlerInterceptor {
     @Value("${auth.run:true}")
     private boolean run;
@@ -97,7 +103,7 @@ public class UserInterceptor implements HandlerInterceptor {
                         jsonUser = getJsonUser(jwt);
                         refreshJWT.checkAlmostExpire();
                     } else {
-                        if (tokenValidDetail.isExpired() && refreshJWT.expiredRefresh()) {// 只是超时，而非非法的令牌，可以走 refresh token
+                        if (tokenValidDetail.isExpired() && refreshJWT.expiredRefresh()) {// 只是超时，而不是非法的令牌，可以走 refresh token
                             jsonUser = getJsonUser(jwt);
                         } else {
                             returnErrorMsg(403, response);
@@ -196,7 +202,7 @@ public class UserInterceptor implements HandlerInterceptor {
      */
     protected static void returnMsg(HttpServletResponse resp, int httpErrCode, String msg) {
         resp.setStatus(httpErrCode);// 设置 HTTP 响应状态码
-        resp.setCharacterEncoding("UTF-8"); // 设置响应的字符编码和内容类型
+        resp.setCharacterEncoding(UTF8_SYMBOL); // 设置响应的字符编码和内容类型
         resp.setContentType("application/json;charset=utf-8");
 
         try (PrintWriter writer = resp.getWriter()) {// 使用 PrintWriter 对象将消息写入响应体
@@ -229,11 +235,11 @@ public class UserInterceptor implements HandlerInterceptor {
      */
     public static String extractToken(HttpServletRequest request) {
 //        String token = extractHeaderToken(request); // 尝试从请求头的"Authorization"字段提取 token
-        String token = request.getHeader("Authorization"); // 尝试从请求头的"Authorization"字段以另一种大小写形式提取 token
+        String token = request.getHeader(AUTHORIZATION); // 尝试从请求头的"Authorization"字段以另一种大小写形式提取 token
 
         // 如果从请求头的"Authorization"字段提取不到 token，尝试从请求头的"token"字段提取
         if (token == null) {
-            token = request.getHeader("token");
+            token = request.getHeader(TOKEN);
 
             if (token == null) {
 
@@ -295,10 +301,13 @@ public class UserInterceptor implements HandlerInterceptor {
     String clientSecret;
 
     public Map<String, Object> refreshToken(String refreshToken) {
-        String tokenApi = iamService + "/iam_api/oauth/refresh_token";
+        String tokenApi = iamService + "/iam_api/oidc/refresh_token";
 
         Map<String, String> params = ObjectHelper.mapOf("grant_type", "refresh_token", "refresh_token", refreshToken);
         Map<String, Object> result = Post.api(tokenApi, params, conn -> conn.setRequestProperty("Authorization", ClientCredentials.encodeClient(clientId, clientSecret)));
+
+        if (result == null)
+            throw new IllegalAccessError("通讯失败");
 
         return result;
     }

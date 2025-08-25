@@ -2,6 +2,7 @@ package com.ajaxjs.iam.server.service;
 
 import com.ajaxjs.framework.cache.Cache;
 import com.ajaxjs.framework.model.BusinessException;
+import com.ajaxjs.iam.jwt.JwtUtils;
 import com.ajaxjs.iam.server.common.IamConstants;
 import com.ajaxjs.iam.server.common.IamUtils;
 import com.ajaxjs.iam.server.model.AccessToken;
@@ -31,6 +32,8 @@ public abstract class OAuthCommon implements IamConstants {
     @Autowired
     UserSession userSession;
 
+    public final static String DEFAULT_SCOPE = "DEFAULT_SCOPE";
+
     /**
      * @param webUrl 前端页面地址，用于跳到这里以便获取 Token
      */
@@ -43,7 +46,6 @@ public abstract class OAuthCommon implements IamConstants {
         if (user == null) { // 未登录
             // 返回一段 HTML
             String qs = req.getQueryString();
-
             String loginPage;
 
             // 根据 appId 获取登录地址
@@ -67,7 +69,7 @@ public abstract class OAuthCommon implements IamConstants {
                 sb.append("&web_url=").append(webUrl);
 
             if (!StringUtils.hasText(scope))
-                scope = "DEFAULT_SCOPE";
+                scope = DEFAULT_SCOPE;
 
             if (user.getTenantId() != null)
                 scope += ";tenantId=" + user.getTenantId();
@@ -116,14 +118,15 @@ public abstract class OAuthCommon implements IamConstants {
     /**
      * Token 的有效期，单位：分钟  默认两天
      */
-    @Value("${oauth.token.client_expires: 2880}")
+//    @Value("${oauth.token.client_expires: 2880}")
+    @Value("${oauth.token.client_expires: 60}")
     private Integer clientExpires;
 
     /**
      * Refresh Token 的有效期，单位：天，默认 7 天
      * 放 yml 配置没意义，因为多租户
      */
-    private static final int refreshExpires = 7;
+    private static final int REFRESH_EXPIRES_DAYS = 7;
 
     /**
      * 获取令牌的过期时间（以毫秒为单位）。
@@ -162,19 +165,20 @@ public abstract class OAuthCommon implements IamConstants {
      * @param user        用户对象
      */
     public void createToken(AccessToken accessToken, App app, String grantType, User user) {
-        accessToken.setAccess_token(RandomTools.uuid(false));
-        accessToken.setRefresh_token(RandomTools.uuid(false));
-
-        Integer minutes = app.getExpires() == null ? clientExpires : app.getExpires();
-        accessToken.setExpires_in(minutes * 60);
-        int refreshExpiresDays = app.getRefreshExpires() == null ? refreshExpires : app.getRefreshExpires();
+//        accessToken.setAccess_token(RandomTools.uuid(false));
+//        accessToken.setRefresh_token(RandomTools.uuid(false));
+//
+//        Integer minutes = app.getExpires() == null ? clientExpires : app.getExpires();
+//        accessToken.setExpires_in(minutes * 60);
+//        int refreshExpiresDays = app.getRefreshExpires() == null ? refreshExpires : app.getRefreshExpires();
+        Date[] arr = createToken(accessToken, app);
 
         // 保存 token
         AccessTokenPo save = new AccessTokenPo();
         save.setAccessToken(accessToken.getAccess_token());
         save.setRefreshToken(accessToken.getRefresh_token());
-        save.setExpiresDate(calculateExpirationDate(minutes));
-        save.setRefreshExpires(calculateExpirationDate(refreshExpiresDays * 1440));
+        save.setExpiresDate(arr[0]);
+        save.setRefreshExpires(arr[1]);
         save.setGrantType(grantType);
         save.setClientId(app.getClientId());
         save.setCreateDate(new Date());
@@ -191,6 +195,31 @@ public abstract class OAuthCommon implements IamConstants {
             save.setJwtToken(JsonUtil.toJson(accessToken));
 
         Entity.newInstance().input(save).create(Long.class);
+    }
+
+    public Date[] createToken(AccessToken accessToken, App app) {
+        accessToken.setAccess_token(RandomTools.uuid(false));
+        accessToken.setRefresh_token(RandomTools.uuid(false));
+
+        Integer minutes = getTokenExpiresMinutes(app);
+        accessToken.setExpires_in(minutes * 60);
+        int refreshExpiresDays = app.getRefreshExpires() == null ? REFRESH_EXPIRES_DAYS : app.getRefreshExpires();
+
+        return new Date[]{
+                calculateExpirationDate(minutes),
+                calculateExpirationDate(refreshExpiresDays * 1440)
+        };
+    }
+
+    public Integer getTokenExpiresMinutes(App app) {
+        return app.getExpires() == null ? clientExpires : app.getExpires();
+    }
+
+    public long getJwtExpireTimeStamp(App app) {
+        Integer tokenExpiresMinutes = getTokenExpiresMinutes(app);
+//        tokenExpiresMinutes = -10; // for test
+
+        return JwtUtils.setExpire(tokenExpiresMinutes);
     }
 
     /**

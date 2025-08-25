@@ -1,5 +1,6 @@
 package com.ajaxjs.iam.server.controller;
 
+import com.ajaxjs.iam.annotation.AllowOpenAccess;
 import com.ajaxjs.iam.server.model.AccessToken;
 import com.ajaxjs.iam.server.model.JwtAccessToken;
 import org.springframework.web.bind.annotation.*;
@@ -61,6 +62,7 @@ public interface OidcController {
      * @return Token
      */
     @PostMapping("/refresh_token")
+    @AllowOpenAccess
     JwtAccessToken refreshToken(@RequestParam("grant_type") String grantType, @RequestHeader("Authorization") String authorization, @RequestParam("refresh_token") String refreshToken);
 
     /**

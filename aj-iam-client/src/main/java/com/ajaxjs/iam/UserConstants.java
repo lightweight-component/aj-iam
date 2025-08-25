@@ -4,6 +4,10 @@ package com.ajaxjs.iam;
  * 用户常量
  */
 public interface UserConstants {
+    String TOKEN = "token";
+
+    String AUTHORIZATION = "Authorization";
+
     String ACCESS_TOKEN_KEY = "access_token";
     String REFRESH_TOKEN_KEY = "refresh_token";
 

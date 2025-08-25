@@ -1,7 +1,10 @@
 package com.ajaxjs.iam.client.filter;
 
 import com.ajaxjs.iam.UserConstants;
+import com.ajaxjs.iam.client.BaseOidcClientUserController;
 import com.ajaxjs.iam.client.model.TokenValidDetail;
+import com.ajaxjs.iam.jwt.JwtAccessToken;
+import com.ajaxjs.util.JsonUtil;
 import com.ajaxjs.util.StrUtil;
 import com.ajaxjs.util.WebUtils;
 import lombok.AllArgsConstructor;
@@ -10,6 +13,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Map;
 
+/**
+ * 刷新访问令牌
+ */
 @AllArgsConstructor
 public class RefreshJWT {
     TokenValidDetail tokenValidDetail;
@@ -20,6 +26,12 @@ public class RefreshJWT {
 
     UserInterceptor userInterceptor;
 
+    /**
+     * 从 HTTP 请求中提取刷新令牌
+     *
+     * @param request HTTP 请求对象
+     * @return 提取到的刷新令牌，如果未找到则返回 null
+     */
     public static String extractRefreshToken(HttpServletRequest request) {
         String token = request.getHeader(UserConstants.REFRESH_TOKEN_KEY);
 
@@ -33,9 +45,21 @@ public class RefreshJWT {
         return StrUtil.isEmptyText(token) ? null : token;
     }
 
-    public boolean refreshToken(String refreshToken) {
-        Map<String, Object> result = userInterceptor.refreshToken(refreshToken);
+    /**
+     * 刷新用户访问令牌
+     *
+     * @param refreshToken 用于刷新访问令牌的刷新令牌字符串
+     */
+    @SuppressWarnings("unchecked")
+    public void refreshToken(String refreshToken) {
+        Map<String, Object> result = userInterceptor.refreshToken(refreshToken);  // 调用拦截器刷新令牌接口
 
+        if ((int) result.get("status") == 1) {
+            // 将返回数据转换为JwtAccessToken对象并设置到Cookie中
+            JwtAccessToken token = JsonUtil.map2pojo((Map<String, Object>) result.get("data"), JwtAccessToken.class);
+            BaseOidcClientUserController.setTokenToCookie(token, response);
+        } else
+            System.err.println("刷新失败:" + result.get("message"));
     }
 
     private static final long REFRESH_THRESHOLD = 60 * 1000; // 60秒内过期就刷新
@@ -44,7 +68,7 @@ public class RefreshJWT {
      * 检查 Access Token 是否快过期了，且有有效的 Refresh Token，则刷新
      */
     public void checkAlmostExpire() {
-        long timeUntilExpiry = tokenValidDetail.getExpiredTime() - System.currentTimeMillis();
+        long timeUntilExpiry = tokenValidDetail.getExpiredTime() - System.currentTimeMillis() / 1000;
 
         if (timeUntilExpiry < REFRESH_THRESHOLD) {
             String refreshToken = RefreshJWT.extractRefreshToken(request);
@@ -56,6 +80,11 @@ public class RefreshJWT {
         }
     }
 
+    /**
+     * 检查并刷新过期的访问令牌
+     *
+     * @return boolean 刷新成功返回true，否则返回false
+     */
     public boolean expiredRefresh() {
         String refreshToken = RefreshJWT.extractRefreshToken(request);
 

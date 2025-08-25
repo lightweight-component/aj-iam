@@ -2,10 +2,7 @@ package com.ajaxjs.iam.client;
 
 import com.ajaxjs.iam.UserConstants;
 import com.ajaxjs.iam.jwt.JwtAccessToken;
-import com.ajaxjs.util.JsonUtil;
-import com.ajaxjs.util.ObjectHelper;
-import com.ajaxjs.util.RandomTools;
-import com.ajaxjs.util.StrUtil;
+import com.ajaxjs.util.*;
 import com.ajaxjs.util.http_request.Post;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -17,8 +14,6 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.view.RedirectView;
 
 import javax.servlet.http.HttpServletResponse;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -56,32 +51,13 @@ public abstract class BaseOidcClientUserController {
         log.info("set state code:" + state);
 
         String url = getAuthCodeUrl + "?response_type=code&client_id=" + clientId;
-        url += "&redirect_uri=" + urlEncode(clientCallbackUrl);
+        url += "&redirect_uri=" + EncodeTools.urlEncode(clientCallbackUrl);
         url += "&state=" + state;
 
         if (StringUtils.hasText(webUrl))
-            url += "&web_url=" + urlEncode(webUrl);
+            url += "&web_url=" + EncodeTools.urlEncode(webUrl);
 
         return new RedirectView(url);
-    }
-
-    /**
-     * UTF-8 字符串而已
-     */
-    public static final String UTF8_SYMBOL = "UTF-8";
-
-    /**
-     * URL 编码
-     *
-     * @param str 输入的字符串
-     * @return URL 编码后的字符串
-     */
-    public static String urlEncode(String str) {
-        try {
-            return URLEncoder.encode(str, UTF8_SYMBOL);
-        } catch (UnsupportedEncodingException e) {
-            return null;
-        }
     }
 
     /**
@@ -96,17 +72,13 @@ public abstract class BaseOidcClientUserController {
 
         if (!state.equals(savedState)) { // 检查返回的 state 值是否与之前保存的值匹配
             ClientUtils.returnForbidden(resp);
-            log.warn("state code error, in session: " + savedState);
+            log.warn("State code error, in session: " + savedState);
 
             return null;
         } else
 //            session.removeAttribute(ClientUtils.OAUTH_STATE);
             getCacheProvider().remove(ClientUtils.OAUTH_STATE);
 
-        log.info("code:" + code);
-        log.info("state:" + state);
-        log.info("clientId:" + clientId);
-        log.info("clientSecret:" + clientSecret);
         String tokenApi = getIamService() + "/iam_api/oidc/token";
 
         Map<String, String> params = ObjectHelper.mapOf("grant_type", "authorization_code", "code", code, "state", state);
@@ -126,11 +98,9 @@ public abstract class BaseOidcClientUserController {
                 log.info("error:" + result);
                 throw new SecurityException("获取 JWT Token 失败，原因: " + result.get("message"));
             }
-        } else {
-
+        } else
 //			 处理授权失败的逻辑
             throw new SecurityException("获取 JWT Token 失败");
-        }
     }
 
     public JwtAccessToken ropcLogin(String username, String password) {
@@ -176,7 +146,29 @@ public abstract class BaseOidcClientUserController {
                 .maxAge(0)
                 .build();
 
+        resp.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
+    }
+
+    public static void setTokenToCookie(JwtAccessToken token, HttpServletResponse resp) {
+        // 设置 Token 到 Cookie
+        ResponseCookie cookie = ResponseCookie.from(UserConstants.ACCESS_TOKEN_KEY,  token.getId_token())
+                .httpOnly(true)
+                .secure(false) // TODO for prod
+                .path("/")
+                .sameSite("Strict") // 设置 SameSite 属性
+                .maxAge(3600 * 24 * 3) // TODO 改为一致的失效时间
+                .build();
+
         resp.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+
+        ResponseCookie refreshCookie = ResponseCookie.from(UserConstants.REFRESH_TOKEN_KEY, token.getRefresh_token())
+                .httpOnly(true)
+                .secure(false) // TODO for prod
+                .path("/")
+                .sameSite("Strict") // 设置 SameSite 属性
+                .maxAge(3600 * 24 * 3)
+                .build();
+
         resp.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
     }
 }
