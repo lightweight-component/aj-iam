@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
+
 <head>
     <meta charset="UTF-8" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css" />
@@ -9,20 +10,35 @@
     <link rel="stylesheet/less" type="text/css" href="https://framework.ajaxjs.com/static/new-ui/less/widgets.less" />
     <script src="https://framework.ajaxjs.com/static/libs/less.js"></script>
     <script src="https://framework.ajaxjs.com/static/new-ui/js/aj.js"></script>
-    <script src="https://framework.ajaxjs.com/static/libs/vue.js"></script>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <!--     <script src="https://framework.ajaxjs.com/static/libs/vue.js"></script>-->
     <script src="https://framework.ajaxjs.com/static/new-ui/js/common-ui.js"></script>
     <script src="https://framework.ajaxjs.com/static/libs/dayjs.js"></script>
-    <script src="user-center.js"></script>
+    <script src="user-profile.js"></script>
     <title>IAM 用户详情页 Profile</title>
 </head>
+
 <body>
     <div class="user-center">
         <user-center />
     </div>
-<script>
-    new Vue({
-        el: '.user-center',
-    });
-</script>
+    <script>
+        const { createApp } = Vue;
+
+        const app = createApp({});
+        app.component('aj-layer', aj.layer);
+        app.component('aj-confirm', aj.confirm);
+        app.component('aj-list', aj.list);
+        app.component('aj-file-upload', aj.fileUpload);
+        app.component('aj-process-line', aj.processLine);
+        app.component('user-center', UserCenter);
+        app.component('user-center-main', UserCenterMain);
+        app.component('user-center-profile', UserCenterProfile);
+        app.component('user-center-account', UserCenterAccount);
+        app.component('user-center-login-log', UserCenterLoginLog);
+
+        app.mount('.user-center');
+    </script>
 </body>
+
 </html>

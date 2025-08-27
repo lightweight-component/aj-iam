@@ -1,9 +1,69 @@
-// 全局过滤器
-Vue.filter('date', (value, format = 'YYYY-MM-DD HH:mm') => {
+window.dateFilter = (value, format = 'YYYY-MM-DD HH:mm') => {
     return value ? dayjs(value).format(format) : '';
-});
+};
 
-Vue.component('user-center-main', {
+const UserCenter = {
+    template: html`<div class="user-center">
+        <div class="left">
+            <div class="avatar">
+                <div class="imgHolder userAvatar">
+                    <img :src="USER.avatar" />
+                </div>
+
+                <h3 class="userName">{{USER.username}}</h3>
+            </div>
+            <menu>
+                <ul>
+                    <li :class="{actived: showing == 'main'}"><a href="###" @click="showing = 'main'">概 览</a></li>
+                    <li :class="{actived: showing == 'profile'}"><a href="###" @click="showing = 'profile'">个人信息</a></li>
+                    <li :class="{actived: showing == 'account'}"><a href="###" @click="showing = 'account'">帐号管理</a></li>
+                    <li :class="{actived: showing == 'loginLog'}"><a href="###" @click="showing = 'loginLog'">登录历史</a></li>
+                    <li><a href="###" @click="isShow = true">退出登录</a></li>
+                </ul>
+            </menu>
+        </div>
+        <div class="right">
+            <user-center-main v-if="showing =='main'" />
+            <user-center-profile v-if="showing =='profile'" />
+            <user-center-account v-if="showing =='account'" />
+            <user-center-login-log v-if="showing =='loginLog'" />
+        </div>
+        <div class="copyright">Powered by AJ-IAM.</div>
+        <!-- 对话框 -->
+        <aj-confirm class="logout" v-if="isShow" message="确定退出吗？" />
+  </div>
+  `,
+    data() {
+        return {
+            showing: 'main',
+            isShow: false,
+            loginState: false,
+            USER: {},
+        }
+    },
+
+    mounted() {
+        // 调接口判断是否已经登录
+        aj.xhr.get('../../iam_api/user/info', json => {
+            if (json.status && json.data) {
+                console.log(json.data)
+
+                this.USER = json.data;
+                this.loginState = true;
+            } else {
+                if (confirm('你未登录！是否跳转到登录页面？')) {
+                    location.assign(`../../iam_api/client/to_login?web_url=${encodeURIComponent(location.href)}`);
+                }
+            }
+        });
+    },
+    methods: {
+        confirm() {
+        }
+    }
+};
+
+const UserCenterMain = {
     template: html`<div class="user-center-main">
         <h3 class="aj-center-title">概览</h3>
 	<h4>欢迎</h4>
@@ -21,6 +81,7 @@ Vue.component('user-center-main', {
 	<hr class="aj-hr" />
     <br />
 	 <table class="aj-form-table">
+        <tbody>
         <tr>
             <td>用户 id：</td>
             <td>#{{$parent.USER.id}}</td>
@@ -65,36 +126,22 @@ Vue.component('user-center-main', {
                     v-model="$parent.USER.content"></textarea>
             </td>
         </tr>
+        </tbody>
     </table>
 <!-- 	<h4>我的订单</h4>
 	<hr class="aj-hr" />
 	<div class="box" style="margin: 0 auto;width: 500px;">
 		<img src="" width="160" style="vertical-align: middle;" /> 还没消费过，马上<a href="/shop/goods/">去看看？</a>~
 	</div> -->
-  </div>`,
-    mounted() {
+  </div>`
+};
 
-    },
-});
-
-Vue.component('user-center-order', {
-    template: html`<div class="user-center-order">
-        <h3 class="aj-center-title">订单</h3>
-    </div>`,
-});
-
-Vue.component('user-center-cart', {
-    template: html`<div class="user-center-cart">
-        <h3 class="aj-center-title">购物车</h3>
-    </div>`,
-});
-
-Vue.component('user-center-profile', {
+const UserCenterProfile = {
     template: html`<div class="user-center-profile">
         <h3 class="aj-center-title">个人信息</h3>
         <hr class="aj-hr" />
         <div class="loginId">
-            <span style="float:right">注册日期：{{$parent.USER.createDate | date}}</span>
+            <span style="float:right">注册日期：{{dateFilter($parent.USER.createDate)}}</span>
             用户 id/登录账号：#{{$parent.USER.id}}/{{$parent.USER.loginId}}
         </div>
         <div class="userInfoPanel aj-form">
@@ -154,11 +201,14 @@ Vue.component('user-center-profile', {
     methods: {
         onImageUploaded(file) {
             // this.$parent.USER.image = file.url;
+        },
+        dateFilter(v) {
+            return dateFilter(v);
         }
     }
-});
+};
 
-Vue.component('user-center-account', {
+const UserCenterAccount = {
     template: html`<div class="user-center-account"><h3 class="aj-center-title">帐号管理</h3>
     <ul class="safe">
 <!--         <li>	
@@ -248,7 +298,6 @@ Vue.component('user-center-account', {
     </aj-layer>
     <aj-confirm v-show="isShowDelAccount" state="isShowDelAccount" :confirm-handler="delAccount" message="确定删除帐号吗？" />
   </div>`,
-
     data() {
         return {
             userMail: null,
@@ -267,9 +316,9 @@ Vue.component('user-center-account', {
             alert(9)
         }
     }
-});
+};
 
-Vue.component('user-center-login-log', {
+const UserCenterLoginLog = {
     template: html`<div class="user-center-login-log">
         <h3 class="aj-center-title">登录历史记录</h3>
         <aj-list style="margin: 0 25px" :api="getApi()">
@@ -277,7 +326,7 @@ Vue.component('user-center-login-log', {
                 <th>日期</th><th>登录类型</th><th>登录 IP</th><th>登录地区</th>
             </template>
             <template v-slot:default="data">
-                <td>{{data.data.createDate | date}}</td><td>{{loginType[data.data.loginType]}}</td><td>{{data.data.ip}}</td><td>{{data.data.ipLocation}}</td>
+                <td>{{$date(data.data.createDate)}}</td><td>{{loginType[data.data.loginType]}}</td><td>{{data.data.ip}}</td><td>{{data.data.ipLocation}}</td>
             </template>
         </aj-list>
 </div>
@@ -293,89 +342,9 @@ Vue.component('user-center-login-log', {
     methods: {
         getApi() {
             return '/iam_api/common_api/user_login_log/page?q_user_id=' + this.$parent.USER.id;
-        }
-    }
-});
-
-Vue.component('user-center', {
-    template: html`<div class="user-center">
-        <div class="left">
-				<div class="avatar">
-					<div class="imgHolder userAvatar">
-						<img :src="USER.avatar" />
-					</div>
-
-					<h3 class="userName">{{username}}</h3>
-				</div>
-				<menu>
-					<ul>
-						<li :class="{actived: showing == 'main'}"><a href="###" @click="showing = 'main'">概 览</a></li>
-<!-- 						<li :class="{actived: showing == 'order'}"><a href="###" @click="showing = 'order'">订单</a></li>
-						<li :class="{actived: showing == 'cart'}"><a href="###" @click="showing = 'cart'">购物车</a></li>  -->
-						<!-- <li :class="{actived: showing == 'bookmark'}"><a href="###" @click="showing = 'bookmark'">收藏夹</a></li>  -->
-						<li :class="{actived: showing == 'profile'}"><a href="###" @click="showing = 'profile'">个人信息</a></li>
-						<li :class="{actived: showing == 'account'}"><a href="###" @click="showing = 'account'">帐号管理</a></li>
-						<li :class="{actived: showing == 'loginLog'}"><a href="###" @click="showing = 'loginLog'">登录历史</a></li>
-						<li><a href="###" @click="isShow = true">退出登录</a></li>
-					</ul>
-				</menu>
-				<!-- 对话框 -->
-				<span class="logout"><aj-confirm v-show="isShow" message="确定退出吗？"></aj-confirm></span>
-			</div>
-			<div class="right">
-                <user-center-main v-if="showing =='main'" />
-                <user-center-order v-if="showing =='order'" />
-                <user-center-cart v-if="showing =='cart'" />
-                <user-center-profile v-if="showing =='profile'" />
-                <user-center-account v-if="showing =='account'" />
-                <user-center-login-log v-if="showing =='loginLog'" />
-			</div>
-            <div class="copyright">Powered by AJ-IAM.</div>
-  </div>`,
-    props: {
-        username: {
-            type: String,
-            required: false
         },
-        interval: {
-            type: Number,
-            default: 5000
-        }
-    },
-    data() {
-        return {
-            showing: 'main',
-            isShow: false,
-            loginState: false,
-            USER: {},
-        }
-    },
-
-    mounted() {
-        // 调接口判断是否已经登录
-        aj.xhr.get('../../iam_api/user/info', json => {
-            if (json.status && json.data) {
-                console.log(json.data)
-
-                this.USER = json.data;
-                this.loginState = true;
-            } else {
-                if (confirm('你未登录！是否跳转到登录页面？')) {
-                    // location.assign(`../../iam_api/oidc/authorization?response_type=code&client_id=lKi9p9FyicBd6eA` +
-                    //     `&state=${Math.random().toString(36).substring(2, 15)}` +
-                    //     `&nonce=${Math.random().toString(36).substring(2, 15)}` +
-                    //     `&web_uri=${encodeURIComponent(location.href)}` +
-                    //     `&redirect_uri=${encodeURIComponent('../../iam_api/client/callback')}`);
-
-                    location.assign(`../../iam_api/client/to_login?web_url=${encodeURIComponent(location.href)}`);
-                }
-            }
-        });
-    },
-    methods: {
-        confirm() {
-            aj.xhr.get('logout');// 本地登出
-            sdk.logout('/');
+        $date(v) {
+            return dateFilter(v);
         }
     }
-});
+};
