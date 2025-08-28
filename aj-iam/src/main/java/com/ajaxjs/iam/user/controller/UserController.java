@@ -1,5 +1,6 @@
 package com.ajaxjs.iam.user.controller;
 
+import com.ajaxjs.framework.mvc.unifiedreturn.BizAction;
 import com.ajaxjs.iam.user.model.User;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,6 +16,7 @@ public interface UserController {
      * @return 用户详情
      */
     @CrossOrigin
+    @BizAction("获取当前用户详情")
     @GetMapping("/info")
     User currentUserInfo();
 

@@ -1,5 +1,6 @@
 package com.ajaxjs.iam.server.service;
 
+import com.ajaxjs.framework.mvc.unifiedreturn.BizAction;
 import com.ajaxjs.iam.server.controller.AdminController;
 import com.ajaxjs.iam.user.service.TenantService;
 import com.ajaxjs.sqlman.Sql;
@@ -10,6 +11,7 @@ import java.util.Map;
 @Service
 public class AdminService implements AdminController {
     @Override
+    @BizAction("欢迎页")
     public Map<String, Object> welcome() {
         Integer tenantId = TenantService.getTenantId();
         return Sql.instance().input("SELECT\n" +
