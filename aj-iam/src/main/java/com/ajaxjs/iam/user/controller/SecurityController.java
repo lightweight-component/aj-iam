@@ -1,6 +1,7 @@
 package com.ajaxjs.iam.user.controller;
 
 import com.ajaxjs.framework.database.IgnoreDataBaseConnect;
+import com.ajaxjs.iam.annotation.AllowOpenAccess;
 import com.ajaxjs.security.captcha.image.ImageCaptcha;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,6 +19,7 @@ public class SecurityController {
 
     @GetMapping("/captcha")
     @IgnoreDataBaseConnect
+    @AllowOpenAccess
     void showCaptcha(HttpServletRequest req, HttpServletResponse response) {
         imageCaptcha.captchaImage(req, response);
     }
