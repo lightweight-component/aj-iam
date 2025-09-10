@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.util.ClassUtils;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -41,6 +42,10 @@ public class AutoConfiguration implements WebMvcConfigurer {
     }
 
     private void testIamConnection() {
+        // 如果在 IAM 本体，根本不需要检测，都还未有服务，检查啥
+        if (ClassUtils.isPresent("com.ajaxjs.iam.server.IamServerApp",null))
+            return;
+
         if (StrUtil.hasText(iamService)) {
             CompletableFuture.runAsync(() -> {        // 异步执行任务
                 try {

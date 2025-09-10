@@ -66,7 +66,7 @@ public interface OidcController {
     JwtAccessToken refreshToken(@RequestParam("grant_type") String grantType, @RequestHeader("Authorization") String authorization, @RequestParam("refresh_token") String refreshToken);
 
     /**
-     * ROPC 密码模式获取 Token
+     * Resource Owner Password Credentials(ROPC) 密码模式获取 Token
      *
      * @param grant_type    必填，且固定是 password
      * @param username
