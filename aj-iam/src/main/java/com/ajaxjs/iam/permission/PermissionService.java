@@ -211,6 +211,11 @@ public class PermissionService implements PermissionController {
         return iView;
     }
 
+    /**
+     * 初始化权限
+     *
+     * @param permissionListClz 权限列表的类，一般是接口
+     */
     public static void init(Class<?> permissionListClz) {
         List<String> allPermissionIIdList = Sql.newInstance().input("SELECT code FROM per_permission WHERE stat = 0 ORDER BY id ASC").queryList(String.class);
         Field[] fields = permissionListClz.getDeclaredFields();
@@ -230,9 +235,10 @@ public class PermissionService implements PermissionController {
                         throw new IllegalStateException("找不到权限");
 
                     permissionEntity.setIndex(index);
-                    System.out.println("Field: " + permissionEntity);
+                    log.info("Field: " + permissionEntity);
                 }
             } catch (IllegalAccessException e) {
+                log.error("获取字段值时出错：" + e.getMessage(), e);
                 throw new RuntimeException(e);
             }
         }

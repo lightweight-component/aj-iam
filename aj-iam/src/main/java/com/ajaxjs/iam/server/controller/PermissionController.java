@@ -1,11 +1,15 @@
 package com.ajaxjs.iam.server.controller;
 
+import com.ajaxjs.framework.mvc.unifiedreturn.BizAction;
 import com.ajaxjs.iam.permission.Permission;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
 
+/**
+ * 权限后台管理接口
+ */
 @RestController
 @RequestMapping("/permission")
 public interface PermissionController {
@@ -15,6 +19,7 @@ public interface PermissionController {
      * @return 角色树
      */
     @GetMapping("/role_tree")
+    @BizAction("获取角色树")
     List<Map<String, Object>> getRoleTree();
 
     /**
@@ -24,6 +29,7 @@ public interface PermissionController {
      * @return 是否成功
      */
     @DeleteMapping("/role/{id}")
+    @BizAction("删除角色")
     boolean deleteRole(@PathVariable Integer id);
 
     /**
@@ -33,6 +39,7 @@ public interface PermissionController {
      * @return 权限列表
      */
     @GetMapping("/permission_list_by_role/{roleId}")
+    @BizAction("根据角色 id 获取其权限列表")
     List<Permission> getPermissionListByRole(@PathVariable Integer roleId);
 
     /**
@@ -43,5 +50,6 @@ public interface PermissionController {
      * @return 是否成功
      */
     @PostMapping("/add_permissions_to_role")
+    @BizAction("为角色添加权限 id 列表")
     boolean addPermissionsToRole(@RequestParam Integer roleId, @RequestParam List<Integer> permissionIds);
 }

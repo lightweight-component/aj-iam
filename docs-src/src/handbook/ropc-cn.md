@@ -108,10 +108,34 @@ public class UserService extends BaseOidcClientUserController implements UserCon
     }
 
     @Override
+    public CacheProvider getCacheProvider() {
+        return null;
+    }
+
+    @Override
     public JwtAccessToken onAccessTokenGot(JwtAccessToken token, HttpServletResponse resp, HttpSession session) {
         return null;
     }
 }
+
+import lombok.Data;
+
+@Data
+public class RddUserDTO {
+    private String username;
+
+    private String password;
+}
+
+import lombok.Data;
+
+@Data
+public class RddUserTokenVo {
+    String userId;
+
+    String token;
+}
+
 ```
 
 如上主要是调用 IAM-SDK 的`ropcLogin()`获取 Token 返回返回。

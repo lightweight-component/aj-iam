@@ -31,7 +31,8 @@ public class PermissionEntity {
      */
     public boolean check(long[] permissionValues) {
         for (long permissionValue : permissionValues)
-            if (PermissionControl.check(permissionValue, index)) return true;
+            if (PermissionControl.check(permissionValue, index))
+                return true;
 
         return false;
     }
@@ -40,7 +41,7 @@ public class PermissionEntity {
      * 检查权限值是否满足要求
      *
      * @param permissionValue 权限值
-     * @return true表示满足要求，false表示不满足要求
+     * @return true 表示满足要求，false 表示不满足要求
      */
     public boolean check(long permissionValue) {
         return PermissionControl.check(permissionValue, index);

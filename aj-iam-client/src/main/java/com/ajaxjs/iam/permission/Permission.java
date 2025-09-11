@@ -7,10 +7,19 @@ import lombok.Data;
  */
 @Data
 public class Permission {
+    /**
+     * 权限 id
+     */
     public Integer id;
 
+    /**
+     * 权限名称
+     */
     public String name;
 
+    /**
+     * 权限简介
+     */
     public String content;
 
     /**

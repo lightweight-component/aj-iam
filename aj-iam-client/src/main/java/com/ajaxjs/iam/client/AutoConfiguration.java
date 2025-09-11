@@ -26,7 +26,7 @@ public class AutoConfiguration implements WebMvcConfigurer {
     /**
      * JWT 验证的密钥
      */
-    @Value("${User.oidc.jwtSecretKey:Df87sD#$%#A}")
+    @Value("${auth:Df87sD#$%#A}")
     private String jwtSecretKey;
 
     /**
