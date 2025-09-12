@@ -41,7 +41,8 @@ public class PermissionService implements PermissionController {
 
     @Override
     public List<Permission> getPermissionListByRole(Integer roleId) {
-        Role role = Sql.newInstance().input("SELECT * FROM per_role WHERE id = ?", roleId).queryOne(Role.class);
+        Role role = Sql.newInstance().input("SELECT * FROM per_role WHERE id = ?", roleId).query(Role.class);
+        Objects.requireNonNull(role, "There is NO role, id:" + roleId);
         List<Permission> result = new ArrayList<>();
         // get all permission list
         List<Permission> allPermissionList = getAllPermissionList();
