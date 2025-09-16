@@ -112,9 +112,7 @@ public class OidcService extends OAuthCommon implements OidcController {
         accessToken.setId_token(jWebToken);
 
         Date[] arr= createToken(accessToken, app);
-
-        // 保存 token 在缓存
-        saveTokenToCache(user, accessToken, app);
+        saveTokenToCache(user, accessToken, app); // 保存 token 在缓存
 
         // 修改旧的
         AccessTokenPo updated = new AccessTokenPo();

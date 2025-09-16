@@ -300,6 +300,12 @@ public class UserInterceptor implements HandlerInterceptor {
     @Value("${auth.clientSecret}")
     String clientSecret;
 
+    /**
+     * 远程访问 IAM 接口，刷新访问令牌
+     *
+     * @param refreshToken 刷新令牌
+     * @return API 返回的对象
+     */
     public Map<String, Object> refreshToken(String refreshToken) {
         String tokenApi = iamService + "/iam_api/oidc/refresh_token";
 

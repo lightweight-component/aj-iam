@@ -55,7 +55,7 @@ public class RefreshJWT {
         Map<String, Object> result = userInterceptor.refreshToken(refreshToken);  // 调用拦截器刷新令牌接口
 
         if ((int) result.get("status") == 1) {
-            // 将返回数据转换为JwtAccessToken对象并设置到Cookie中
+            // 将返回数据转换为 JwtAccessToken 对象并设置到 Cookie 中
             JwtAccessToken token = JsonUtil.map2pojo((Map<String, Object>) result.get("data"), JwtAccessToken.class);
             BaseOidcClientUserController.setTokenToCookie(token, response);
         } else
@@ -73,10 +73,8 @@ public class RefreshJWT {
         if (timeUntilExpiry < REFRESH_THRESHOLD) {
             String refreshToken = RefreshJWT.extractRefreshToken(request);
 
-            if (refreshToken != null) {
-                // 刷新成功，生成新的 Access Token
-                refreshToken(refreshToken);
-            }
+            if (refreshToken != null)
+                refreshToken(refreshToken); // 刷新成功，生成新的 Access Token
         }
     }
 

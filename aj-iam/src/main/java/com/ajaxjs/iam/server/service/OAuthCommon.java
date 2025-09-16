@@ -51,7 +51,10 @@ public abstract class OAuthCommon implements IamConstants {
             // 根据 appId 获取登录地址
 //            loginPage = Sql.newInstance().input("SELECT login_page FROM app WHERE stat = 0 AND client_id = ?", clientId).queryOne(String.class);
             // 根据 租户 获取登录地址
-            loginPage = Sql.newInstance().input("SELECT login_page FROM tenant WHERE stat = 0 AND id = ?", TenantService.getTenantId()).queryOne(String.class);
+            if (TenantService.getTenantId() == null) // 没租户 id，超级管理员登录
+                loginPage = "../../iam/login";
+            else
+                loginPage = Sql.newInstance().input("SELECT login_page FROM tenant WHERE stat = 0 AND id = ?", TenantService.getTenantId()).queryOne(String.class);
 
             if (StrUtil.isEmptyText(loginPage))
                 throw new BusinessException("应用或登录地址不存在");
@@ -197,6 +200,13 @@ public abstract class OAuthCommon implements IamConstants {
         Entity.newInstance().input(save).create(Long.class);
     }
 
+    /**
+     * 创建访问令牌和刷新令牌
+     *
+     * @param accessToken 访问令牌对象，用于设置生成的令牌信息
+     * @param app         应用对象，用于获取令牌过期时间配置
+     * @return Date数组，包含两个日期：第一个是访问令牌过期时间，第二个是刷新令牌过期时间
+     */
     public Date[] createToken(AccessToken accessToken, App app) {
         accessToken.setAccess_token(RandomTools.uuid(false));
         accessToken.setRefresh_token(RandomTools.uuid(false));

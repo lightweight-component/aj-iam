@@ -104,7 +104,7 @@ public class PermissionService implements PermissionController {
      * @param allPermissionIIdList 所有权限 ID 列表
      * @return 包含索引的数组
      */
-    private static int[] findIndexes(List<Integer> ids, List<Integer> allPermissionIIdList) {
+    public static int[] findIndexes(List<Integer> ids, List<Integer> allPermissionIIdList) {
         int[] result = new int[ids.size()];
 
         for (int i = 0; i < ids.size(); i++) {
@@ -116,7 +116,7 @@ public class PermissionService implements PermissionController {
     }
 
     // 去重
-    private static List<Permission> removeDuplicates(List<Permission> list) {
+    public static List<Permission> removeDuplicates(List<Permission> list) {
         return list.stream().collect(Collectors.collectingAndThen(
                 Collectors.toCollection(() -> new TreeSet<>(Comparator.comparing(Permission::getId))),
                 ArrayList::new
@@ -132,7 +132,7 @@ public class PermissionService implements PermissionController {
      * @param isInherited       是否继承
      * @param roleName          父角色名称
      */
-    private void getPermissionList(List<Permission> result, List<Permission> allPermissionList, Long permissionValue, boolean isInherited, String roleName) {
+    public static void getPermissionList(List<Permission> result, List<Permission> allPermissionList, Long permissionValue, boolean isInherited, String roleName) {
         int i = 0;
 
         for (Permission p : allPermissionList) {
