@@ -24,7 +24,10 @@ import org.springframework.util.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 @Service
 @Slf4j
@@ -73,8 +76,11 @@ public class OidcService extends OAuthCommon implements OidcController {
             JwtAccessToken accessToken = new JwtAccessToken();
             // 生成 JWT Token
             // TODO user.getName() 中文名会乱码
-
-            String jWebToken = jWebTokenMgr.tokenFactory(String.valueOf(user.getId()), user.getLoginId(), scope, getJwtExpireTimeStamp(app)).toString();
+            Long[][] userPermissions = getUserPermissions(user.getId());
+            String jWebToken = jWebTokenMgr.tokenFactory(
+                    String.valueOf(user.getId()), user.getLoginId(), scope, getJwtExpireTimeStamp(app),
+                    user.getTenantId().intValue(), userPermissions[0],  userPermissions[1]
+            ).toString();
             accessToken.setId_token(jWebToken);
 
             createToken(accessToken, app, GrantType.OIDC, user);
@@ -108,10 +114,14 @@ public class OidcService extends OAuthCommon implements OidcController {
         JwtAccessToken accessToken = new JwtAccessToken();
         // 生成 JWT Token
         // TODO user.getName() 中文名会乱码
-        String jWebToken = jWebTokenMgr.tokenFactory(String.valueOf(user.getId()), user.getLoginId(), DEFAULT_SCOPE, getJwtExpireTimeStamp(app)).toString();
+        Long[][] userPermissions = getUserPermissions(user.getId());
+        String jWebToken = jWebTokenMgr.tokenFactory(
+                String.valueOf(user.getId()), user.getLoginId(), DEFAULT_SCOPE, getJwtExpireTimeStamp(app),
+                user.getTenantId().intValue(), userPermissions[0],  userPermissions[1]
+        ).toString();
         accessToken.setId_token(jWebToken);
 
-        Date[] arr= createToken(accessToken, app);
+        Date[] arr = createToken(accessToken, app);
         saveTokenToCache(user, accessToken, app); // 保存 token 在缓存
 
         // 修改旧的
@@ -168,7 +178,11 @@ public class OidcService extends OAuthCommon implements OidcController {
 
         // 生成 JWT Token
         // TODO user.getName() 中文名会乱码
-        String jWebToken = jWebTokenMgr.tokenFactory(String.valueOf(user.getId()), user.getLoginId(), scope, JwtUtils.setExpire(jwtExpireHours)).toString();
+        Long[][] userPermissions = getUserPermissions(user.getId());
+        String jWebToken = jWebTokenMgr.tokenFactory(
+                String.valueOf(user.getId()), user.getLoginId(), scope, JwtUtils.setExpire(jwtExpireHours),
+                user.getTenantId().intValue(), userPermissions[0],  userPermissions[1]
+        ).toString();
         accessToken.setId_token(jWebToken);
 
         String key = JWT_TOKEN_USER_KEY + "-" + jWebToken;
@@ -190,9 +204,47 @@ public class OidcService extends OAuthCommon implements OidcController {
         createToken(accessToken, app, GrantType.OIDC);
 
         // 生成 JWT Token
-        String jWebToken = jWebTokenMgr.tokenFactory(String.valueOf(app.getId()), app.getName(), "", 0L /* 0 表示不过期*/).toString();
+        // 目前 client 没有权限机制
+        String jWebToken = jWebTokenMgr.tokenFactory(String.valueOf(app.getId()), app.getName(), "", 0L /* 0 表示不过期*/, null, null, null).toString();
         accessToken.setId_token(jWebToken);
 
         return accessToken;
+    }
+
+    private Long[][] getUserPermissions(Long userId) {
+        String sql = "SELECT module_value, permission_value FROM per_role WHERE id IN (SELECT role_id FROM per_user_role WHERE user_id = ?)";
+        List<Map<String, Object>> result = Sql.instance().input(sql, userId).queryList();
+
+        List<Long> permissions = new ArrayList<>();
+        List<Long> modulePermissions = new ArrayList<>();
+
+        if (result != null && !result.isEmpty()) {
+            result.forEach(item -> {
+                Object _permissionValue = item.get("permissionValue");
+
+                if (_permissionValue != null) {
+                    Long permissionValue = (Long) _permissionValue;
+
+                    if (permissionValue != 0L)
+                        permissions.add(permissionValue);
+                }
+
+                Object _moduleValue = item.get("moduleValue");
+
+                if (_moduleValue != null) {
+                    Long moduleValue = (Long) _moduleValue;
+
+                    if (moduleValue != 0L)
+                        modulePermissions.add(moduleValue);
+                }
+            });
+        }
+
+        Long[][] _permissions = new Long[2][];
+
+        _permissions[0] = permissions.isEmpty() ? null : permissions.toArray(new Long[0]);
+        _permissions[1] = modulePermissions.isEmpty() ? null : modulePermissions.toArray(new Long[0]);
+
+        return _permissions;
     }
 }

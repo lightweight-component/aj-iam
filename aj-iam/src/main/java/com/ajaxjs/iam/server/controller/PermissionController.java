@@ -1,6 +1,7 @@
 package com.ajaxjs.iam.server.controller;
 
 import com.ajaxjs.framework.mvc.unifiedreturn.BizAction;
+import com.ajaxjs.iam.annotation.AllowOpenAccess;
 import com.ajaxjs.iam.permission.Permission;
 import org.springframework.web.bind.annotation.*;
 
@@ -52,4 +53,9 @@ public interface PermissionController {
     @PostMapping("/add_permissions_to_role")
     @BizAction("为角色添加权限 id 列表")
     boolean addPermissionsToRole(@RequestParam Integer roleId, @RequestParam List<Integer> permissionIds);
+
+    @GetMapping("/get_index_by_code")
+    @BizAction("根据权限编码获取索引")
+    @AllowOpenAccess
+    Map<String, Long> getIndexesByCode(@RequestParam List<String> permissionCodes, @RequestParam String type);
 }

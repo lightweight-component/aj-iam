@@ -97,6 +97,26 @@ public class PermissionService implements PermissionController {
         return updateResult.isOk();
     }
 
+    @Override
+    public Map<String, Long> getIndexesByCode(List<String> permissionCodes, String type) {
+        List<String> codes = Sql.newInstance().input("SELECT code FROM "
+                + ("module".equals(type) ? "per_module_permission" : "per_permission")
+                + " WHERE stat = 0 ORDER BY id ASC").queryList(String.class);
+        Map<String, Long> map = new HashMap<>();
+
+        for (String code : permissionCodes) {
+            int index = codes.indexOf(code);
+
+            if (index == -1)
+                throw new IllegalStateException("找不到权限");
+
+            map.put(code, (long) index);
+            log.info("Code: {}, index: {}", code, index);
+        }
+
+        return map;
+    }
+
     /**
      * 查找索引
      *

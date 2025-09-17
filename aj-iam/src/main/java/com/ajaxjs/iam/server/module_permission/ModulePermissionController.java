@@ -35,7 +35,7 @@ public class ModulePermissionController {
         List<Permission> result = new ArrayList<>();
         // get all permission list
         List<Permission> allPermissionList = getAllPermissionList();
-        Long permissionValue = role.getPermissionValue();
+        Long permissionValue = role.getModuleValue();
 
         if (permissionValue != null && permissionValue != 0)
             PermissionService.getPermissionList(result, allPermissionList, permissionValue, false, null);
@@ -54,7 +54,7 @@ public class ModulePermissionController {
 
             if (!CollectionUtils.isEmpty(parentRoles)) {
                 for (Role r : parentRoles)
-                    PermissionService.getPermissionList(result, allPermissionList, r.getPermissionValue(), true, r.getName());
+                    PermissionService.getPermissionList(result, allPermissionList, r.getModuleValue(), true, r.getName());
             }
         }
 
