@@ -32,6 +32,7 @@ public class JWebTokenMgr {
      */
     public JWebToken parse(String tokenStr) {
         String[] parts = tokenStr.split("\\.");
+
         if (parts.length != 3)
             throw new IllegalArgumentException("无效 Token 格式");
 
@@ -154,18 +155,24 @@ public class JWebTokenMgr {
     /**
      * 创建 JWT Token
      *
-     * @param sub     用户 ID
-     * @param name    用户名称
-     * @param aud     角色的意思，可为多个
-     * @param expires 过期时间
+     * @param sub                    用户 ID
+     * @param name                   用户名称
+     * @param aud                    角色的意思，可为多个
+     * @param expires                过期时间
+     * @param tenantId               租户 id
+     * @param permissionValues       权限值列表
+     * @param modulePermissionValues 模块权限值列表
      * @return JWT Token
      */
-    public JWebToken tokenFactory(String sub, String name, String aud, long expires) {
+    public JWebToken tokenFactory(String sub, String name, String aud, long expires, Integer tenantId, Long[] permissionValues, Long[] modulePermissionValues) {
         Payload payload = new Payload();
         payload.setSub(sub);
         payload.setName(name);
         payload.setAud(aud);
         payload.setExp(expires);
+        payload.setT(tenantId);
+        payload.setP(permissionValues);
+        payload.setMP(modulePermissionValues);
 
         return tokenFactory(payload);
     }

@@ -7,6 +7,7 @@ import com.ajaxjs.iam.client.ClientUtils;
 import com.ajaxjs.iam.client.model.TokenValidDetail;
 import com.ajaxjs.iam.jwt.JWebToken;
 import com.ajaxjs.iam.jwt.JWebTokenMgr;
+import com.ajaxjs.iam.jwt.Payload;
 import com.ajaxjs.iam.model.SimpleUser;
 import com.ajaxjs.util.*;
 import com.ajaxjs.util.http_request.Post;
@@ -101,10 +102,12 @@ public class UserInterceptor implements HandlerInterceptor {
 
                     if (tokenValidDetail.isValid()) {
                         jsonUser = getJsonUser(jwt);
+                        permissionCheck(jwt);
                         refreshJWT.checkAlmostExpire();
                     } else {
                         if (tokenValidDetail.isExpired() && refreshJWT.expiredRefresh()) {// 只是超时，而不是非法的令牌，可以走 refresh token
                             jsonUser = getJsonUser(jwt);
+                            permissionCheck(jwt);
                         } else {
                             returnErrorMsg(403, response);
 
@@ -127,6 +130,22 @@ public class UserInterceptor implements HandlerInterceptor {
                 return returnErrorMsg(401, response);
         } else
             return true; // 关掉了认证
+    }
+
+    private void permissionCheck(JWebToken jwt) {
+        Payload payload = jwt.getPayload();
+
+        // 租户检查
+        if (payload.getT() != null) {
+            // TODO TenantService 不在此包里
+//            TenantService.getTenantId();
+        }
+
+        Long[] mp = payload.getMP();
+
+        if (!CollUtils.isEmpty(mp)) {
+
+        }
     }
 
     private static String getJsonUser(JWebToken jwt) {

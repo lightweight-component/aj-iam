@@ -72,7 +72,7 @@ public class TestJWebTokenMgr {
         String aud = "admin";
         long expires = System.currentTimeMillis() / 1000 + 3600; // Expires in 1 hour
 
-        JWebToken token = jWebTokenMgr.tokenFactory(sub, name, aud, expires);
+        JWebToken token = jWebTokenMgr.tokenFactory(sub, name, aud, expires, null, null, null);
 
         assertNotNull(token, "Token should not be null");
         assertNotNull(token.getPayload(), "Payload should not be null");

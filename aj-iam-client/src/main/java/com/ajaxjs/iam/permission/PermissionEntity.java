@@ -5,7 +5,7 @@ import lombok.Data;
 @Data
 public class PermissionEntity {
     /**
-     * CODE
+     *  权限 CODE，用于关联权限实体
      */
     private String name;
 
