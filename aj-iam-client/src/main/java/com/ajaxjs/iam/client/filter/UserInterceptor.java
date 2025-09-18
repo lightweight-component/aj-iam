@@ -2,6 +2,7 @@ package com.ajaxjs.iam.client.filter;
 
 import com.ajaxjs.iam.UserConstants;
 import com.ajaxjs.iam.annotation.AllowOpenAccess;
+import com.ajaxjs.iam.annotation.PermissionCheck;
 import com.ajaxjs.iam.client.ClientCredentials;
 import com.ajaxjs.iam.client.ClientUtils;
 import com.ajaxjs.iam.client.model.TokenValidDetail;
@@ -9,6 +10,8 @@ import com.ajaxjs.iam.jwt.JWebToken;
 import com.ajaxjs.iam.jwt.JWebTokenMgr;
 import com.ajaxjs.iam.jwt.Payload;
 import com.ajaxjs.iam.model.SimpleUser;
+import com.ajaxjs.iam.permission.PermissionConfig;
+import com.ajaxjs.iam.permission.PermissionEntity;
 import com.ajaxjs.util.*;
 import com.ajaxjs.util.http_request.Post;
 import lombok.Data;
@@ -28,6 +31,7 @@ import java.io.PrintWriter;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.Enumeration;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.regex.Matcher;
@@ -102,15 +106,25 @@ public class UserInterceptor implements HandlerInterceptor {
 
                     if (tokenValidDetail.isValid()) {
                         jsonUser = getJsonUser(jwt);
-                        permissionCheck(jwt);
+
+                        if (!permissionCheck(jwt, handler)) {
+                            returnErrorMsg(403, response, "模块权限不足");
+                            log.warn("模块权限不足");
+                            return false;
+                        }
+
                         refreshJWT.checkAlmostExpire();
                     } else {
                         if (tokenValidDetail.isExpired() && refreshJWT.expiredRefresh()) {// 只是超时，而不是非法的令牌，可以走 refresh token
                             jsonUser = getJsonUser(jwt);
-                            permissionCheck(jwt);
+
+                            if (!permissionCheck(jwt, handler)) {
+                                returnErrorMsg(403, response, "模块权限不足");
+                                log.warn("模块权限不足");
+                                return false;
+                            }
                         } else {
                             returnErrorMsg(403, response);
-
                             return false;
                         }
                     }
@@ -132,7 +146,16 @@ public class UserInterceptor implements HandlerInterceptor {
             return true; // 关掉了认证
     }
 
-    private void permissionCheck(JWebToken jwt) {
+    @Autowired(required = false)
+    private PermissionConfig permissionConfig;
+
+    /**
+     * 权限检查方法
+     *
+     * @param jwt JWT令牌对象，用于获取权限相关信息
+     * @return boolean 权限检查结果，true表示有权限，false表示无权限
+     */
+    private boolean permissionCheck(JWebToken jwt, Object handler) {
         Payload payload = jwt.getPayload();
 
         // 租户检查
@@ -141,11 +164,60 @@ public class UserInterceptor implements HandlerInterceptor {
 //            TenantService.getTenantId();
         }
 
-        Long[] mp = payload.getMP();
+        if (permissionConfig != null) {
+            Long[] mp = payload.getMP(); // 通过 code 加载 index，权限数据保存在 IAM
 
-        if (!CollUtils.isEmpty(mp)) {
+            /* 这里采用比较”宽容“的模式，如果 token 没有 mp 字段那么是放行的。认为：如果有 Token 了但某些原因没有 mp 的话，是特殊的。
+             * 健全的机制下在生成 Token 的时候，必须同时生成 mp 字段。日后如果需要更严格的校验，那么可以强制非空 mp 处理，即 mp 为空的一律作无权限
+             */
+            if (!CollUtils.isEmpty(mp)) {
+                PermissionEntity mainModulePermission = permissionConfig.getMainModulePermission();
+                boolean globalModuleCheck = mainModulePermission.check(toPrimitive(mp));
 
+                if (!globalModuleCheck)
+                    return false;
+            }
+
+            PermissionCheck ann = ClientUtils.getAnnotationFromMethod((HandlerMethod) handler, PermissionCheck.class);
+
+            if (ann != null && StringUtils.hasText(ann.modulePermissionCode())) {
+                String code = ann.modulePermissionCode();
+                List<PermissionEntity> modulePermissions = permissionConfig.getModulePermissions();
+
+                if (!CollUtils.isEmpty(modulePermissions))
+                    for (PermissionEntity permission : modulePermissions) {
+                        if (code.equals(permission.getName())) {
+                            boolean check = permission.check(toPrimitive(mp));
+
+                            if (!check)
+                                return false;
+                        }
+                    }
+            }
         }
+
+        return true;
+    }
+
+    /**
+     * 将Long对象数组转换为long基本类型数组
+     *
+     * @param objectArray Long对象数组，可能包含null元素
+     * @return 转换后的long基本类型数组，如果输入为null则返回null
+     */
+    public static long[] toPrimitive(Long[] objectArray) {
+        if (objectArray == null)
+            return null;
+
+        long[] primitiveArray = new long[objectArray.length];
+        for (int i = 0; i < objectArray.length; i++) {
+            // 处理 null 的策略在这里决定
+            primitiveArray[i] = objectArray[i] == null ? 0L : objectArray[i]; // 默认 0L
+            // 或者直接解包，遇到 null 会抛异常
+            // primitiveArray[i] = objectArray[i]; // 自动解包，null -> NPE
+        }
+
+        return primitiveArray;
     }
 
     private static String getJsonUser(JWebToken jwt) {
@@ -173,15 +245,19 @@ public class UserInterceptor implements HandlerInterceptor {
      * @param response 响应请求
      */
     private boolean returnErrorMsg(int status, HttpServletResponse response) {
+        return returnErrorMsg(status, response, null);
+    }
+
+    private boolean returnErrorMsg(int status, HttpServletResponse response, String msg) {
         switch (status) {
             case 401:
-                returnMsg(response, HttpStatus.UNAUTHORIZED.value(), "unauthorized", "未认证");
+                returnMsg(response, HttpStatus.UNAUTHORIZED.value(), "unauthorized", msg == null ? "未认证" : msg);
                 break;
             case 403:
-                returnMsg(response, HttpStatus.FORBIDDEN.value(), "forbidden", "没有权限");
+                returnMsg(response, HttpStatus.FORBIDDEN.value(), "forbidden", msg == null ? "没有权限" : msg);
                 break;
             case 500:
-                returnMsg(response, HttpStatus.INTERNAL_SERVER_ERROR.value(), "error", "认证失败");
+                returnMsg(response, HttpStatus.INTERNAL_SERVER_ERROR.value(), "error", msg == null ? "认证失败" : msg);
                 break;
         }
 

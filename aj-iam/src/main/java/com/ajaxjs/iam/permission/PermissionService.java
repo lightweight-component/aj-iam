@@ -100,7 +100,7 @@ public class PermissionService implements PermissionController {
     @Override
     public Map<String, Long> getIndexesByCode(List<String> permissionCodes, String type) {
         List<String> codes = Sql.newInstance().input("SELECT code FROM "
-                + ("module".equals(type) ? "per_module_permission" : "per_permission")
+                + ("module".equals(type) ? "per_module" : "per_permission")
                 + " WHERE stat = 0 ORDER BY id ASC").queryList(String.class);
         Map<String, Long> map = new HashMap<>();
 

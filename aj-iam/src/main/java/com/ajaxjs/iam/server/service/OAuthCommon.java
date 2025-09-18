@@ -194,8 +194,10 @@ public abstract class OAuthCommon implements IamConstants {
             save.setUserName(user.getLoginId());
         }
 
-        if (accessToken instanceof JwtAccessToken)
+        if (accessToken instanceof JwtAccessToken) {
             save.setJwtToken(JsonUtil.toJson(accessToken));
+            save.setIdToken(((JwtAccessToken) accessToken).getId_token());
+        }
 
         Entity.newInstance().input(save).create(Long.class);
     }

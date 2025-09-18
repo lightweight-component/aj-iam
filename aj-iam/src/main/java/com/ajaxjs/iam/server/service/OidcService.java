@@ -169,12 +169,6 @@ public class OidcService extends OAuthCommon implements OidcController {
 
         // 生成 Access Token
         JwtAccessToken accessToken = new JwtAccessToken();
-        createToken(accessToken, app, GrantType.OIDC);
-
-        // 保存 token 在缓存
-        TokenUser tokenUser = new TokenUser();
-        tokenUser.setUserId(user.getId());
-        tokenUser.setAccessToken(accessToken);
 
         // 生成 JWT Token
         // TODO user.getName() 中文名会乱码
@@ -184,6 +178,12 @@ public class OidcService extends OAuthCommon implements OidcController {
                 user.getTenantId().intValue(), userPermissions[0],  userPermissions[1]
         ).toString();
         accessToken.setId_token(jWebToken);
+        createToken(accessToken, app, GrantType.OIDC, user);
+
+        // 保存 token 在缓存
+        TokenUser tokenUser = new TokenUser();
+        tokenUser.setUserId(user.getId());
+        tokenUser.setAccessToken(accessToken);
 
         String key = JWT_TOKEN_USER_KEY + "-" + jWebToken;
         cache.put(key, tokenUser, getTokenExpires(app));
