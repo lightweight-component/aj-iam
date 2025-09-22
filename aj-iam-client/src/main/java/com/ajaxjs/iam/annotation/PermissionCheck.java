@@ -9,7 +9,7 @@ import java.lang.annotation.Target;
  * 权限拦截检查
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.METHOD)
+@Target({ElementType.METHOD, ElementType.TYPE})
 public @interface PermissionCheck {
     /**
      * 模块权限 CODE 标识

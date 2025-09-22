@@ -178,7 +178,7 @@ public class UserInterceptor implements HandlerInterceptor {
                     return false;
             }
 
-            PermissionCheck ann = ClientUtils.getAnnotationFromMethod((HandlerMethod) handler, PermissionCheck.class);
+            PermissionCheck ann = ClientUtils.getAnnotationFromMethodAndClz((HandlerMethod) handler, PermissionCheck.class);
 
             if (ann != null && StringUtils.hasText(ann.modulePermissionCode())) {
                 String code = ann.modulePermissionCode();
@@ -210,6 +210,7 @@ public class UserInterceptor implements HandlerInterceptor {
             return null;
 
         long[] primitiveArray = new long[objectArray.length];
+
         for (int i = 0; i < objectArray.length; i++) {
             // 处理 null 的策略在这里决定
             primitiveArray[i] = objectArray[i] == null ? 0L : objectArray[i]; // 默认 0L
