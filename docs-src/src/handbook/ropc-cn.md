@@ -9,8 +9,7 @@ layout: layouts/docs.njk
 ---
 # 资源所有者密码凭证（ROPC）
 
-OAuth 规范中除了常见的授权模式外，还有一种密码凭证模式，即 Resource Owner Password Credentials（ROPC）。
-这种模式只能在高度信任的情况下使用，说白了就是登录页不与 IAM Server 在一起，而是跟业务系统一起。这是一种不得已的情况，一般不推荐，在新版 OAuth 中被弃用。
+OAuth 规范中除了常见的授权模式外，还有一种密码凭证模式，即 Resource Owner Password Credentials（ROPC），简单说是“密码模式”。这种模式只能在高度信任的情况下使用，说白了就是登录页不与 IAM Server 在一起，而是跟业务系统一起。这是一种不得已的情况，一般不推荐，在新版 OAuth 中被弃用。
 
 虽然但是，有时候还是需要的。那么我们来看看 ROPC 在 IAM 中怎办使用。
 

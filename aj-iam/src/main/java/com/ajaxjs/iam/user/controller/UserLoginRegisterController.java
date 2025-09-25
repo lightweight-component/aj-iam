@@ -2,6 +2,7 @@ package com.ajaxjs.iam.user.controller;
 
 //import com.ajaxjs.framework.filter.google_captcha.GoogleCaptchaCheck;
 
+import com.ajaxjs.framework.mvc.unifiedreturn.BizAction;
 import com.ajaxjs.iam.annotation.AllowOpenAccess;
 import com.ajaxjs.security.captcha.image.ImageCaptchaCheck;
 import org.springframework.web.bind.annotation.*;
@@ -34,18 +35,19 @@ public interface UserLoginRegisterController {
      * @return 若成功登录跳转
      */
     @PostMapping("/login")
+    @BizAction("普通用户登录")
     boolean login(@RequestParam String loginId, @RequestParam String password, @RequestParam(required = false) String returnUrl, HttpServletRequest req, HttpServletResponse resp);
 
     /**
      * 用户登出
      */
     @PostMapping("/logout")
+    @BizAction("用户登出")
     boolean logout(@RequestParam(required = false) String returnUrl, HttpServletResponse resp, HttpSession session);
 
     /**
      * 用户注册
      * <p>
-     * TODO 验证码
      *
      * @param params 用户参数
      * @return 是否成功
@@ -53,6 +55,7 @@ public interface UserLoginRegisterController {
     @PostMapping
     @AllowOpenAccess
     @ImageCaptchaCheck
+    @BizAction("用户注册")
     Boolean register(@RequestBody Map<String, Object> params);
 
     /**
@@ -63,5 +66,6 @@ public interface UserLoginRegisterController {
      * @return true=存在
      */
     @GetMapping("/checkRepeat")
+    @BizAction("查用户某个值是否已经存在一样的值")
     Boolean checkRepeat(@RequestParam String field, @RequestParam String value);
 }

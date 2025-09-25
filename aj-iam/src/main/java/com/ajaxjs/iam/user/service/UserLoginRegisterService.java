@@ -3,7 +3,6 @@ package com.ajaxjs.iam.user.service;
 
 import com.ajaxjs.framework.database.EnableTransaction;
 import com.ajaxjs.framework.model.BusinessException;
-import com.ajaxjs.spring.DiContextUtil;
 import com.ajaxjs.iam.UserConstants;
 import com.ajaxjs.iam.server.common.IamUtils;
 import com.ajaxjs.iam.user.common.UserUtils;
@@ -12,6 +11,7 @@ import com.ajaxjs.iam.user.common.util.CheckStrength;
 import com.ajaxjs.iam.user.controller.UserLoginRegisterController;
 import com.ajaxjs.iam.user.model.User;
 import com.ajaxjs.iam.user.model.UserAccount;
+import com.ajaxjs.spring.DiContextUtil;
 import com.ajaxjs.sqlman.Sql;
 import com.ajaxjs.sqlman.crud.Entity;
 import com.ajaxjs.sqlman.util.SnowflakeId;
@@ -221,6 +221,8 @@ public class UserLoginRegisterService implements UserLoginRegisterController, Us
 
         long userId = Entity.instance().setTableName("user").input(params).create(Long.class).getNewlyId(); // 写入数据库
 
+        saveUserRole(userId, tenantId);
+
         UserAccount auth = new UserAccount();
         auth.setUserId(userId);
         auth.setPassword(passwordEncode.apply(psw));
@@ -228,6 +230,21 @@ public class UserLoginRegisterService implements UserLoginRegisterController, Us
         auth.setRegisterIp(WebUtils.getClientIp(Objects.requireNonNull(DiContextUtil.getRequest())));
 
         return Entity.instance().setTableName("user_account").input(auth).create(Long.class).isOk();
+    }
+
+    /**
+     * 保存用户角色
+     */
+    private static void saveUserRole(long userId, int tenantId) {
+        String sql = "INSERT INTO per_user_role (user_id, role_id)\n" +
+                "(SELECT ?, default_role_id FROM tenant WHERE id = ? AND default_role_id IS NOT NULL)";
+        // default_role_id 如果为空则不插入新数据（用户没角色）
+        boolean isOk = Sql.instance().input(sql, userId, tenantId).create(true, Long.class).isOk();
+
+        if (isOk)
+            log.info("保存用户角色成功！");
+        else
+            log.warn("保存用户角色失败！");
     }
 
     private static boolean isNull(Map<String, Object> params, String key) {

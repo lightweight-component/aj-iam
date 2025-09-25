@@ -27,6 +27,7 @@ public interface UserController {
      * @return 用户详情
      */
     @GetMapping("/{id}")
+    @BizAction("获取用户详情")
     User info(@PathVariable Long id);
 
     /**
