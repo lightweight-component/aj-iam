@@ -57,6 +57,11 @@ public class User extends BaseModel implements UserConstants, IBaseModel {
     private String avatar;
 
     /**
+     * 头像（二进制文件，base64 编码）
+     */
+    private String avatarBlob;
+
+    /**
      * 邮件
      */
     @Email

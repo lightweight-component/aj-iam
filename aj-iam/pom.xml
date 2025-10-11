@@ -75,6 +75,14 @@
             <version>1.0</version>
         </dependency>
 
+        <!-- 支持图片格式 WebP，用户头像用 -->
+        <dependency>
+            <groupId>org.sejda.imageio</groupId>
+            <artifactId>webp-imageio</artifactId>
+            <version>0.1.6</version>
+        </dependency>
+
+
         <!-- JSP 页面所需 -->
         <!--        <dependency>
                     <groupId>org.apache.tomcat.embed</groupId>
