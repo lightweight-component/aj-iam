@@ -37,7 +37,6 @@ import java.util.function.Function;
 @Service
 @Slf4j
 public class UserLoginRegisterService implements UserLoginRegisterController, UserConstants {
-
     @Override
     public Boolean isLogin() {
         return userSession.getUserFromSession() != null;
@@ -218,6 +217,7 @@ public class UserLoginRegisterService implements UserLoginRegisterController, Us
 
         params = Utils.changeFieldToColumnName(params);
         params.put("uid", SnowflakeId.get());
+        params.put("bindState", UserFunction.BindState.IAM);
 
         long userId = Entity.instance().setTableName("user").input(params).create(Long.class).getNewlyId(); // 写入数据库
 

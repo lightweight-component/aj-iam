@@ -3,6 +3,8 @@ package com.ajaxjs.iam.user.model;
 import com.ajaxjs.framework.model.BaseModel;
 import com.ajaxjs.framework.model.IBaseModel;
 import com.ajaxjs.iam.UserConstants;
+import com.ajaxjs.sqlman.annotation.Id;
+import com.ajaxjs.sqlman.annotation.Table;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -11,6 +13,7 @@ import javax.validation.constraints.NotNull;
 import java.util.Date;
 
 @Data
+@Table("user")
 @EqualsAndHashCode(callSuper = true)
 public class User extends BaseModel implements UserConstants, IBaseModel {
     /**
@@ -71,6 +74,16 @@ public class User extends BaseModel implements UserConstants, IBaseModel {
      * 手机
      */
     private String phone;
+
+    /**
+     * 是否验证了（手机号码、邮箱、实名、银行卡）的状态总值，采用 8421 码
+     */
+    private Integer verifiedState;
+
+    /**
+     * 绑定第三方登录账号的状态总值，采用 8421 码
+     */
+    private Integer  bindState;
 
     /**
      * 身份证号码

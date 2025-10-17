@@ -2,7 +2,7 @@ package com.ajaxjs.iam.user.service;
 
 
 import com.ajaxjs.framework.model.BaseEntityConstants;
-import com.ajaxjs.spring.DiContextUtil;
+import com.ajaxjs.framework.model.BusinessException;
 import com.ajaxjs.iam.UserConstants;
 import com.ajaxjs.iam.client.SecurityManager;
 import com.ajaxjs.iam.model.SimpleUser;
@@ -10,6 +10,7 @@ import com.ajaxjs.iam.server.model.po.App;
 import com.ajaxjs.iam.server.service.OAuthCommon;
 import com.ajaxjs.iam.user.controller.UserController;
 import com.ajaxjs.iam.user.model.User;
+import com.ajaxjs.spring.DiContextUtil;
 import com.ajaxjs.sqlman.Sql;
 import com.ajaxjs.sqlman.crud.Entity;
 import com.ajaxjs.sqlman.util.Utils;
@@ -71,7 +72,9 @@ public class UserService implements UserController, UserConstants {
 
     @Override
     public User info() {
-        return info(getUserFromRequestCxt().getId());
+        SimpleUser user = getUserFromRequestCxt();
+
+        return info(user.getId());
     }
 
     @Override
@@ -91,5 +94,14 @@ public class UserService implements UserController, UserConstants {
         user.setStat(BaseEntityConstants.STATUS_DELETED);  // 逻辑删除
 
         return update(user);
+    }
+
+    public static User getUserById(Long id) {
+        User user = Sql.instance().input("SELECT * FROM user WHERE stat != 1 AND id = ?", id).query(User.class);
+
+        if (user == null)
+            throw new BusinessException("The user with id#" + id + " does not exist");
+
+        return user;
     }
 }

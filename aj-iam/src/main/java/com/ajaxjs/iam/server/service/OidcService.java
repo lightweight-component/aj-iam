@@ -12,6 +12,7 @@ import com.ajaxjs.iam.server.model.po.App;
 import com.ajaxjs.iam.user.common.session.UserSession;
 import com.ajaxjs.iam.user.model.User;
 import com.ajaxjs.iam.user.service.UserLoginRegisterService;
+import com.ajaxjs.iam.user.service.UserService;
 import com.ajaxjs.sqlman.Sql;
 import com.ajaxjs.sqlman.crud.Entity;
 import com.ajaxjs.util.JsonUtil;
@@ -79,7 +80,7 @@ public class OidcService extends OAuthCommon implements OidcController {
             Long[][] userPermissions = getUserPermissions(user.getId());
             String jWebToken = jWebTokenMgr.tokenFactory(
                     String.valueOf(user.getId()), user.getLoginId(), scope, getJwtExpireTimeStamp(app),
-                    user.getTenantId().intValue(), userPermissions[0],  userPermissions[1]
+                    user.getTenantId().intValue(), userPermissions[0], userPermissions[1]
             ).toString();
             accessToken.setId_token(jWebToken);
 
@@ -109,7 +110,8 @@ public class OidcService extends OAuthCommon implements OidcController {
         if (accessTokenPO == null)
             throw new BusinessException("找不到 RefreshToken " + refreshToken);
 
-        User user = Sql.instance().input("SELECT * FROM user WHERE id = ? AND stat != 1", accessTokenPO.getUserId()).query(User.class);
+        User user = UserService.getUserById(accessTokenPO.getUserId());
+
         // 生成 Access Token
         JwtAccessToken accessToken = new JwtAccessToken();
         // 生成 JWT Token
@@ -117,7 +119,7 @@ public class OidcService extends OAuthCommon implements OidcController {
         Long[][] userPermissions = getUserPermissions(user.getId());
         String jWebToken = jWebTokenMgr.tokenFactory(
                 String.valueOf(user.getId()), user.getLoginId(), DEFAULT_SCOPE, getJwtExpireTimeStamp(app),
-                user.getTenantId().intValue(), userPermissions[0],  userPermissions[1]
+                user.getTenantId().intValue(), userPermissions[0], userPermissions[1]
         ).toString();
         accessToken.setId_token(jWebToken);
 
@@ -175,7 +177,7 @@ public class OidcService extends OAuthCommon implements OidcController {
         Long[][] userPermissions = getUserPermissions(user.getId());
         String jWebToken = jWebTokenMgr.tokenFactory(
                 String.valueOf(user.getId()), user.getLoginId(), scope, JwtUtils.setExpire(jwtExpireHours),
-                user.getTenantId().intValue(), userPermissions[0],  userPermissions[1]
+                user.getTenantId().intValue(), userPermissions[0], userPermissions[1]
         ).toString();
         accessToken.setId_token(jWebToken);
         createToken(accessToken, app, GrantType.OIDC, user);
@@ -211,7 +213,9 @@ public class OidcService extends OAuthCommon implements OidcController {
         return accessToken;
     }
 
-    private Long[][] getUserPermissions(Long userId) {
+    public static Long[][]
+
+    getUserPermissions(Long userId) {
         String sql = "SELECT module_value, permission_value FROM per_role WHERE id IN (SELECT role_id FROM per_user_role WHERE user_id = ?)";
         List<Map<String, Object>> result = Sql.instance().input(sql, userId).queryList();
 
