@@ -2,6 +2,7 @@ package com.ajaxjs.iam.server.service;
 
 import com.ajaxjs.framework.cache.Cache;
 import com.ajaxjs.framework.model.BusinessException;
+import com.ajaxjs.iam.jwt.JwtUtils;
 import com.ajaxjs.iam.server.common.IamConstants;
 import com.ajaxjs.iam.server.common.IamUtils;
 import com.ajaxjs.iam.server.model.AccessToken;
@@ -31,6 +32,8 @@ public abstract class OAuthCommon implements IamConstants {
     @Autowired
     UserSession userSession;
 
+    public final static String DEFAULT_SCOPE = "DEFAULT_SCOPE";
+
     /**
      * @param webUrl 前端页面地址，用于跳到这里以便获取 Token
      */
@@ -43,13 +46,15 @@ public abstract class OAuthCommon implements IamConstants {
         if (user == null) { // 未登录
             // 返回一段 HTML
             String qs = req.getQueryString();
-
             String loginPage;
 
             // 根据 appId 获取登录地址
 //            loginPage = Sql.newInstance().input("SELECT login_page FROM app WHERE stat = 0 AND client_id = ?", clientId).queryOne(String.class);
             // 根据 租户 获取登录地址
-            loginPage = Sql.newInstance().input("SELECT login_page FROM tenant WHERE stat = 0 AND id = ?", TenantService.getTenantId()).queryOne(String.class);
+            if (TenantService.getTenantId() == null) // 没租户 id，超级管理员登录
+                loginPage = "../../iam/login";
+            else
+                loginPage = Sql.newInstance().input("SELECT login_page FROM tenant WHERE stat = 0 AND id = ?", TenantService.getTenantId()).queryOne(String.class);
 
             if (StrUtil.isEmptyText(loginPage))
                 throw new BusinessException("应用或登录地址不存在");
@@ -67,7 +72,7 @@ public abstract class OAuthCommon implements IamConstants {
                 sb.append("&web_url=").append(webUrl);
 
             if (!StringUtils.hasText(scope))
-                scope = "DEFAULT_SCOPE";
+                scope = DEFAULT_SCOPE;
 
             if (user.getTenantId() != null)
                 scope += ";tenantId=" + user.getTenantId();
@@ -116,8 +121,15 @@ public abstract class OAuthCommon implements IamConstants {
     /**
      * Token 的有效期，单位：分钟  默认两天
      */
-    @Value("${oauth.token.client_expires: 2880}")
+//    @Value("${oauth.token.client_expires: 2880}")
+    @Value("${oauth.token.client_expires: 60}")
     private Integer clientExpires;
+
+    /**
+     * Refresh Token 的有效期，单位：天，默认 7 天
+     * 放 yml 配置没意义，因为多租户
+     */
+    private static final int REFRESH_EXPIRES_DAYS = 7;
 
     /**
      * 获取令牌的过期时间（以毫秒为单位）。
@@ -136,25 +148,40 @@ public abstract class OAuthCommon implements IamConstants {
         return minutes * 60 * 1000;
     }
 
+    /**
+     * 创建访问令牌
+     *
+     * @param accessToken 访问令牌对象，用于存储令牌信息
+     * @param app         应用程序对象，表示当前授权的应用
+     * @param grantType   授权类型，指定令牌的授权方式
+     */
     public void createToken(AccessToken accessToken, App app, String grantType) {
         createToken(accessToken, app, grantType, null);
     }
 
     /**
-     * 创建 Token
+     * 创建访问令牌
+     *
+     * @param accessToken 访问令牌对象，用于存储令牌信息
+     * @param app         应用程序对象，表示当前授权的应用
+     * @param grantType   授权类型，指定令牌的授权方式
+     * @param user        用户对象
      */
     public void createToken(AccessToken accessToken, App app, String grantType, User user) {
-        accessToken.setAccess_token(RandomTools.uuid(false));
-        accessToken.setRefresh_token(RandomTools.uuid(false));
-
-        Integer minutes = app.getExpires() == null ? clientExpires : app.getExpires();
-        accessToken.setExpires_in(minutes * 60);
+//        accessToken.setAccess_token(RandomTools.uuid(false));
+//        accessToken.setRefresh_token(RandomTools.uuid(false));
+//
+//        Integer minutes = app.getExpires() == null ? clientExpires : app.getExpires();
+//        accessToken.setExpires_in(minutes * 60);
+//        int refreshExpiresDays = app.getRefreshExpires() == null ? refreshExpires : app.getRefreshExpires();
+        Date[] arr = createToken(accessToken, app);
 
         // 保存 token
         AccessTokenPo save = new AccessTokenPo();
         save.setAccessToken(accessToken.getAccess_token());
         save.setRefreshToken(accessToken.getRefresh_token());
-        save.setExpiresDate(calculateExpirationDate(minutes));
+        save.setExpiresDate(arr[0]);
+        save.setRefreshExpires(arr[1]);
         save.setGrantType(grantType);
         save.setClientId(app.getClientId());
         save.setCreateDate(new Date());
@@ -167,10 +194,44 @@ public abstract class OAuthCommon implements IamConstants {
             save.setUserName(user.getLoginId());
         }
 
-        if (accessToken instanceof JwtAccessToken)
+        if (accessToken instanceof JwtAccessToken) {
             save.setJwtToken(JsonUtil.toJson(accessToken));
+            save.setIdToken(((JwtAccessToken) accessToken).getId_token());
+        }
 
         Entity.newInstance().input(save).create(Long.class);
+    }
+
+    /**
+     * 创建访问令牌和刷新令牌
+     *
+     * @param accessToken 访问令牌对象，用于设置生成的令牌信息
+     * @param app         应用对象，用于获取令牌过期时间配置
+     * @return Date数组，包含两个日期：第一个是访问令牌过期时间，第二个是刷新令牌过期时间
+     */
+    public Date[] createToken(AccessToken accessToken, App app) {
+        accessToken.setAccess_token(RandomTools.uuid(false));
+        accessToken.setRefresh_token(RandomTools.uuid(false));
+
+        Integer minutes = getTokenExpiresMinutes(app);
+        accessToken.setExpires_in(minutes * 60);
+        int refreshExpiresDays = app.getRefreshExpires() == null ? REFRESH_EXPIRES_DAYS : app.getRefreshExpires();
+
+        return new Date[]{
+                calculateExpirationDate(minutes),
+                calculateExpirationDate(refreshExpiresDays * 1440)
+        };
+    }
+
+    public Integer getTokenExpiresMinutes(App app) {
+        return app.getExpires() == null ? clientExpires : app.getExpires();
+    }
+
+    public long getJwtExpireTimeStamp(App app) {
+        Integer tokenExpiresMinutes = getTokenExpiresMinutes(app);
+//        tokenExpiresMinutes = -10; // for test
+
+        return JwtUtils.setExpire(tokenExpiresMinutes);
     }
 
     /**

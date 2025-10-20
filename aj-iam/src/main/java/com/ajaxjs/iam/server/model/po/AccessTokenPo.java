@@ -31,6 +31,11 @@ public class AccessTokenPo {
     private String jwtToken;
 
     /**
+     * JWT Token 进行 Base64 后的，以便测试
+     */
+    private String idToken;
+
+    /**
      * 关联的用户 id
      */
     private Long userId;
@@ -49,6 +54,11 @@ public class AccessTokenPo {
      * 过期时间
      */
     private Date expiresDate;
+
+    /**
+     * Refresh Token 过期的具体时间
+     */
+    private Date refreshExpires;
 
     private Integer tenantId;
 

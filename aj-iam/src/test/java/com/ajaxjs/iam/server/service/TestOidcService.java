@@ -48,7 +48,7 @@ public class TestOidcService extends BaseTest {
         OidcService.getCache().put("1:user", user, 0);
         OidcService.getCache().put("1:scope", "user", 0);
 
-        String s = encodeClient("G5IFeG7Eesbny3f", "J1Bb4zhchfziuDipKI7sgo6iyk");
+        String s = encodeClient("lKi9p9FyicBd9eb", "zLkv9ngl8mnF5KkKtKEbtCeLC4");
         JwtAccessToken token = OidcService.token(s, "authorization_code", "1", "57458", "kjkkk");
         System.out.println(token.getId_token());
 

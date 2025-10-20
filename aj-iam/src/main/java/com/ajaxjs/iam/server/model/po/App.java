@@ -36,6 +36,11 @@ public class App extends BaseModel {
     private Integer expires;
 
     /**
+     * RefreshToken 有效期，单位：天
+     */
+    private Integer refreshExpires;
+
+    /**
      * 应用类型：HTML， APP，API_SERVICE， RPC_SERVICE， MISC
      */
     private String type;

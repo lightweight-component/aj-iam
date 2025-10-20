@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>模块权限 管理</title>
+    <!--#include file="common/head-vue3.html" -->
+    <link rel="stylesheet" href="common/component/role.css" />
+    <script src="common/component/role.umd.cjs"></script>
+    <link rel="stylesheet" href="https://unpkg.com/view-ui-plus/dist/styles/viewuiplus.css">
+    <!-- import View UI Plus -->
+    <script src="https://unpkg.com/view-ui-plus"></script>
+</head>
+
+<body class="inner-page">
+    <h2>模块权限 管理</h2>
+
+    <div id="app">
+        <Role />
+    </div>
+
+    <script>
+        const app = Vue.createApp({
+            components: {
+                Role: Role.Role
+            }
+        });
+        app.use(ViewUIPlus);
+        app.mount('#app'); 
+    </script>
+</body>
+
+</html>

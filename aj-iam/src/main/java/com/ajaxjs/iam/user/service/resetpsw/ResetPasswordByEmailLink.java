@@ -8,7 +8,7 @@ import com.ajaxjs.message.email.ISendEmail;
 import com.ajaxjs.sqlman.Sql;
 import com.ajaxjs.util.EncodeTools;
 import com.ajaxjs.util.MessageDigestHelper;
-import com.ajaxjs.util.cryptography.AesCrypto;
+import com.ajaxjs.util.cryptography.Cryptography;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -80,7 +80,7 @@ public class ResetPasswordByEmailLink extends BaseResetPasswordService {
     public String makeEmailToken(String email, Integer tenantId) {
         String expireHex = Long.toHexString(System.currentTimeMillis());
         String emailToken = MessageDigestHelper.getSHA1(encryptKey + email),
-                timeToken = AesCrypto.getInstance().AES_encode(expireHex, encryptKey);
+                timeToken = Cryptography.AES_encode(expireHex, encryptKey);
 
         return emailToken + timeToken;
     }
@@ -111,7 +111,7 @@ public class ResetPasswordByEmailLink extends BaseResetPasswordService {
         if (!MessageDigestHelper.getSHA1(encryptKey + email).equals(emailToken))
             throw new SecurityException("非法 email 账号！ " + email);
 
-        String expireHex = AesCrypto.getInstance().AES_decode(timeToken, encryptKey);
+        String expireHex = Cryptography.AES_decode(timeToken, encryptKey);
         long cha = new Date().getTime() - Long.parseLong(expireHex, 16);
         double result = cha * 1.0 / (1000 * 60 * 60);
 

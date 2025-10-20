@@ -35,6 +35,11 @@ public class Role {
     private Long permissionValue;
 
     /**
+     * 权限总值
+     */
+    private Long moduleValue;
+
+    /**
      * 角色编码
      */
     private String code;

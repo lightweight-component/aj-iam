@@ -7,6 +7,7 @@ import com.ajaxjs.message.email.Email;
 import com.ajaxjs.message.email.ISendEmail;
 import com.ajaxjs.sqlman.Sql;
 import com.ajaxjs.sqlman.crud.Entity;
+import com.ajaxjs.sqlman.util.Utils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,7 +18,7 @@ import java.util.function.Function;
 public abstract class BaseResetPasswordService {
     public static User findUserBy(String type, Object value, Integer tenantId) {
         String sql = "SELECT * FROM user WHERE %s = ? AND stat != 1";
-        sql = String.format(sql, type);
+        sql = String.format(sql, Utils.escapeSqlInjection(type));
         User user;
 
         if (tenantId != null && tenantId != 0) {

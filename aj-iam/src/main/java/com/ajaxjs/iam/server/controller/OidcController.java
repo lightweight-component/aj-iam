@@ -1,5 +1,7 @@
 package com.ajaxjs.iam.server.controller;
 
+import com.ajaxjs.iam.annotation.AllowOpenAccess;
+import com.ajaxjs.iam.server.model.AccessToken;
 import com.ajaxjs.iam.server.model.JwtAccessToken;
 import org.springframework.web.bind.annotation.*;
 
@@ -51,7 +53,20 @@ public interface OidcController {
                          @RequestParam(value = "web_url", required = false) String webUrl);
 
     /**
-     * ROPC 密码模式获取 Token
+     * 通过 Refresh Token 刷新 Access Token
+     * 这是通过头传输 client_id/client_secret
+     *
+     * @param grantType     必选，固定为 refresh_token
+     * @param authorization 包含  client_id/client_secret 的头，用 Base64 编码
+     * @param refreshToken  必选，Refresh Token
+     * @return Token
+     */
+    @PostMapping("/refresh_token")
+    @AllowOpenAccess
+    JwtAccessToken refreshToken(@RequestParam("grant_type") String grantType, @RequestHeader("Authorization") String authorization, @RequestParam("refresh_token") String refreshToken);
+
+    /**
+     * Resource Owner Password Credentials(ROPC) 密码模式获取 Token
      *
      * @param grant_type    必填，且固定是 password
      * @param username

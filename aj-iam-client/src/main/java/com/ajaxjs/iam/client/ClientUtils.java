@@ -1,5 +1,6 @@
 package com.ajaxjs.iam.client;
 
+import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.web.method.HandlerMethod;
 
 import javax.servlet.http.HttpServletResponse;
@@ -53,5 +54,23 @@ public class ClientUtils {
         Class<?> controllerClass = handlerMethod.getBeanType();// 获取控制器类（方法所在的类）
 
         return controllerClass.getAnnotation(annotationClass);
+    }
+
+    /**
+     * Get the annotation from: the method or its interface, the class or its interface
+     *
+     * @param handlerMethod   The method on the Interface
+     * @param annotationClass The class of annotation
+     * @param <T>             The type of annotation
+     * @return The annotation
+     */
+    public static <T extends Annotation> T getAnnotationFromMethodAndClz(HandlerMethod handlerMethod, Class<T> annotationClass) {
+        T annotationFromMethod = getAnnotationFromMethod(handlerMethod, annotationClass);
+        if (annotationFromMethod != null)
+            return annotationFromMethod;
+
+        Class<?> controllerClass = handlerMethod.getBeanType();
+
+        return AnnotatedElementUtils.findMergedAnnotation(controllerClass, annotationClass);
     }
 }

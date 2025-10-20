@@ -4,7 +4,6 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class OrgService {
-
     public boolean delete(Long id) {
         // @formatter:off
 		String sql = "DELETE FROM user_org WHERE id IN (WITH RECURSIVE td AS ("

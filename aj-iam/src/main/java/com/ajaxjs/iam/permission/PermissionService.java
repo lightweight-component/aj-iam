@@ -41,7 +41,8 @@ public class PermissionService implements PermissionController {
 
     @Override
     public List<Permission> getPermissionListByRole(Integer roleId) {
-        Role role = Sql.newInstance().input("SELECT * FROM per_role WHERE id = ?", roleId).queryOne(Role.class);
+        Role role = Sql.newInstance().input("SELECT * FROM per_role WHERE id = ?", roleId).query(Role.class);
+        Objects.requireNonNull(role, "There is NO role, id:" + roleId);
         List<Permission> result = new ArrayList<>();
         // get all permission list
         List<Permission> allPermissionList = getAllPermissionList();
@@ -96,6 +97,26 @@ public class PermissionService implements PermissionController {
         return updateResult.isOk();
     }
 
+    @Override
+    public Map<String, Long> getIndexesByCode(List<String> permissionCodes, String type) {
+        List<String> codes = Sql.newInstance().input("SELECT code FROM "
+                + ("module".equals(type) ? "per_module" : "per_permission")
+                + " WHERE stat = 0 ORDER BY id ASC").queryList(String.class);
+        Map<String, Long> map = new HashMap<>();
+
+        for (String code : permissionCodes) {
+            int index = codes.indexOf(code);
+
+            if (index == -1)
+                throw new IllegalStateException("找不到权限");
+
+            map.put(code, (long) index);
+            log.info("Code: {}, index: {}", code, index);
+        }
+
+        return map;
+    }
+
     /**
      * 查找索引
      *
@@ -103,7 +124,7 @@ public class PermissionService implements PermissionController {
      * @param allPermissionIIdList 所有权限 ID 列表
      * @return 包含索引的数组
      */
-    private static int[] findIndexes(List<Integer> ids, List<Integer> allPermissionIIdList) {
+    public static int[] findIndexes(List<Integer> ids, List<Integer> allPermissionIIdList) {
         int[] result = new int[ids.size()];
 
         for (int i = 0; i < ids.size(); i++) {
@@ -115,7 +136,7 @@ public class PermissionService implements PermissionController {
     }
 
     // 去重
-    private static List<Permission> removeDuplicates(List<Permission> list) {
+    public static List<Permission> removeDuplicates(List<Permission> list) {
         return list.stream().collect(Collectors.collectingAndThen(
                 Collectors.toCollection(() -> new TreeSet<>(Comparator.comparing(Permission::getId))),
                 ArrayList::new
@@ -131,7 +152,7 @@ public class PermissionService implements PermissionController {
      * @param isInherited       是否继承
      * @param roleName          父角色名称
      */
-    private void getPermissionList(List<Permission> result, List<Permission> allPermissionList, Long permissionValue, boolean isInherited, String roleName) {
+    public static void getPermissionList(List<Permission> result, List<Permission> allPermissionList, Long permissionValue, boolean isInherited, String roleName) {
         int i = 0;
 
         for (Permission p : allPermissionList) {
@@ -211,6 +232,11 @@ public class PermissionService implements PermissionController {
         return iView;
     }
 
+    /**
+     * 初始化权限
+     *
+     * @param permissionListClz 权限列表的类，一般是接口
+     */
     public static void init(Class<?> permissionListClz) {
         List<String> allPermissionIIdList = Sql.newInstance().input("SELECT code FROM per_permission WHERE stat = 0 ORDER BY id ASC").queryList(String.class);
         Field[] fields = permissionListClz.getDeclaredFields();
@@ -230,9 +256,10 @@ public class PermissionService implements PermissionController {
                         throw new IllegalStateException("找不到权限");
 
                     permissionEntity.setIndex(index);
-                    System.out.println("Field: " + permissionEntity);
+                    log.info("Field: " + permissionEntity);
                 }
             } catch (IllegalAccessException e) {
+                log.error("获取字段值时出错：" + e.getMessage(), e);
                 throw new RuntimeException(e);
             }
         }

@@ -8,7 +8,7 @@ import lombok.Data;
 @Data
 public class AccessToken {
     /**
-     * Access Token
+     * 普通 Access Token，UUID 生成，如果用了 JWT 这个就没什么用了。但保留吧
      */
     private String access_token;
 

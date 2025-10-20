@@ -28,6 +28,11 @@ public class UserAccount extends BaseModel implements IBaseModel {
     private Integer loginType;
 
     /**
+     * 登录类型
+     */
+    private UserAccountType type;
+
+    /**
      * 手机号码是否已验证
      */
     private Boolean phoneVerified;
@@ -51,6 +56,11 @@ public class UserAccount extends BaseModel implements IBaseModel {
      * 第三方id
      */
     private String identifier;
+
+    /**
+     * 第三方id
+     */
+    private String identifier2;
 
     /**
      * 密码凭证（站内的保存密码，站外的不保存或保存token）

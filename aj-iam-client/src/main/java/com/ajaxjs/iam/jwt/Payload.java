@@ -37,6 +37,21 @@ public class Payload {
      */
     private Long iat;
 
+    /**
+     * 租户 id
+     */
+    private Integer t;
+
+    /**
+     * 权限值列表
+     */
+    private Long[] p;
+
+    /**
+     * 模块权限值列表
+     */
+    private Long[] mP;
+
 //    /**
 //     * 编号，似乎不需要
 //     */

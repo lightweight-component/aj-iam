@@ -2,14 +2,19 @@ package com.ajaxjs.iam.client.filter;
 
 import com.ajaxjs.iam.UserConstants;
 import com.ajaxjs.iam.annotation.AllowOpenAccess;
+import com.ajaxjs.iam.annotation.PermissionCheck;
+import com.ajaxjs.iam.client.ClientCredentials;
 import com.ajaxjs.iam.client.ClientUtils;
+import com.ajaxjs.iam.client.model.TokenValidDetail;
 import com.ajaxjs.iam.jwt.JWebToken;
 import com.ajaxjs.iam.jwt.JWebTokenMgr;
+import com.ajaxjs.iam.jwt.Payload;
 import com.ajaxjs.iam.model.SimpleUser;
-import com.ajaxjs.util.JsonUtil;
-import com.ajaxjs.util.StrUtil;
-import com.ajaxjs.util.Version;
-import com.ajaxjs.util.WebUtils;
+import com.ajaxjs.iam.permission.PermissionConfig;
+import com.ajaxjs.iam.permission.PermissionEntity;
+import com.ajaxjs.util.*;
+import com.ajaxjs.util.http_request.Post;
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -26,14 +31,21 @@ import java.io.PrintWriter;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.Enumeration;
+import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static com.ajaxjs.iam.UserConstants.TOKEN;
+import static com.ajaxjs.util.EncodeTools.UTF8_SYMBOL;
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 
 /**
  * 资源拦截器
  */
 @Slf4j
+@Data
 public class UserInterceptor implements HandlerInterceptor {
     @Value("${auth.run:true}")
     private boolean run;
@@ -54,6 +66,8 @@ public class UserInterceptor implements HandlerInterceptor {
 
     @Autowired(required = false)
     JWebTokenMgr jWebTokenMgr;
+
+    private final static Pattern GET_TENANT_ID_REP = Pattern.compile("tenantId=(\\d+)");
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
@@ -85,28 +99,34 @@ public class UserInterceptor implements HandlerInterceptor {
                         jsonUser = getUserFromJvmHash.apply(token);
                     break;
                 case "jwt":
-//                    JWebTokenMgr mgr = getBean(request, JWebTokenMgr.class);
-
                     JWebToken jwt = jWebTokenMgr.parse(token);
+                    TokenValidDetail tokenValidDetail = jWebTokenMgr.validAndDetail(jwt);
+//                    boolean isValid = jWebTokenMgr.isValid(jwt);
+                    RefreshJWT refreshJWT = new RefreshJWT(tokenValidDetail, request, response, this);
 
-                    if (jWebTokenMgr.isValid(jwt)) {
-                        jsonUser = "{\"id\": %s, \"name\": \"%s\", \"tenantId\":%s}";
+                    if (tokenValidDetail.isValid()) {
+                        jsonUser = getJsonUser(jwt);
 
-                        Integer tenantId = null;
-                        String aud = jwt.getPayload().getAud();
-
-                        if (StringUtils.hasText(aud)) {
-                            Matcher matcher = Pattern.compile("tenantId=(\\d+)").matcher(aud);
-
-                            if (matcher.find())
-                                tenantId = Integer.parseInt(matcher.group(1));
+                        if (!permissionCheck(jwt, handler)) {
+                            returnErrorMsg(403, response, "模块权限不足");
+                            log.warn("模块权限不足");
+                            return false;
                         }
 
-                        jsonUser = String.format(jsonUser, jwt.getPayload().getSub(), jwt.getPayload().getName(), tenantId);
+                        refreshJWT.checkAlmostExpire();
                     } else {
-                        returnErrorMsg(403, response);
+                        if (tokenValidDetail.isExpired() && refreshJWT.expiredRefresh()) {// 只是超时，而不是非法的令牌，可以走 refresh token
+                            jsonUser = getJsonUser(jwt);
 
-                        return false;
+                            if (!permissionCheck(jwt, handler)) {
+                                returnErrorMsg(403, response, "模块权限不足");
+                                log.warn("模块权限不足");
+                                return false;
+                            }
+                        } else {
+                            returnErrorMsg(403, response);
+                            return false;
+                        }
                     }
                     break;
                 default:
@@ -116,8 +136,6 @@ public class UserInterceptor implements HandlerInterceptor {
             }
 
             if (StringUtils.hasText(jsonUser)) {
-                log.debug(jsonUser);
-                log.debug(new SimpleUser().toString());
                 SimpleUser user = JsonUtil.fromJson(jsonUser, SimpleUser.class);
                 request.setAttribute(UserConstants.USER_KEY_IN_REQUEST, user);
 
@@ -128,6 +146,99 @@ public class UserInterceptor implements HandlerInterceptor {
             return true; // 关掉了认证
     }
 
+    @Autowired(required = false)
+    private PermissionConfig permissionConfig;
+
+    /**
+     * 权限检查方法
+     *
+     * @param jwt JWT令牌对象，用于获取权限相关信息
+     * @return boolean 权限检查结果，true表示有权限，false表示无权限
+     */
+    private boolean permissionCheck(JWebToken jwt, Object handler) {
+        Payload payload = jwt.getPayload();
+
+        // 租户检查
+        if (payload.getT() != null) {
+            // TODO TenantService 不在此包里
+//            TenantService.getTenantId();
+        }
+
+        if (permissionConfig != null) {
+            Long[] mp = payload.getMP(); // 通过 code 加载 index，权限数据保存在 IAM
+
+            /* 这里采用比较”宽容“的模式，如果 token 没有 mp 字段那么是放行的。认为：如果有 Token 了但某些原因没有 mp 的话，是特殊的。
+             * 健全的机制下在生成 Token 的时候，必须同时生成 mp 字段。日后如果需要更严格的校验，那么可以强制非空 mp 处理，即 mp 为空的一律作无权限
+             */
+            if (!CollUtils.isEmpty(mp)) {
+                PermissionEntity mainModulePermission = permissionConfig.getMainModulePermission();
+                boolean globalModuleCheck = mainModulePermission.check(toPrimitive(mp));
+
+                if (!globalModuleCheck)
+                    return false;
+            }
+
+            PermissionCheck ann = ClientUtils.getAnnotationFromMethodAndClz((HandlerMethod) handler, PermissionCheck.class);
+
+            if (ann != null && StringUtils.hasText(ann.modulePermissionCode())) {
+                String code = ann.modulePermissionCode();
+                List<PermissionEntity> modulePermissions = permissionConfig.getModulePermissions();
+
+                if (!CollUtils.isEmpty(modulePermissions))
+                    for (PermissionEntity permission : modulePermissions) {
+                        if (code.equals(permission.getName())) {
+                            boolean check = permission.check(toPrimitive(mp));
+
+                            if (!check)
+                                return false;
+                        }
+                    }
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * 将Long对象数组转换为long基本类型数组
+     *
+     * @param objectArray Long对象数组，可能包含null元素
+     * @return 转换后的long基本类型数组，如果输入为null则返回null
+     */
+    public static long[] toPrimitive(Long[] objectArray) {
+        if (objectArray == null)
+            return null;
+
+        long[] primitiveArray = new long[objectArray.length];
+
+        for (int i = 0; i < objectArray.length; i++) {
+            // 处理 null 的策略在这里决定
+            primitiveArray[i] = objectArray[i] == null ? 0L : objectArray[i]; // 默认 0L
+            // 或者直接解包，遇到 null 会抛异常
+            // primitiveArray[i] = objectArray[i]; // 自动解包，null -> NPE
+        }
+
+        return primitiveArray;
+    }
+
+    private static String getJsonUser(JWebToken jwt) {
+        String jsonUser = "{\"id\": %s, \"name\": \"%s\", \"tenantId\":%s}";
+
+        Integer tenantId = null;
+        String aud = jwt.getPayload().getAud();
+
+        if (StringUtils.hasText(aud)) {
+            Matcher matcher = GET_TENANT_ID_REP.matcher(aud);
+
+            if (matcher.find())
+                tenantId = Integer.parseInt(matcher.group(1));
+        }
+
+        jsonUser = String.format(jsonUser, jwt.getPayload().getSub(), jwt.getPayload().getName(), tenantId);
+
+        return jsonUser;
+    }
+
     /**
      * 根据错误代码返回响应的信息
      *
@@ -135,15 +246,19 @@ public class UserInterceptor implements HandlerInterceptor {
      * @param response 响应请求
      */
     private boolean returnErrorMsg(int status, HttpServletResponse response) {
+        return returnErrorMsg(status, response, null);
+    }
+
+    private boolean returnErrorMsg(int status, HttpServletResponse response, String msg) {
         switch (status) {
             case 401:
-                returnMsg(response, HttpStatus.UNAUTHORIZED.value(), "unauthorized", "未认证");
+                returnMsg(response, HttpStatus.UNAUTHORIZED.value(), "unauthorized", msg == null ? "未认证" : msg);
                 break;
             case 403:
-                returnMsg(response, HttpStatus.FORBIDDEN.value(), "forbidden", "没有权限");
+                returnMsg(response, HttpStatus.FORBIDDEN.value(), "forbidden", msg == null ? "没有权限" : msg);
                 break;
             case 500:
-                returnMsg(response, HttpStatus.INTERNAL_SERVER_ERROR.value(), "error", "认证失败");
+                returnMsg(response, HttpStatus.INTERNAL_SERVER_ERROR.value(), "error", msg == null ? "认证失败" : msg);
                 break;
         }
 
@@ -183,7 +298,7 @@ public class UserInterceptor implements HandlerInterceptor {
      */
     protected static void returnMsg(HttpServletResponse resp, int httpErrCode, String msg) {
         resp.setStatus(httpErrCode);// 设置 HTTP 响应状态码
-        resp.setCharacterEncoding("UTF-8"); // 设置响应的字符编码和内容类型
+        resp.setCharacterEncoding(UTF8_SYMBOL); // 设置响应的字符编码和内容类型
         resp.setContentType("application/json;charset=utf-8");
 
         try (PrintWriter writer = resp.getWriter()) {// 使用 PrintWriter 对象将消息写入响应体
@@ -216,11 +331,11 @@ public class UserInterceptor implements HandlerInterceptor {
      */
     public static String extractToken(HttpServletRequest request) {
 //        String token = extractHeaderToken(request); // 尝试从请求头的"Authorization"字段提取 token
-        String token = request.getHeader("Authorization"); // 尝试从请求头的"Authorization"字段以另一种大小写形式提取 token
+        String token = request.getHeader(AUTHORIZATION); // 尝试从请求头的"Authorization"字段以另一种大小写形式提取 token
 
         // 如果从请求头的"Authorization"字段提取不到 token，尝试从请求头的"token"字段提取
         if (token == null) {
-            token = request.getHeader("token");
+            token = request.getHeader(TOKEN);
 
             if (token == null) {
 
@@ -270,5 +385,32 @@ public class UserInterceptor implements HandlerInterceptor {
         if (commaIndex > 0) authHeaderValue = authHeaderValue.substring(0, commaIndex);
 
         return authHeaderValue;
+    }
+
+    @Value("${auth.iam_service: }")
+    private String iamService;
+
+    @Value("${auth.clientId}")
+    String clientId;
+
+    @Value("${auth.clientSecret}")
+    String clientSecret;
+
+    /**
+     * 远程访问 IAM 接口，刷新访问令牌
+     *
+     * @param refreshToken 刷新令牌
+     * @return API 返回的对象
+     */
+    public Map<String, Object> refreshToken(String refreshToken) {
+        String tokenApi = iamService + "/iam_api/oidc/refresh_token";
+
+        Map<String, String> params = ObjectHelper.mapOf("grant_type", "refresh_token", "refresh_token", refreshToken);
+        Map<String, Object> result = Post.api(tokenApi, params, conn -> conn.setRequestProperty("Authorization", ClientCredentials.encodeClient(clientId, clientSecret)));
+
+        if (result == null)
+            throw new IllegalAccessError("通讯失败");
+
+        return result;
     }
 }

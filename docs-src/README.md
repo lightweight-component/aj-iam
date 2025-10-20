@@ -7,3 +7,6 @@ Easy to write HTML content in this environment, just pure HTML/CSS/JS is enough,
 
 # Less.js supports
 Install https://www.npmjs.com/package/eleventy-plugin-less
+
+
+可参考富士康中央授权中心 https://sso.foxconn.com/Developer

@@ -1,7 +1,7 @@
 package com.ajaxjs.iam.jwt;
 
 
-
+import com.ajaxjs.iam.client.model.TokenValidDetail;
 import com.ajaxjs.util.EncodeTools;
 import com.ajaxjs.util.JsonUtil;
 import com.ajaxjs.util.MessageDigestHelper;
@@ -32,6 +32,7 @@ public class JWebTokenMgr {
      */
     public JWebToken parse(String tokenStr) {
         String[] parts = tokenStr.split("\\.");
+
         if (parts.length != 3)
             throw new IllegalArgumentException("无效 Token 格式");
 
@@ -77,6 +78,35 @@ public class JWebTokenMgr {
 
             return !isExp && isMatch;
         }
+    }
+
+    public TokenValidDetail validAndDetail(JWebToken token) {
+        String _token = signature(token);
+        boolean isMatch = token.getSignature().equals(_token); // signature matched
+        Long exp = token.getPayload().getExp();
+
+        TokenValidDetail detail = new TokenValidDetail();
+
+        if (exp == 0L) { /* 0 表示永不过期，不用检查是否超时 */
+            detail.setValid(true);
+            detail.setExpired(false);
+            detail.setExpiredTime(0L);
+        } else {
+            boolean isExp = exp < JwtUtils.now(); // true = token expired
+
+            if (isExp) {
+                log.debug("超时:" + exp + ", now:" + JwtUtils.now());
+                log.debug("超时:" + JwtUtils.toRealTime(exp) + ", now:" + JwtUtils.toRealTime(JwtUtils.now()));
+            }
+
+            boolean isValid = !isExp && isMatch;
+
+            detail.setValid(isValid);
+            detail.setExpired(isExp);
+            detail.setExpiredTime(exp);
+        }
+
+        return detail;
     }
 
     /**
@@ -125,18 +155,24 @@ public class JWebTokenMgr {
     /**
      * 创建 JWT Token
      *
-     * @param sub     用户 ID
-     * @param name    用户名称
-     * @param aud     角色的意思，可为多个
-     * @param expires 过期时间
+     * @param sub                    用户 ID
+     * @param name                   用户名称
+     * @param aud                    角色的意思，可为多个
+     * @param expires                过期时间
+     * @param tenantId               租户 id
+     * @param permissionValues       权限值列表
+     * @param modulePermissionValues 模块权限值列表
      * @return JWT Token
      */
-    public JWebToken tokenFactory(String sub, String name, String aud, long expires) {
+    public JWebToken tokenFactory(String sub, String name, String aud, long expires, Integer tenantId, Long[] permissionValues, Long[] modulePermissionValues) {
         Payload payload = new Payload();
         payload.setSub(sub);
         payload.setName(name);
         payload.setAud(aud);
         payload.setExp(expires);
+        payload.setT(tenantId);
+        payload.setP(permissionValues);
+        payload.setMP(modulePermissionValues);
 
         return tokenFactory(payload);
     }

@@ -1,11 +1,14 @@
 package com.ajaxjs.iam.permission;
 
+/**
+ * 权限控制的一些静态方法
+ */
 public class PermissionControl {
     /**
      * 检查是否有权限
      * 这个 Java 函数用于检查一个权限值是否具有某个权限位的权限。
      * 函数通过将权限值进行右移操作来获取权限位的值，
-     * 然后通过与1进行按位与操作来判断该位是否为1，最终返回结果。
+     * 然后通过与1进行按位与操作来判断该位是否为 1，最终返回结果。
      *
      * @param num      权限值
      * @param position 权限位
@@ -16,6 +19,7 @@ public class PermissionControl {
             throw new IllegalArgumentException("The position '" + position + "' is illegal.");
 
         num = num >>> position;
+
         return (num & 1) == 1;
     }
 
