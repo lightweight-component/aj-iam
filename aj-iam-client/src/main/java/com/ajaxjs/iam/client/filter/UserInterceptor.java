@@ -13,7 +13,7 @@ import com.ajaxjs.iam.model.SimpleUser;
 import com.ajaxjs.iam.permission.PermissionConfig;
 import com.ajaxjs.iam.permission.PermissionEntity;
 import com.ajaxjs.util.*;
-import com.ajaxjs.util.http_request.Post;
+import com.ajaxjs.util.httpremote.Post;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,7 +38,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static com.ajaxjs.iam.UserConstants.TOKEN;
-import static com.ajaxjs.util.EncodeTools.UTF8_SYMBOL;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 
 /**
@@ -76,7 +75,7 @@ public class UserInterceptor implements HandlerInterceptor {
         if (isAllowAccess)
             return true;
 
-        if (Version.isDebug && "1".equals(request.getParameter("allow"))) // 方便开发
+        if (DebugTools.isDebug && "1".equals(request.getParameter("allow"))) // 方便开发
             return true;
         else if (run) {
             String token = extractToken(request);
@@ -170,7 +169,7 @@ public class UserInterceptor implements HandlerInterceptor {
             /* 这里采用比较”宽容“的模式，如果 token 没有 mp 字段那么是放行的。认为：如果有 Token 了但某些原因没有 mp 的话，是特殊的。
              * 健全的机制下在生成 Token 的时候，必须同时生成 mp 字段。日后如果需要更严格的校验，那么可以强制非空 mp 处理，即 mp 为空的一律作无权限
              */
-            if (!CollUtils.isEmpty(mp)) {
+            if (!ObjectHelper.isEmpty(mp)) {
                 PermissionEntity mainModulePermission = permissionConfig.getMainModulePermission();
                 boolean globalModuleCheck = mainModulePermission.check(toPrimitive(mp));
 
@@ -184,7 +183,7 @@ public class UserInterceptor implements HandlerInterceptor {
                 String code = ann.modulePermissionCode();
                 List<PermissionEntity> modulePermissions = permissionConfig.getModulePermissions();
 
-                if (!CollUtils.isEmpty(modulePermissions))
+                if (!ObjectHelper.isEmpty(modulePermissions))
                     for (PermissionEntity permission : modulePermissions) {
                         if (code.equals(permission.getName())) {
                             boolean check = permission.check(toPrimitive(mp));
@@ -298,7 +297,7 @@ public class UserInterceptor implements HandlerInterceptor {
      */
     protected static void returnMsg(HttpServletResponse resp, int httpErrCode, String msg) {
         resp.setStatus(httpErrCode);// 设置 HTTP 响应状态码
-        resp.setCharacterEncoding(UTF8_SYMBOL); // 设置响应的字符编码和内容类型
+        resp.setCharacterEncoding(CommonConstant.UTF8); // 设置响应的字符编码和内容类型
         resp.setContentType("application/json;charset=utf-8");
 
         try (PrintWriter writer = resp.getWriter()) {// 使用 PrintWriter 对象将消息写入响应体
@@ -351,7 +350,7 @@ public class UserInterceptor implements HandlerInterceptor {
             }
         }
 
-        if (StrUtil.isEmptyText(token))
+        if (ObjectHelper.isEmptyText(token))
             return null;
 
         if (token.toLowerCase().startsWith(BEARER_TYPE))

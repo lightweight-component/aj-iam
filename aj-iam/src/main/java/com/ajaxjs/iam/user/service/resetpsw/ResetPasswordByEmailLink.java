@@ -6,8 +6,8 @@ import com.ajaxjs.iam.user.model.User;
 import com.ajaxjs.iam.user.service.TenantService;
 import com.ajaxjs.message.email.ISendEmail;
 import com.ajaxjs.sqlman.Sql;
-import com.ajaxjs.util.EncodeTools;
-import com.ajaxjs.util.MessageDigestHelper;
+import com.ajaxjs.util.HashHelper;
+import com.ajaxjs.util.UrlEncode;
 import com.ajaxjs.util.cryptography.Cryptography;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -55,7 +55,8 @@ public class ResetPasswordByEmailLink extends BaseResetPasswordService {
         Integer tenantId = TenantService.getTenantId();
         User user = findUserBy("email", email, tenantId);
         String token = makeEmailToken(email, tenantId);
-        String url = websiteBasePath + FIND_BY_EMAIL + String.format("?email=%s&token=%s", EncodeTools.urlEncode(email), EncodeTools.urlEncode(token));
+
+        String url = websiteBasePath + FIND_BY_EMAIL + String.format("?email=%s&token=%s", new UrlEncode(email).encodeQuery(), new UrlEncode(token).encodeQuery());
 
         String title = "重置密码";
         Map<String, String> map = new HashMap<>();
@@ -79,7 +80,7 @@ public class ResetPasswordByEmailLink extends BaseResetPasswordService {
      */
     public String makeEmailToken(String email, Integer tenantId) {
         String expireHex = Long.toHexString(System.currentTimeMillis());
-        String emailToken = MessageDigestHelper.getSHA1(encryptKey + email),
+        String emailToken = HashHelper.getSHA1(encryptKey + email),
                 timeToken = Cryptography.AES_encode(expireHex, encryptKey);
 
         return emailToken + timeToken;

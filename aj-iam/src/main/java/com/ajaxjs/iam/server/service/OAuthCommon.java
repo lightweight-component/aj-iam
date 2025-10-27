@@ -56,7 +56,7 @@ public abstract class OAuthCommon implements IamConstants {
             else
                 loginPage = Sql.newInstance().input("SELECT login_page FROM tenant WHERE stat = 0 AND id = ?", TenantService.getTenantId()).queryOne(String.class);
 
-            if (StrUtil.isEmptyText(loginPage))
+            if (ObjectHelper.isEmptyText(loginPage))
                 throw new BusinessException("应用或登录地址不存在");
 
             String html = String.format(NOT_LOGIN_TEXT, loginPage + "?" + qs);
@@ -65,7 +65,7 @@ public abstract class OAuthCommon implements IamConstants {
             StringBuilder sb = new StringBuilder();
             sb.append("?state=").append(state);
             // 生成授权码（Authorization Code）
-            String code = MessageDigestHelper.getSHA1(clientId + RandomTools.generateRandomString(6));
+            String code = HashHelper.getSHA1(clientId + RandomTools.generateRandomString(6));
             sb.append("&code=").append(code);
 
             if (StringUtils.hasText(webUrl))
@@ -106,7 +106,7 @@ public abstract class OAuthCommon implements IamConstants {
      * 根据 HTTP 头的 authorization 获取 App 信息
      */
     public static App getAppByAuthHeader(String authorization) {
-        authorization = authorization.replaceAll("Basic ", StrUtil.EMPTY_STRING);
+        authorization = authorization.replaceAll("Basic ", CommonConstant.EMPTY_STRING);
         String base64Str = EncodeTools.base64DecodeToStringUtf8(authorization);
 
         if (!base64Str.contains(":"))

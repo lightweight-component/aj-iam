@@ -1,8 +1,7 @@
 package com.ajaxjs.iam.client;
 
-
-import com.ajaxjs.util.EncodeTools;
-import com.ajaxjs.util.StrUtil;
+import com.ajaxjs.util.Base64Utils;
+import com.ajaxjs.util.ObjectHelper;
 import lombok.Data;
 import org.springframework.http.*;
 import org.springframework.util.LinkedMultiValueMap;
@@ -42,12 +41,12 @@ public class ClientCredentials {
      * @return 返回编码后的字符串，格式为"Basic base64 编码的客户端ID:客户端密钥"
      */
     public static String encodeClient(String clientId, String clientSecret) {
-        if (StrUtil.isEmptyText(clientId) || StrUtil.isEmptyText(clientSecret))
+        if (ObjectHelper.isEmptyText(clientId) || ObjectHelper.isEmptyText(clientSecret))
             throw new IllegalArgumentException("Missing the arguments: clientId/clientSecret");
 
         String clientAndSecret = clientId + ":" + clientSecret;
 
-        return "Basic " + EncodeTools.base64EncodeToString(clientAndSecret);
+        return "Basic " + new Base64Utils(clientAndSecret).encodeAsString();
     }
 
     /**

@@ -1,6 +1,7 @@
 package com.ajaxjs.iam.client.filter;
 
 import com.ajaxjs.iam.annotation.NeedsUserLogined;
+import com.ajaxjs.util.CommonConstant;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 
@@ -41,7 +42,7 @@ public class UserAccessHandlerInterceptor implements HandlerInterceptor {
                     // 用户未登录，返回401未授权的消息
                     response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                     response.setContentType("text/plain; charset=UTF-8");
-                    response.setCharacterEncoding("UTF-8");
+                    response.setCharacterEncoding(CommonConstant.UTF8);
                     response.getWriter().println("未登录，请先进行登录");
                 }
 

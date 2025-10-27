@@ -2,7 +2,7 @@ package com.ajaxjs.iam.client;
 
 import com.ajaxjs.iam.UserConstants;
 import com.ajaxjs.iam.model.SimpleUser;
-import com.ajaxjs.util.Version;
+import com.ajaxjs.util.DebugTools;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -36,7 +36,7 @@ public class SecurityManager {
         if (obj != null)
             user = (SimpleUser) obj;
 
-        if (user == null && Version.isDebug) {
+        if (user == null && DebugTools.isDebug) {
             user = new SimpleUser();
             user.setName("Jack");
             user.setId(888L);

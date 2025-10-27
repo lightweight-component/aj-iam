@@ -4,9 +4,9 @@ import com.ajaxjs.iam.client.filter.UserInterceptor;
 import com.ajaxjs.iam.jwt.JWebTokenMgr;
 import com.ajaxjs.iam.permission.PermissionConfig;
 import com.ajaxjs.iam.permission.PermissionEntity;
-import com.ajaxjs.util.CollUtils;
-import com.ajaxjs.util.StrUtil;
-import com.ajaxjs.util.http_request.Get;
+import com.ajaxjs.util.ObjectHelper;
+import com.ajaxjs.util.httpremote.Get;
+import com.ajaxjs.util.httpremote.Response;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -74,7 +74,7 @@ public class AutoConfiguration implements WebMvcConfigurer {
         if (ClassUtils.isPresent("com.ajaxjs.iam.server.IamServerApp", null))
             return;
 
-        if (StrUtil.hasText(iamService)) {
+        if (ObjectHelper.hasText(iamService)) {
             CompletableFuture.runAsync(() -> {        // 异步执行任务
                 try {
                     Map<String, Object> api = Get.api(iamService + "/iam_api/");
@@ -104,7 +104,7 @@ public class AutoConfiguration implements WebMvcConfigurer {
         interceptor.addPathPatterns("/**").excludePathPatterns("/favicon.ico"); // 拦截所有
 
         // 不需要的拦截路径
-        if (StrUtil.hasText(excludes)) {
+        if (ObjectHelper.hasText(excludes)) {
             String[] arr = excludes.split(",|\\|");
             interceptor.excludePathPatterns(arr);
         }
@@ -123,18 +123,18 @@ public class AutoConfiguration implements WebMvcConfigurer {
         PermissionEntity mainModulePermission = config.getMainModulePermission();
         permissionCodes.add(mainModulePermission.getName());
 
-        if (!CollUtils.isEmpty(config.getModulePermissions()))
+        if (!ObjectHelper.isEmpty(config.getModulePermissions()))
             config.getModulePermissions().forEach(permission -> permissionCodes.add(permission.getName()));
 
         Map<String, Object> result = Get.api(iamService + "/iam_api/permission/get_index_by_code?permissionCodes=" + String.join(",", permissionCodes) + "&type=module");
 
-        if (Get.isOk(result)) {
+        if (Response.isOk(result)) {
             Map<String, Object> data = (Map<String, Object>) result.get("data");
 
             Object index = data.get(mainModulePermission.getName());
             mainModulePermission.setIndex((int) index);
 
-            if (!CollUtils.isEmpty(config.getModulePermissions()))
+            if (!ObjectHelper.isEmpty(config.getModulePermissions()))
                 config.getModulePermissions().forEach(permission -> {
                     Object index2 = data.get(permission.getName());
                     permission.setIndex((int) index2);
