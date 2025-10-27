@@ -3,7 +3,7 @@ package com.ajaxjs.iam.client;
 import com.ajaxjs.iam.UserConstants;
 import com.ajaxjs.iam.jwt.JwtAccessToken;
 import com.ajaxjs.util.*;
-import com.ajaxjs.util.http_request.Post;
+import com.ajaxjs.util.httpremote.Post;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -51,11 +51,11 @@ public abstract class BaseOidcClientUserController {
         log.info("set state code:" + state);
 
         String url = getAuthCodeUrl + "?response_type=code&client_id=" + clientId;
-        url += "&redirect_uri=" + EncodeTools.urlEncode(clientCallbackUrl);
+        url += "&redirect_uri=" + new UrlEncode(clientCallbackUrl).encodeQuery();
         url += "&state=" + state;
 
         if (StringUtils.hasText(webUrl))
-            url += "&web_url=" + EncodeTools.urlEncode(webUrl);
+            url += "&web_url=" + new UrlEncode(webUrl).encodeQuery();
 
         return new RedirectView(url);
     }
@@ -128,7 +128,7 @@ public abstract class BaseOidcClientUserController {
     }
 
     public void doLogout(HttpServletResponse resp) {
-        ResponseCookie cookie = ResponseCookie.from(UserConstants.ACCESS_TOKEN_KEY, StrUtil.EMPTY_STRING)
+        ResponseCookie cookie = ResponseCookie.from(UserConstants.ACCESS_TOKEN_KEY, CommonConstant.EMPTY_STRING)
                 .httpOnly(true)
                 .secure(false) // TODO for prod
                 .path("/")
@@ -138,7 +138,7 @@ public abstract class BaseOidcClientUserController {
 
         resp.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
 
-        ResponseCookie refreshCookie = ResponseCookie.from(UserConstants.REFRESH_TOKEN_KEY, StrUtil.EMPTY_STRING)
+        ResponseCookie refreshCookie = ResponseCookie.from(UserConstants.REFRESH_TOKEN_KEY, CommonConstant.EMPTY_STRING)
                 .httpOnly(true)
                 .secure(false) // TODO for prod
                 .path("/")
@@ -151,7 +151,7 @@ public abstract class BaseOidcClientUserController {
 
     public static void setTokenToCookie(JwtAccessToken token, HttpServletResponse resp) {
         // 设置 Token 到 Cookie
-        ResponseCookie cookie = ResponseCookie.from(UserConstants.ACCESS_TOKEN_KEY,  token.getId_token())
+        ResponseCookie cookie = ResponseCookie.from(UserConstants.ACCESS_TOKEN_KEY, token.getId_token())
                 .httpOnly(true)
                 .secure(false) // TODO for prod
                 .path("/")

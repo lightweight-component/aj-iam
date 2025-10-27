@@ -2,10 +2,10 @@ package com.ajaxjs.iam.jwt;
 
 
 import com.ajaxjs.iam.client.model.TokenValidDetail;
-import com.ajaxjs.util.EncodeTools;
+import com.ajaxjs.util.Base64Utils;
+import com.ajaxjs.util.HashHelper;
 import com.ajaxjs.util.JsonUtil;
-import com.ajaxjs.util.MessageDigestHelper;
-import com.ajaxjs.util.StrUtil;
+import com.ajaxjs.util.ObjectHelper;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
@@ -39,7 +39,7 @@ public class JWebTokenMgr {
         if (!JWebToken.encodedHeader.equals(parts[0]))
             throw new IllegalArgumentException("非法的 JWT Header: " + parts[0]);
 
-        String json = EncodeTools.base64DecodeToStringUtf8(parts[1]);
+        String json = new Base64Utils(parts[1]).decodeAsString();
         Payload payload = JsonUtil.fromJson(json, Payload.class);
 
         if (payload == null)
@@ -128,11 +128,12 @@ public class JWebTokenMgr {
     public String signature(JWebToken token) {
         String headerPayload = token.headerPayload();
 
-        if (StrUtil.isEmptyText(headerPayload))
+        if (ObjectHelper.isEmptyText(headerPayload))
             throw new IllegalArgumentException("头 Payload 参数有问题");
 
-        return new MessageDigestHelper().setAlgorithmName("HmacSHA256").setKey(secretKey).
-                setValue(headerPayload).setBase64withoutPadding(true).setHexStr(false).getResult();
+//        return new MessageDigestHelper().setAlgorithmName("HmacSHA256").setKey(secretKey).
+//                setValue(headerPayload).setBase64withoutPadding(true).setHexStr(false).getResult();
+        return new HashHelper("HmacSHA256", headerPayload).setKey(secretKey).hashAsBase64(true);
     }
 
     /**

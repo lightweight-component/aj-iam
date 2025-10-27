@@ -4,8 +4,8 @@ import com.ajaxjs.framework.cache.Cache;
 import com.ajaxjs.iam.user.common.UserUtils;
 import com.ajaxjs.iam.user.model.User;
 import com.ajaxjs.iam.user.service.TenantService;
+import com.ajaxjs.util.ObjectHelper;
 import com.ajaxjs.util.RandomTools;
-import com.ajaxjs.util.StrUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -48,7 +48,7 @@ public class ResetPasswordBySmsCode  extends BaseResetPasswordService implements
         String code;
         String radAndUserId = cache.get(key, String.class);
 
-        if (StrUtil.hasText(radAndUserId)) {
+        if (ObjectHelper.hasText(radAndUserId)) {
             String[] _radAndUserId = radAndUserId.replace(CACHE_PREFIX, "").split("_");
 
             code = _radAndUserId[0];

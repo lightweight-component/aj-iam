@@ -9,7 +9,6 @@ import com.ajaxjs.message.email.Email;
 import com.ajaxjs.message.email.ISendEmail;
 import com.ajaxjs.util.ObjectHelper;
 import com.ajaxjs.util.RandomTools;
-import com.ajaxjs.util.StrUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -61,7 +60,7 @@ public class ResetPasswordByEmailCode extends BaseResetPasswordService implement
         String code;
         String radAndUserId = cache.get(key, String.class);
 
-        if (StrUtil.hasText(radAndUserId)) {
+        if (ObjectHelper.hasText(radAndUserId)) {
             String[] _radAndUserId = radAndUserId.replace(CACHE_PREFIX, "").split("_");
 
             code = _radAndUserId[0];

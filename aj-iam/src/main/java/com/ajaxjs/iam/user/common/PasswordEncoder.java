@@ -1,6 +1,6 @@
 package com.ajaxjs.iam.user.common;
 
-import com.ajaxjs.util.MessageDigestHelper;
+import com.ajaxjs.util.HashHelper;
 
 /**
  * 密码加密规则
@@ -18,6 +18,6 @@ public class PasswordEncoder {
      * @return 密文
      */
     public String md5salt(String psw) {
-        return MessageDigestHelper.getMd5(psw + salt).toLowerCase();
+        return HashHelper.md5(psw + salt).toLowerCase();
     }
 }

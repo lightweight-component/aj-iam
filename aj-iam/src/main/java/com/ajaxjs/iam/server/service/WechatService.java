@@ -20,10 +20,7 @@ import com.ajaxjs.iam.user.service.UserFunction;
 import com.ajaxjs.iam.user.service.UserService;
 import com.ajaxjs.sqlman.Sql;
 import com.ajaxjs.sqlman.crud.Entity;
-import com.ajaxjs.util.EncodeTools;
-import com.ajaxjs.util.JsonUtil;
-import com.ajaxjs.util.RandomTools;
-import com.ajaxjs.util.StrUtil;
+import com.ajaxjs.util.*;
 import com.ajaxjs.util.cryptography.Constant;
 import com.ajaxjs.util.cryptography.Cryptography;
 import com.ajaxjs.util.http_request.Get;
@@ -145,7 +142,7 @@ public class WechatService extends OAuthCommon implements WechatController {
         String sessionKey = Sql.instance().input("SELECT identifier2 FROM user_account WHERE user_id = ? AND type = 'WECHAT_MINI'",
                 user.getId()).queryOne(String.class);
 
-        if (StrUtil.isEmptyText(sessionKey))
+        if (ObjectHelper.isEmptyText(sessionKey))
             throw new IllegalArgumentException("用户" + user.getName() + "没有微信小程序的 session key");
 
         String json = aesDecryptPhone(iv, data, sessionKey);

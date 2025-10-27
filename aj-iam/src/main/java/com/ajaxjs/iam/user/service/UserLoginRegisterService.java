@@ -16,9 +16,7 @@ import com.ajaxjs.sqlman.Sql;
 import com.ajaxjs.sqlman.crud.Entity;
 import com.ajaxjs.sqlman.util.SnowflakeId;
 import com.ajaxjs.sqlman.util.Utils;
-import com.ajaxjs.util.RandomTools;
-import com.ajaxjs.util.StrUtil;
-import com.ajaxjs.util.WebUtils;
+import com.ajaxjs.util.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -117,14 +115,14 @@ public class UserLoginRegisterService implements UserLoginRegisterController, Us
     public boolean logout(String returnUrl, HttpServletResponse resp, HttpSession session) {
         session.invalidate(); // 销毁会话
         // 清除 HttpOnly Cookie
-        Cookie cookie = new Cookie(UserConstants.ACCESS_TOKEN_KEY, StrUtil.EMPTY_STRING);
+        Cookie cookie = new Cookie(UserConstants.ACCESS_TOKEN_KEY, CommonConstant.EMPTY_STRING);
         cookie.setHttpOnly(true);
         cookie.setSecure(false);
         cookie.setPath("/");
         cookie.setMaxAge(0);
         resp.addCookie(cookie);
 
-        if (StrUtil.hasText(returnUrl)) {
+        if (ObjectHelper.hasText(returnUrl)) {
 
         }
 
@@ -192,7 +190,7 @@ public class UserLoginRegisterService implements UserLoginRegisterController, Us
             Object value = entry.getValue();
             boolean isRemove = !basicFields.contains(key);
 
-            if (isRemove && value != null && (value instanceof String && StrUtil.hasText(value.toString())))
+            if (isRemove && value != null && (value instanceof String && ObjectHelper.hasText(value.toString())))
                 extract.put(key, value);
 
             return isRemove;

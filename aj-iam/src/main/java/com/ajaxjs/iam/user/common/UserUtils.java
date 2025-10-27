@@ -1,6 +1,6 @@
 package com.ajaxjs.iam.user.common;
 
-import com.ajaxjs.util.StrUtil;
+import com.ajaxjs.util.CommonConstant;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -70,15 +70,15 @@ public class UserUtils {
         while (m.find()) {
             row = new LinkedHashMap<>();
             province = m.group("province");
-            row.put("province", province == null ? StrUtil.EMPTY_STRING : province.trim());
+            row.put("province", province == null ? CommonConstant.EMPTY_STRING : province.trim());
             city = m.group("city");
-            row.put("city", city == null ? StrUtil.EMPTY_STRING : city.trim());
+            row.put("city", city == null ? CommonConstant.EMPTY_STRING : city.trim());
             county = m.group("county");
-            row.put("county", county == null ? StrUtil.EMPTY_STRING : county.trim());
+            row.put("county", county == null ? CommonConstant.EMPTY_STRING : county.trim());
             town = m.group("town");
-            row.put("town", town == null ? StrUtil.EMPTY_STRING : town.trim());
+            row.put("town", town == null ? CommonConstant.EMPTY_STRING : town.trim());
             village = m.group("village");
-            row.put("village", village == null ? StrUtil.EMPTY_STRING : village.trim());
+            row.put("village", village == null ? CommonConstant.EMPTY_STRING : village.trim());
             table.add(row);
         }
 

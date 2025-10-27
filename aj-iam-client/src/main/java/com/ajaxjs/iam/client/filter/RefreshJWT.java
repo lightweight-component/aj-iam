@@ -5,7 +5,7 @@ import com.ajaxjs.iam.client.BaseOidcClientUserController;
 import com.ajaxjs.iam.client.model.TokenValidDetail;
 import com.ajaxjs.iam.jwt.JwtAccessToken;
 import com.ajaxjs.util.JsonUtil;
-import com.ajaxjs.util.StrUtil;
+import com.ajaxjs.util.ObjectHelper;
 import com.ajaxjs.util.WebUtils;
 import lombok.AllArgsConstructor;
 
@@ -42,7 +42,7 @@ public class RefreshJWT {
                 token = request.getParameter(UserConstants.REFRESH_TOKEN_KEY);
         }
 
-        return StrUtil.isEmptyText(token) ? null : token;
+        return ObjectHelper.isEmptyText(token) ? null : token;
     }
 
     /**
