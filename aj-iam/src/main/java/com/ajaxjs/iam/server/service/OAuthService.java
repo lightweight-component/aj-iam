@@ -89,8 +89,8 @@ public class OAuthService extends OAuthCommon implements OAuthController {
             throw new BusinessException("找不到 RefreshToken " + refreshToken);
 
         AccessToken accessToken = new AccessToken();
-        accessToken.setAccess_token(RandomTools.uuid(false));
-        accessToken.setRefresh_token(RandomTools.uuid(false));
+        accessToken.setAccess_token(RandomTools.uuidStr());
+        accessToken.setRefresh_token(RandomTools.uuidStr());
 
         // 获取超时
         Integer minutes;
