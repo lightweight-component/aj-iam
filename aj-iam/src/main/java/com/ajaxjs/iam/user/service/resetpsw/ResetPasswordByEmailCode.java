@@ -66,7 +66,7 @@ public class ResetPasswordByEmailCode extends BaseResetPasswordService implement
             code = _radAndUserId[0];
         } else {
 //            code = RandomTools.generateRandomString(6).toUpperCase(); // 6 位随机码
-            code = String.valueOf(RandomTools.generateRandomNumber(4));
+            code = String.valueOf(RandomTools.generateNumber(4));
             Long userId = user.getId();
             String loginId = user.getLoginId();
             radAndUserId = code + "_" + userId + "_" + loginId;

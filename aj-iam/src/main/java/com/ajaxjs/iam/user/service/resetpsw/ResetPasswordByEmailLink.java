@@ -109,7 +109,7 @@ public class ResetPasswordByEmailLink extends BaseResetPasswordService {
     public boolean checkEmailToken(String token, String email) {
         String emailToken = token.substring(0, 40), timeToken = token.substring(40);
 
-        if (!MessageDigestHelper.getSHA1(encryptKey + email).equals(emailToken))
+        if (!HashHelper.getSHA1(encryptKey + email).equals(emailToken))
             throw new SecurityException("非法 email 账号！ " + email);
 
         String expireHex = Cryptography.AES_decode(timeToken, encryptKey);

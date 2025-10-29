@@ -1,7 +1,7 @@
 package com.ajaxjs.iam.user.service;
 
 import com.ajaxjs.spring.DiContextUtil;
-import com.ajaxjs.util.Version;
+import com.ajaxjs.util.DebugTools;
 import org.springframework.util.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
@@ -35,7 +35,7 @@ public class TenantService {
         HttpServletRequest request = DiContextUtil.getRequest();
 
         if (request == null)
-            return Version.isRunningTest() ? 1 : 0; // 单测模式下，给个测试值
+            return DebugTools.isDebug ? 1 : 0; // 单测模式下，给个测试值
 
         String tenantIdStr = request.getHeader(AUTH_TENANT_ID);
 

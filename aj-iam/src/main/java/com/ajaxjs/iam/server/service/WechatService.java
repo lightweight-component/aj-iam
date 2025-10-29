@@ -23,7 +23,7 @@ import com.ajaxjs.sqlman.crud.Entity;
 import com.ajaxjs.util.*;
 import com.ajaxjs.util.cryptography.Constant;
 import com.ajaxjs.util.cryptography.Cryptography;
-import com.ajaxjs.util.http_request.Get;
+import com.ajaxjs.util.httpremote.Get;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -159,11 +159,11 @@ public class WechatService extends OAuthCommon implements WechatController {
      * @return 解密后的文本
      */
     public static String aesDecryptPhone(String iv, String cipherText, String sessionKey) {
-        byte[] keyData = EncodeTools.base64Decode(sessionKey);
+        byte[] keyData = new Base64Utils(sessionKey).decode();
 
         Cryptography cryptography = new Cryptography(Constant.AES_WX_MINI_APP, Cipher.DECRYPT_MODE);
         cryptography.setKey(new SecretKeySpec(keyData, Constant.AES)); // little odd, it's AES, differs with AES_WX_MINI_APP.
-        cryptography.setSpec(new IvParameterSpec(EncodeTools.base64Decode(iv)));
+        cryptography.setSpec(new IvParameterSpec(new Base64Utils(iv).decode()));
         cryptography.setDataStrBase64(cipherText);
 
         return cryptography.doCipherAsStr();
@@ -179,7 +179,7 @@ public class WechatService extends OAuthCommon implements WechatController {
         Map<String, Object> query = Sql.instance().input("SELECT app_id, app_secret FROM app_secret_mgr WHERE owner = ?", data.getAppId()).query();
         log.info(":::" + query);
         String url = String.format(AppletService.LOGIN_API, query.get("appId"), query.get("appSecret"), data.getCode());
-        Code2SessionResult session = Get.api2bean(url, Code2SessionResult.class);
+        Code2SessionResult session = Get.api(url, Code2SessionResult.class);
         log.info("session: " + session);
 
         if (session == null || session.getErrcode() != null && session.getErrcode() != 0)

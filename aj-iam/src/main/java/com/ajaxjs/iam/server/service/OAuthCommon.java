@@ -107,7 +107,7 @@ public abstract class OAuthCommon implements IamConstants {
      */
     public static App getAppByAuthHeader(String authorization) {
         authorization = authorization.replaceAll("Basic ", CommonConstant.EMPTY_STRING);
-        String base64Str = EncodeTools.base64DecodeToStringUtf8(authorization);
+        String base64Str = new Base64Utils(authorization).decodeAsString();
 
         if (!base64Str.contains(":"))
             throw new IllegalArgumentException("非法 Token");
@@ -210,8 +210,8 @@ public abstract class OAuthCommon implements IamConstants {
      * @return Date数组，包含两个日期：第一个是访问令牌过期时间，第二个是刷新令牌过期时间
      */
     public Date[] createToken(AccessToken accessToken, App app) {
-        accessToken.setAccess_token(RandomTools.uuid(false));
-        accessToken.setRefresh_token(RandomTools.uuid(false));
+        accessToken.setAccess_token(RandomTools.uuidStr());
+        accessToken.setRefresh_token(RandomTools.uuidStr());
 
         Integer minutes = getTokenExpiresMinutes(app);
         accessToken.setExpires_in(minutes * 60);
