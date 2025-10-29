@@ -9,7 +9,7 @@ import com.ajaxjs.sqlman.crud.Entity;
 import com.ajaxjs.sqlman.model.CreateResult;
 import com.ajaxjs.sqlman.model.PageResult;
 import com.ajaxjs.util.WebUtils;
-import com.ajaxjs.util.http_request.Get;
+import com.ajaxjs.util.httpremote.Get;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 

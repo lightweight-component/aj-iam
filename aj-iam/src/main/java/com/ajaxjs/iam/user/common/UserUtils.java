@@ -14,7 +14,7 @@ public class UserUtils {
      * 测试 8421 码是否包含 v
      *
      * @param v   当前权限值
-     * @param all 同值
+     * @param all 总值
      * @return true=已包含
      */
     public static boolean testBCD(int v, int all) {
