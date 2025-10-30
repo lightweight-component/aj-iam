@@ -1,8 +1,10 @@
 package com.ajaxjs.iam.user.controller;
 
+import com.ajaxjs.framework.fileupload.UploadedResult;
 import com.ajaxjs.framework.mvc.unifiedreturn.BizAction;
 import com.ajaxjs.iam.user.model.User;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * 用户相关控制器
@@ -75,4 +77,13 @@ public interface UserController {
      */
     @DeleteMapping("/{id}")
     Boolean delete(Long id);
+
+    /**
+     * 修改用户头像
+     *
+     * @return 是否成功
+     */
+    @BizAction("修改用户头像")
+    @PostMapping(value = "/avatar", consumes = "multipart/form-data")
+    UploadedResult avatar(@RequestParam("file") MultipartFile file);
 }
