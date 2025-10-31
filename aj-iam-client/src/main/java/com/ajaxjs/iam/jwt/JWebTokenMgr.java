@@ -133,7 +133,8 @@ public class JWebTokenMgr {
 
 //        return new MessageDigestHelper().setAlgorithmName("HmacSHA256").setKey(secretKey).
 //                setValue(headerPayload).setBase64withoutPadding(true).setHexStr(false).getResult();
-        return new HashHelper("HmacSHA256", headerPayload).setKey(secretKey).hashAsBase64(true);
+
+        return HashHelper.getHmacSHA256(headerPayload, secretKey, true);
     }
 
     /**

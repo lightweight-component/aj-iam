@@ -1,8 +1,8 @@
 package com.ajaxjs.iam.permission;
 
 import com.ajaxjs.iam.BaseTest;
-import com.ajaxjs.util.CollUtils;
-import com.ajaxjs.util.http_request.Get;
+import com.ajaxjs.util.ObjectHelper;
+import com.ajaxjs.util.httpremote.Get;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -40,7 +40,7 @@ public class TestSDK extends BaseTest {
 
         @Override
         public List<PermissionEntity> getModulePermissions() {
-            return CollUtils.listOf(ADMIN_PERMISSION);
+            return ObjectHelper.listOf(ADMIN_PERMISSION);
         }
     }
 
@@ -49,7 +49,7 @@ public class TestSDK extends BaseTest {
         PermissionEntity mainModulePermission = config.getMainModulePermission();
         permissionCodes.add(mainModulePermission.getName());
 
-        if (!CollUtils.isEmpty(config.getModulePermissions()))
+        if (!ObjectHelper.isEmpty(config.getModulePermissions()))
             config.getModulePermissions().forEach(permission -> permissionCodes.add(permission.getName()));
 
         Map<String, Object> result = Get.api("http://localhost:8082/iam_api/permission/get_index_by_code?permissionCodes=" + String.join(",", permissionCodes) + "&type=module");
@@ -60,7 +60,7 @@ public class TestSDK extends BaseTest {
             Object index = data.get(mainModulePermission.getName());
             mainModulePermission.setIndex((int) index);
 
-            if (!CollUtils.isEmpty(config.getModulePermissions()))
+            if (!ObjectHelper.isEmpty(config.getModulePermissions()))
                 config.getModulePermissions().forEach(permission -> {
                     Object index2 = data.get(permission.getName());
                     permission.setIndex((int) index2);

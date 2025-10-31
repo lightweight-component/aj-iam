@@ -1,6 +1,11 @@
 package com.ajaxjs.iam.user.service;
 
 
+import com.ajaxjs.framework.fileupload.DetectType;
+import com.ajaxjs.framework.fileupload.FileUploadAction;
+import com.ajaxjs.framework.fileupload.UploadUtils;
+import com.ajaxjs.framework.fileupload.UploadedResult;
+import com.ajaxjs.framework.fileupload.policy.StorageType;
 import com.ajaxjs.framework.model.BaseEntityConstants;
 import com.ajaxjs.framework.model.BusinessException;
 import com.ajaxjs.iam.UserConstants;
@@ -17,8 +22,11 @@ import com.ajaxjs.sqlman.util.Utils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.util.Objects;
 import java.util.function.Function;
 
@@ -95,6 +103,29 @@ public class UserService implements UserController, UserConstants {
 
         return update(user);
     }
+
+    @Override
+@FileUploadAction(storageType = StorageType.DATABASE, detectType = DetectType.IMAGE, maxFileSize = 3)
+public UploadedResult avatar(MultipartFile file) {
+    Long userId = SecurityManager.getUser().getId();
+
+    return UploadUtils.doUpload(getClass(), "avatar", file, null, (_file, config) -> {
+        try {
+            if (!Sql.instance().input("UPDATE user SET avatar_blob = ? WHERE id = ?", _file.getBytes(), userId).update().isOk())
+                throw new BusinessException("更新用户头像失败");
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+
+        String filename = file.getOriginalFilename();
+        UploadedResult result = new UploadedResult();
+        result.setFileName(filename);
+        result.setOriginalFileName(filename);
+        result.setFileSize(file.getSize());
+
+        return result;
+    });
+}
 
     public static User getUserById(Long id) {
         User user = Sql.instance().input("SELECT * FROM user WHERE stat != 1 AND id = ?", id).query(User.class);
