@@ -5,7 +5,7 @@ import com.ajaxjs.framework.tree.FlatArrayToTree;
 import com.ajaxjs.iam.BaseTest;
 import com.ajaxjs.iam.permission.Permission;
 import com.ajaxjs.iam.permission.PermissionService;
-import com.ajaxjs.sqlman.Sql;
+import com.ajaxjs.sqlman.Action;
 import com.ajaxjs.util.JsonUtil;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +17,7 @@ import java.util.Map;
 public class TestRoleTree extends BaseTest {
     @Test
     public void test() {
-        List<Map<String, Object>> nodes = Sql.newInstance().input("SELECT * FROM per_role").queryList();
+        List<Map<String, Object>> nodes = new Action("SELECT * FROM per_role").query().list();
         // 扁平化的列表转换为 tree 结构
         List<Map<String, Object>> tree = new FlatArrayToTree().mapAsTree(Integer.class, nodes);
 
@@ -36,7 +36,7 @@ public class TestRoleTree extends BaseTest {
     @Test
     void testGetPermission() {
         String sql = "SELECT module_value, permission_value FROM per_role WHERE id IN (SELECT role_id FROM per_user_role WHERE user_id = ?)";
-        List<Map<String, Object>> result = Sql.instance().input(sql, 1).queryList();
+        List<Map<String, Object>> result = new Action(sql).query(1).list();
 
         List<Long> permissions = new ArrayList<>();
         List<Long> modulePermissions = new ArrayList<>();

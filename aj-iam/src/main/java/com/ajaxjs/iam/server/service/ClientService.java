@@ -1,8 +1,7 @@
 package com.ajaxjs.iam.server.service;
 
 import com.ajaxjs.iam.server.model.po.App;
-import com.ajaxjs.sqlman.Sql;
-import com.ajaxjs.sqlman.crud.Entity;
+import com.ajaxjs.sqlman.Action;
 import com.ajaxjs.util.RandomTools;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -30,10 +29,10 @@ public class ClientService {
         app.setClientSecret(RandomTools.generateRandomString(32));
 
         // 保存到数据库
-        return Entity.newInstance().setTableName("app").input(app).create().isOk();
+        return new Action(app, "app").create().execute(true).isOk();
     }
 
     App findClientDetailsByClientId(String clientId) {
-        return Sql.newInstance().input("SELECT * FROM app WHERE stat = 1 AND client_id = ?", clientId).query(App.class);
+        return new Action("SELECT * FROM app WHERE stat = 1 AND client_id = ?").query(clientId).one(App.class);
     }
 }

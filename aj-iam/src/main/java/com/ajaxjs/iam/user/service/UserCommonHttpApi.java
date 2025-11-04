@@ -1,10 +1,10 @@
 package com.ajaxjs.iam.user.service;
 
-import com.ajaxjs.framework.FastCrudController.model.Namespaces;
+import com.ajaxjs.framework.FastCrudController.Namespaces;
 import com.ajaxjs.iam.client.SecurityManager;
-import com.ajaxjs.sqlman.crud.model.TableModel;
-import com.ajaxjs.sqlman_v2.sqlgenerator.AutoQuery;
-import com.ajaxjs.sqlman_v2.sqlgenerator.AutoQueryBusiness;
+import com.ajaxjs.sqlman.model.tablemodel.TableModel;
+import com.ajaxjs.sqlman.sqlgenerator.AutoQuery;
+import com.ajaxjs.sqlman.sqlgenerator.AutoQueryBusiness;
 import org.springframework.stereotype.Component;
 
 import java.io.Serializable;

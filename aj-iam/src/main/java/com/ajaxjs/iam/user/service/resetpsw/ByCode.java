@@ -3,8 +3,7 @@ package com.ajaxjs.iam.user.service.resetpsw;
 import com.ajaxjs.framework.cache.Cache;
 import com.ajaxjs.iam.user.model.User;
 import com.ajaxjs.iam.user.service.TenantService;
-import com.ajaxjs.spring.DiContextUtil;
-import com.ajaxjs.sqlman.Sql;
+import com.ajaxjs.sqlman.Action;
 import org.springframework.util.StringUtils;
 
 import java.util.Map;
@@ -34,8 +33,8 @@ public interface ByCode {
 
         cache.remove(key);// 验证码正确，删除缓存
 
-        Map<String, Object> user = Sql.newInstance().input(
-                "SELECT u.*, a.id AS auth_id, a.password FROM user u LEFT JOIN user_account a ON u.id = a.user_id WHERE u.id = ?", userId).query();
+        Map<String, Object> user = new Action(
+                "SELECT u.*, a.id AS auth_id, a.password FROM user u LEFT JOIN user_account a ON u.id = a.user_id WHERE u.id = ?").query(userId).one();
 
         return updatePwd(user, newPsw);
     }

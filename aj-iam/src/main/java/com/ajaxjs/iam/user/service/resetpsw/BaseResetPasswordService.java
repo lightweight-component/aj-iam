@@ -5,9 +5,8 @@ import com.ajaxjs.iam.user.model.User;
 import com.ajaxjs.iam.user.model.UserAccount;
 import com.ajaxjs.message.email.Email;
 import com.ajaxjs.message.email.ISendEmail;
-import com.ajaxjs.sqlman.Sql;
-import com.ajaxjs.sqlman.crud.Entity;
 import com.ajaxjs.sqlman.util.Utils;
+import com.ajaxjs.sqlman.Action;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -23,9 +22,9 @@ public abstract class BaseResetPasswordService {
 
         if (tenantId != null && tenantId != 0) {
             sql += " AND tenant_id = ?";
-            user = Sql.newInstance().input(sql, value, tenantId).query(User.class);
+            user = new Action(sql).query(value, tenantId).one(User.class);
         } else
-            user = Sql.newInstance().input(sql, value).query(User.class);
+            user = new Action(sql).query(value).one(User.class);
 
         if (user == null)
             throw new IllegalAccessError("该 " + type + ": " + value + " 的用户不存在！");
@@ -75,6 +74,6 @@ public abstract class BaseResetPasswordService {
         updateAuth.setId(Long.parseLong(String.valueOf(user.get("authId"))));
         updateAuth.setPassword(newPassword);
 
-        return Entity.newInstance().input(updateAuth).update().isOk();
+        return new Action(updateAuth).update().withId().isOk();
     }
 }

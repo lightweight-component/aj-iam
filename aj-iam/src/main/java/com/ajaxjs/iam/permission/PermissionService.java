@@ -1,11 +1,8 @@
 package com.ajaxjs.iam.permission;
 
-
 import com.ajaxjs.framework.tree.FlatArrayToTree;
 import com.ajaxjs.iam.server.controller.PermissionController;
-import com.ajaxjs.sqlman.Sql;
-import com.ajaxjs.sqlman.crud.Entity;
-import com.ajaxjs.sqlman.model.UpdateResult;
+import com.ajaxjs.sqlman.Action;
 import com.ajaxjs.util.ObjectHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -20,7 +17,7 @@ import java.util.stream.Collectors;
 public class PermissionService implements PermissionController {
     @Override
     public List<Map<String, Object>> getRoleTree() {
-        List<Map<String, Object>> nodes = Sql.newInstance().input("SELECT * FROM per_role WHERE stat != 1").queryList();
+        List<Map<String, Object>> nodes = new Action("SELECT * FROM per_role WHERE stat != 1").query().list();
         // 扁平化的列表转换为 tree 结构
         List<Map<String, Object>> data = new FlatArrayToTree().mapAsTree(Integer.class, nodes);
 
@@ -36,15 +33,15 @@ public class PermissionService implements PermissionController {
                 ")" +
                 "UPDATE per_role SET stat = 1 WHERE id IN (SELECT id FROM sub_roles);";
 
-        return Sql.newInstance().input(sql, id).update().isOk();
+        return new Action(sql).update(id).execute().isOk();
     }
 
     @Override
     public List<Permission> getPermissionListByRole(Integer roleId) {
-        Role role = Sql.newInstance().input("SELECT * FROM per_role WHERE id = ?", roleId).query(Role.class);
+        Role role = new Action("SELECT * FROM per_role WHERE id = ?").query(roleId).one(Role.class);
         Objects.requireNonNull(role, "There is NO role, id:" + roleId);
         List<Permission> result = new ArrayList<>();
-        // get all permission list
+        // get all permission lists
         List<Permission> allPermissionList = getAllPermissionList();
         Long permissionValue = role.getPermissionValue();
 
@@ -53,7 +50,7 @@ public class PermissionService implements PermissionController {
 
         // find parents
         if (role.getIsInheritedParent()) {
-            List<Role> parentRoles = Sql.newInstance().input("WITH RECURSIVE parent_cte AS (\n" +
+            List<Role> parentRoles = new Action("WITH RECURSIVE parent_cte AS (\n" +
                     "  SELECT id, name, parent_id, permission_value FROM per_role\n" +
                     "  WHERE id = ?  -- 用您要查询的节点的ID替换 <your_node_id>\n" +
                     "  UNION ALL\n" +
@@ -61,7 +58,7 @@ public class PermissionService implements PermissionController {
                     "  INNER JOIN parent_cte pc ON pr.id = pc.parent_id\n" +
                     ")\n" +
                     "SELECT id, name, parent_id, permission_value\n" +
-                    "FROM parent_cte WHERE id != ? -- 不包含自己", roleId, roleId).queryList(Role.class);
+                    "FROM parent_cte WHERE id != ? -- 不包含自己").query(roleId, roleId).list(Role.class);
 
             if (!CollectionUtils.isEmpty(parentRoles)) {
                 for (Role r : parentRoles)
@@ -73,12 +70,12 @@ public class PermissionService implements PermissionController {
     }
 
     private List<Permission> getAllPermissionList() {
-        return Sql.newInstance().input("SELECT * FROM per_permission WHERE stat = 0 ORDER BY id ASC").queryList(Permission.class);
+        return new Action("SELECT * FROM per_permission WHERE stat = 0 ORDER BY id ASC").query().list(Permission.class);
     }
 
     @Override
     public boolean addPermissionsToRole(Integer roleId, List<Integer> permissionIds) {
-        List<Integer> allPermissionIIdList = Sql.newInstance().input("SELECT id FROM per_permission WHERE stat = 0 ORDER BY id ASC").queryList(Integer.class);
+        List<Integer> allPermissionIIdList = new Action("SELECT id FROM per_permission WHERE stat = 0 ORDER BY id ASC").query().list(Integer.class);
         int[] indexes = findIndexes(permissionIds, allPermissionIIdList);
 //        System.out.println(allPermissionIIdList);
 //        System.out.println(Arrays.toString(indexes));
@@ -92,16 +89,15 @@ public class PermissionService implements PermissionController {
 
         log.info("permissionValue: " + num);
         Map<String, Object> map = ObjectHelper.mapOf("id", roleId, "permission_value", num);
-        UpdateResult updateResult = Entity.newInstance().setTableName("per_role").input(map).update();
 
-        return updateResult.isOk();
+        return new Action(map, "per_role").update().withId().isOk();
     }
 
     @Override
     public Map<String, Long> getIndexesByCode(List<String> permissionCodes, String type) {
-        List<String> codes = Sql.newInstance().input("SELECT code FROM "
+        List<String> codes = new Action("SELECT code FROM "
                 + ("module".equals(type) ? "per_module" : "per_permission")
-                + " WHERE stat = 0 ORDER BY id ASC").queryList(String.class);
+                + " WHERE stat = 0 ORDER BY id ASC").query().list(String.class);
         Map<String, Long> map = new HashMap<>();
 
         for (String code : permissionCodes) {
@@ -238,7 +234,7 @@ public class PermissionService implements PermissionController {
      * @param permissionListClz 权限列表的类，一般是接口
      */
     public static void init(Class<?> permissionListClz) {
-        List<String> allPermissionIIdList = Sql.newInstance().input("SELECT code FROM per_permission WHERE stat = 0 ORDER BY id ASC").queryList(String.class);
+        List<String> allPermissionIIdList = new Action("SELECT code FROM per_permission WHERE stat = 0 ORDER BY id ASC").query().list(String.class);
         Field[] fields = permissionListClz.getDeclaredFields();
 
         for (Field field : fields) {

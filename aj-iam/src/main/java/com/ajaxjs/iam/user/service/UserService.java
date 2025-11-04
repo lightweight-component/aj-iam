@@ -16,9 +16,8 @@ import com.ajaxjs.iam.server.service.OAuthCommon;
 import com.ajaxjs.iam.user.controller.UserController;
 import com.ajaxjs.iam.user.model.User;
 import com.ajaxjs.spring.DiContextUtil;
-import com.ajaxjs.sqlman.Sql;
-import com.ajaxjs.sqlman.crud.Entity;
 import com.ajaxjs.sqlman.util.Utils;
+import com.ajaxjs.sqlman.Action;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -48,7 +47,7 @@ public class UserService implements UserController, UserConstants {
         String sql = "SELECT u.*, t.name AS tenantName FROM user u LEFT JOIN tenant t ON u.tenant_id = t.id WHERE u.stat != 1 AND u.id = ?";
 //        sql = TenantService.addTenantIdQuery(sql);
 
-        return Sql.instance().input(sql, id).query(User.class);
+        return new Action(sql).query(id).one(User.class);
     }
 
     @Override
@@ -56,7 +55,7 @@ public class UserService implements UserController, UserConstants {
         App app = OAuthCommon.getAppByAuthHeader(authorization);
         String sql = "SELECT * FROM user WHERE stat != 1 AND tenant_id = ? AND " + Utils.escapeSqlInjection(field) + " = ?";
 
-        return Sql.instance().input(sql, app.getTenantId(), value).query(User.class);
+        return new Action(sql).query(app.getTenantId(), value).one(User.class);
     }
 
     /**
@@ -92,7 +91,7 @@ public class UserService implements UserController, UserConstants {
 
     @Override
     public Boolean update(User user) {
-        return Entity.instance().setTableName("user").input(user).update().isOk();
+        return new Action(user, "user").update().withId().isOk();
     }
 
     @Override
@@ -105,30 +104,30 @@ public class UserService implements UserController, UserConstants {
     }
 
     @Override
-@FileUploadAction(storageType = StorageType.DATABASE, detectType = DetectType.IMAGE, maxFileSize = 3)
-public UploadedResult avatar(MultipartFile file) {
-    Long userId = SecurityManager.getUser().getId();
+    @FileUploadAction(storageType = StorageType.DATABASE, detectType = DetectType.IMAGE, maxFileSize = 3)
+    public UploadedResult avatar(MultipartFile file) {
+        Long userId = SecurityManager.getUser().getId();
 
-    return UploadUtils.doUpload(getClass(), "avatar", file, null, (_file, config) -> {
-        try {
-            if (!Sql.instance().input("UPDATE user SET avatar_blob = ? WHERE id = ?", _file.getBytes(), userId).update().isOk())
-                throw new BusinessException("更新用户头像失败");
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
-        }
+        return UploadUtils.doUpload(getClass(), "avatar", file, null, (_file, config) -> {
+            try {
+                if (!new Action("UPDATE user SET avatar_blob = ? WHERE id = ?").update(_file.getBytes(), userId).execute().isOk())
+                    throw new BusinessException("更新用户头像失败");
+            } catch (IOException e) {
+                throw new UncheckedIOException(e);
+            }
 
-        String filename = file.getOriginalFilename();
-        UploadedResult result = new UploadedResult();
-        result.setFileName(filename);
-        result.setOriginalFileName(filename);
-        result.setFileSize(file.getSize());
+            String filename = file.getOriginalFilename();
+            UploadedResult result = new UploadedResult();
+            result.setFileName(filename);
+            result.setOriginalFileName(filename);
+            result.setFileSize(file.getSize());
 
-        return result;
-    });
-}
+            return result;
+        });
+    }
 
     public static User getUserById(Long id) {
-        User user = Sql.instance().input("SELECT * FROM user WHERE stat != 1 AND id = ?", id).query(User.class);
+        User user = new Action("SELECT * FROM user WHERE stat != 1 AND id = ?").query(id).one(User.class);
 
         if (user == null)
             throw new BusinessException("The user with id#" + id + " does not exist");

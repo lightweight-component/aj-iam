@@ -12,8 +12,7 @@ import com.ajaxjs.iam.server.model.po.App;
 import com.ajaxjs.iam.user.common.session.UserSession;
 import com.ajaxjs.iam.user.model.User;
 import com.ajaxjs.iam.user.service.TenantService;
-import com.ajaxjs.sqlman.Sql;
-import com.ajaxjs.sqlman.crud.Entity;
+import com.ajaxjs.sqlman.Action;
 import com.ajaxjs.util.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -54,7 +53,7 @@ public abstract class OAuthCommon implements IamConstants {
             if (TenantService.getTenantId() == null) // 没租户 id，超级管理员登录
                 loginPage = "../../iam/login";
             else
-                loginPage = Sql.newInstance().input("SELECT login_page FROM tenant WHERE stat = 0 AND id = ?", TenantService.getTenantId()).queryOne(String.class);
+                loginPage = new Action("SELECT login_page FROM tenant WHERE stat = 0 AND id = ?").query(TenantService.getTenantId()).one(String.class);
 
             if (ObjectHelper.isEmptyText(loginPage))
                 throw new BusinessException("应用或登录地址不存在");
@@ -94,7 +93,7 @@ public abstract class OAuthCommon implements IamConstants {
      */
     public static App getApp(String clientId, String clientSecret) {
         // 通过 CRUD 操作，查询应用信息，条件是状态为0、客户端 ID 和密钥匹配
-        App app = Sql.newInstance().input("SELECT * FROM app WHERE stat = 0 AND client_id = ? AND client_secret = ?", clientId, clientSecret).query(App.class);
+        App app = new Action("SELECT * FROM app WHERE stat = 0 AND client_id = ? AND client_secret = ?").query(clientId, clientSecret).one(App.class);
 
         if (app == null)
             throw new BusinessException("应用不存在或非法密钥"); // 如果查询结果为空，表示没有找到对应的应用或密钥不正确，抛出业务异常
@@ -199,7 +198,7 @@ public abstract class OAuthCommon implements IamConstants {
             save.setIdToken(((JwtAccessToken) accessToken).getId_token());
         }
 
-        Entity.newInstance().input(save).create(Long.class);
+        new Action(save).create().execute(true);
     }
 
     /**

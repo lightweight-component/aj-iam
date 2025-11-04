@@ -1,5 +1,6 @@
 package com.ajaxjs.iam.server.service;
 
+import com.ajaxjs.framework.cache.Cache;
 import com.ajaxjs.framework.database.EnableTransaction;
 import com.ajaxjs.framework.model.BusinessException;
 import com.ajaxjs.iam.server.controller.OAuthController;
@@ -7,9 +8,7 @@ import com.ajaxjs.iam.server.model.AccessToken;
 import com.ajaxjs.iam.server.model.po.AccessTokenPo;
 import com.ajaxjs.iam.server.model.po.App;
 import com.ajaxjs.iam.user.model.User;
-import com.ajaxjs.framework.cache.Cache;
-import com.ajaxjs.sqlman.Sql;
-import com.ajaxjs.sqlman.crud.Entity;
+import com.ajaxjs.sqlman.Action;
 import com.ajaxjs.util.RandomTools;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -82,8 +81,7 @@ public class OAuthService extends OAuthCommon implements OAuthController {
             throw new IllegalArgumentException("grantType must be 'refresh_token'");
 
         App app = getAppByAuthHeader(authorization);
-
-        AccessTokenPo accessTokenPO = Sql.newInstance().input("SELECT * FROM access_token WHERE refresh_token = ?", refreshToken).query(AccessTokenPo.class);
+        AccessTokenPo accessTokenPO = new Action("SELECT * FROM access_token WHERE refresh_token = ?").query(refreshToken).one(AccessTokenPo.class);
 
         if (accessTokenPO == null)
             throw new BusinessException("找不到 RefreshToken " + refreshToken);
@@ -116,7 +114,7 @@ public class OAuthService extends OAuthCommon implements OAuthController {
         updated.setRefreshToken(accessToken.getRefresh_token());
         updated.setExpiresDate(calculateExpirationDate(minutes));
 
-        Entity.newInstance().input(updated).update();
+        new Action(updated).update().withId();
 
         return accessToken;
     }

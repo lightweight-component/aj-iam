@@ -13,8 +13,7 @@ import com.ajaxjs.iam.user.common.session.UserSession;
 import com.ajaxjs.iam.user.model.User;
 import com.ajaxjs.iam.user.service.UserLoginRegisterService;
 import com.ajaxjs.iam.user.service.UserService;
-import com.ajaxjs.sqlman.Sql;
-import com.ajaxjs.sqlman.crud.Entity;
+import com.ajaxjs.sqlman.Action;
 import com.ajaxjs.util.JsonUtil;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -105,7 +104,7 @@ public class OidcService extends OAuthCommon implements OidcController {
             throw new IllegalArgumentException("GrantType must be 'refresh_token'.");
 
         App app = getAppByAuthHeader(authorization);
-        AccessTokenPo accessTokenPO = Sql.newInstance().input("SELECT * FROM access_token WHERE refresh_token = ?", refreshToken).query(AccessTokenPo.class);
+        AccessTokenPo accessTokenPO = new Action("SELECT * FROM access_token WHERE refresh_token = ?").query(refreshToken).one(AccessTokenPo.class);
 
         if (accessTokenPO == null)
             throw new BusinessException("找不到 RefreshToken " + refreshToken);
@@ -135,7 +134,7 @@ public class OidcService extends OAuthCommon implements OidcController {
         updated.setRefreshExpires(arr[1]);
         updated.setJwtToken(JsonUtil.toJson(accessToken));
 
-        Entity.newInstance().input(updated).update();
+        new Action(updated).update().withId();
 
         return accessToken;
     }
@@ -161,7 +160,7 @@ public class OidcService extends OAuthCommon implements OidcController {
         if (!"password".equals(grant_type))
             throw new IllegalArgumentException("参数 grant_type 只能是 password");
 
-        App app = Sql.instance().input("SELECT * FROM app WHERE stat != 1 AND client_id = ? AND client_secret = ?", client_id, client_secret).query(App.class);
+        App app = new Action("SELECT * FROM app WHERE stat != 1 AND client_id = ? AND client_secret = ?").query(client_id, client_secret).one(App.class);
 
         if (app == null)
             throw new UnsupportedOperationException("App Not found: " + client_id);
@@ -217,7 +216,7 @@ public class OidcService extends OAuthCommon implements OidcController {
 
     getUserPermissions(Long userId) {
         String sql = "SELECT module_value, permission_value FROM per_role WHERE id IN (SELECT role_id FROM per_user_role WHERE user_id = ?)";
-        List<Map<String, Object>> result = Sql.instance().input(sql, userId).queryList();
+        List<Map<String, Object>> result = new Action(sql).query(userId).list();
 
         List<Long> permissions = new ArrayList<>();
         List<Long> modulePermissions = new ArrayList<>();

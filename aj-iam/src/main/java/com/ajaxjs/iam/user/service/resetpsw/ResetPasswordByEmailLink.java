@@ -5,7 +5,7 @@ import com.ajaxjs.iam.user.common.UserUtils;
 import com.ajaxjs.iam.user.model.User;
 import com.ajaxjs.iam.user.service.TenantService;
 import com.ajaxjs.message.email.ISendEmail;
-import com.ajaxjs.sqlman.Sql;
+import com.ajaxjs.sqlman.Action;
 import com.ajaxjs.util.HashHelper;
 import com.ajaxjs.util.UrlEncode;
 import com.ajaxjs.util.cryptography.Cryptography;
@@ -93,8 +93,8 @@ public class ResetPasswordByEmailLink extends BaseResetPasswordService {
         Integer tenantId = TenantService.getTenantId();
         User user = findUserBy("email", email, tenantId);
 
-        Map<String, Object> _user = Sql.newInstance().input(
-                "SELECT u.*, a.id AS auth_id, a.password FROM user u LEFT JOIN user_account a ON u.id = a.user_id WHERE u.id = ?", user.getId()).query();
+        Map<String, Object> _user = new Action(
+                "SELECT u.*, a.id AS auth_id, a.password FROM user u LEFT JOIN user_account a ON u.id = a.user_id WHERE u.id = ?").query(user.getId()).one();
 
         return updatePwd(_user, newPsw);
     }

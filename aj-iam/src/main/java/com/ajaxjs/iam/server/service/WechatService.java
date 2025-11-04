@@ -18,9 +18,11 @@ import com.ajaxjs.iam.user.model.UserAccount;
 import com.ajaxjs.iam.user.model.UserAccountType;
 import com.ajaxjs.iam.user.service.UserFunction;
 import com.ajaxjs.iam.user.service.UserService;
-import com.ajaxjs.sqlman.Sql;
-import com.ajaxjs.sqlman.crud.Entity;
-import com.ajaxjs.util.*;
+import com.ajaxjs.sqlman.Action;
+import com.ajaxjs.util.Base64Utils;
+import com.ajaxjs.util.JsonUtil;
+import com.ajaxjs.util.ObjectHelper;
+import com.ajaxjs.util.RandomTools;
 import com.ajaxjs.util.cryptography.Constant;
 import com.ajaxjs.util.cryptography.Cryptography;
 import com.ajaxjs.util.httpremote.Get;
@@ -47,10 +49,11 @@ public class WechatService extends OAuthCommon implements WechatController {
     @EnableTransaction
     public JwtAccessToken miniAppLogin(WechatAuthCode data) {
         Code2SessionResult session = getOpenIdByCode(data);
-        UserAccount account = Sql.instance().input("SELECT * FROM user_account WHERE identifier = ? AND type = 'WECHAT_MINI'", session.getOpenid()).query(UserAccount.class);
+        UserAccount account = new Action("SELECT * FROM user_account WHERE identifier = ? AND type = 'WECHAT_MINI'")
+                .query(session.getOpenid()).one(UserAccount.class);
         User user;
 
-        App app = Sql.instance().input("SELECT * FROM app WHERE stat != 1 AND client_id = ?", data.getAppId()).query(App.class);
+        App app = new Action("SELECT * FROM app WHERE stat != 1 AND client_id = ?").query(data.getAppId()).one(App.class);
 
         if (app == null)
             throw new UnsupportedOperationException("App Not found: " + data.getAppId());
@@ -64,20 +67,20 @@ public class WechatService extends OAuthCommon implements WechatController {
             saveSessionKey.setId(account.getId());
             saveSessionKey.setIdentifier2(session.getSession_key());
 
-            Entity.instance().input(saveSessionKey).update();
+            new Action(saveSessionKey).update().withId();
 
             User updateBindState = new User();
             updateBindState.setId(user.getId());
             updateBindState.setBindState(user.getBindState() + UserFunction.BindState.WECHAT);
 
-            Entity.instance().input(updateBindState).update();
+            new Action(updateBindState).update();
         } else { // to create a new account
             user = new User();
             user.setLoginId("WxMiniUser_" + RandomTools.generateRandomString(5));
             user.setTenantId(app.getTenantId().longValue());
             user.setBindState(UserFunction.BindState.WECHAT);
 
-            Long userId = Entity.instance().input(user).create(true, Long.class).getNewlyId();
+            Long userId = new Action(user).create().execute(true, Long.class).getNewlyId();
             user.setId(userId);
 
             account = new UserAccount();
@@ -86,7 +89,7 @@ public class WechatService extends OAuthCommon implements WechatController {
             account.setIdentifier2(session.getSession_key());
             account.setType(UserAccountType.WECHAT_MINI);
 
-            Entity.instance().input(account).create();
+            new Action(account).create();
         }
 
         // 生成 JWT Token
@@ -109,14 +112,14 @@ public class WechatService extends OAuthCommon implements WechatController {
     public boolean bindWechat2User(WechatAuthCode data) {
         Code2SessionResult session = getOpenIdByCode(data);
 
-        // check the openId if it's occupied by other user
-        if (Sql.instance().input("SELECT * FROM user_account WHERE identifier = ? AND type = 'WECHAT_MINI'", session.getOpenid()).query() != null)
+        // check the openId if it's occupied by another user
+        if (new Action("SELECT * FROM user_account WHERE identifier = ? AND type = 'WECHAT_MINI'").query(session.getOpenid()).one() != null)
             throw new IllegalStateException("该微信账号已注册过。");
 
         SimpleUser currentUser = SecurityManager.getUser();
 
         // check if the account exists
-        if (Sql.instance().input("SELECT * FROM user_account WHERE user_id = ? AND type = 'WECHAT_MINI'", currentUser.getId()).query() != null)
+        if (new Action("SELECT * FROM user_account WHERE user_id = ? AND type = 'WECHAT_MINI'").query(currentUser.getId()).one() != null)
             throw new IllegalStateException("该用户 " + currentUser.getName() + " 已绑定微信账号");
 
         User user = UserService.getUserById(currentUser.getId());
@@ -124,14 +127,14 @@ public class WechatService extends OAuthCommon implements WechatController {
         updateBindState.setId(user.getId());
         updateBindState.setBindState(user.getBindState() + UserFunction.BindState.WECHAT);
 
-        Entity.instance().input(updateBindState).update();
+        new Action(updateBindState).update();
 
         UserAccount account = new UserAccount();
         account.setUserId(currentUser.getId());
         account.setIdentifier(session.getOpenid());
         account.setType(UserAccountType.WECHAT_MINI);
 
-        return Entity.instance().input(account).create().isOk();
+        return new Action(account).create().execute(true).isOk();
     }
 
     @Override
@@ -139,8 +142,7 @@ public class WechatService extends OAuthCommon implements WechatController {
         String data = _data.get("data"), iv = _data.get("iv");
         SimpleUser user = SecurityManager.getUser();
 
-        String sessionKey = Sql.instance().input("SELECT identifier2 FROM user_account WHERE user_id = ? AND type = 'WECHAT_MINI'",
-                user.getId()).queryOne(String.class);
+        String sessionKey = new Action("SELECT identifier2 FROM user_account WHERE user_id = ? AND type = 'WECHAT_MINI'").query(user.getId()).oneValue(String.class);
 
         if (ObjectHelper.isEmptyText(sessionKey))
             throw new IllegalArgumentException("用户" + user.getName() + "没有微信小程序的 session key");
@@ -176,7 +178,7 @@ public class WechatService extends OAuthCommon implements WechatController {
      * @return 结果
      */
     static Code2SessionResult getOpenIdByCode(WechatAuthCode data) {
-        Map<String, Object> query = Sql.instance().input("SELECT app_id, app_secret FROM app_secret_mgr WHERE owner = ?", data.getAppId()).query();
+        Map<String, Object> query = new Action("SELECT app_id, app_secret FROM app_secret_mgr WHERE owner = ?").query(data.getAppId()).one();
         log.info(":::" + query);
         String url = String.format(AppletService.LOGIN_API, query.get("appId"), query.get("appSecret"), data.getCode());
         Code2SessionResult session = Get.api(url, Code2SessionResult.class);

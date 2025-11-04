@@ -12,11 +12,13 @@ import com.ajaxjs.iam.user.controller.UserLoginRegisterController;
 import com.ajaxjs.iam.user.model.User;
 import com.ajaxjs.iam.user.model.UserAccount;
 import com.ajaxjs.spring.DiContextUtil;
-import com.ajaxjs.sqlman.Sql;
-import com.ajaxjs.sqlman.crud.Entity;
 import com.ajaxjs.sqlman.util.SnowflakeId;
 import com.ajaxjs.sqlman.util.Utils;
-import com.ajaxjs.util.*;
+import com.ajaxjs.sqlman.Action;
+import com.ajaxjs.util.CommonConstant;
+import com.ajaxjs.util.ObjectHelper;
+import com.ajaxjs.util.RandomTools;
+import com.ajaxjs.util.WebUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -101,7 +103,7 @@ public class UserLoginRegisterService implements UserLoginRegisterController, Us
             sql = String.format(sql, "login_id");
 
         String encodePsw = passwordEncode.apply(password);
-        User user = Sql.instance().input(sql, loginId, encodePsw, tenantId).query(User.class);
+        User user = new Action(sql).query(loginId, encodePsw, tenantId).one(User.class);
 
         if (user == null)
             throw new BusinessException("用户 " + loginId + " 登录失败，用户不存在或密码错误");
@@ -217,7 +219,7 @@ public class UserLoginRegisterService implements UserLoginRegisterController, Us
         params.put("uid", SnowflakeId.get());
         params.put("bindState", UserFunction.BindState.IAM);
 
-        long userId = Entity.instance().setTableName("user").input(params).create(Long.class).getNewlyId(); // 写入数据库
+        long userId = new Action(params, "user").create().create(true, Long.class).getNewlyId(); // 写入数据库
 
         saveUserRole(userId, tenantId);
 
@@ -227,7 +229,7 @@ public class UserLoginRegisterService implements UserLoginRegisterController, Us
         auth.setRegisterType(LoginType.PASSWORD);
         auth.setRegisterIp(WebUtils.getClientIp(Objects.requireNonNull(DiContextUtil.getRequest())));
 
-        return Entity.instance().setTableName("user_account").input(auth).create(Long.class).isOk();
+        return new Action(auth, "user_account").create().create(true, Long.class).isOk();
     }
 
     /**
@@ -237,7 +239,7 @@ public class UserLoginRegisterService implements UserLoginRegisterController, Us
         String sql = "INSERT INTO per_user_role (user_id, role_id)\n" +
                 "(SELECT ?, default_role_id FROM tenant WHERE id = ? AND default_role_id IS NOT NULL)";
         // default_role_id 如果为空则不插入新数据（用户没角色）
-        boolean isOk = Sql.instance().input(sql, userId, tenantId).create(true, Long.class).isOk();
+        boolean isOk = new Action(sql).create(userId, tenantId).execute(true, Long.class).isOk();
 
         if (isOk)
             log.info("保存用户角色成功！");
@@ -265,6 +267,6 @@ public class UserLoginRegisterService implements UserLoginRegisterController, Us
         String sql = "SELECT id FROM user WHERE stat != 1 AND %s = ? AND tenant_id = ? LIMIT 1";
         sql = String.format(sql, field.trim());
 
-        return Sql.instance().input(sql, value.trim(), tenantId).queryOne(Long.class) != null; // 有这个数据表示重复
+        return new Action(sql).query(value.trim(), tenantId).oneValue(Long.class) != null; // 有这个数据表示重复
     }
 }

@@ -1,13 +1,12 @@
 package com.ajaxjs.iam.user.service;
 
-
 import com.ajaxjs.iam.UserConstants;
 import com.ajaxjs.iam.user.controller.LogLoginController;
 import com.ajaxjs.iam.user.model.LogLogin;
 import com.ajaxjs.iam.user.model.User;
-import com.ajaxjs.sqlman.crud.Entity;
 import com.ajaxjs.sqlman.model.CreateResult;
-import com.ajaxjs.sqlman.model.PageResult;
+import com.ajaxjs.sqlman.Action;
+import com.ajaxjs.sqlman.crud.page.PageResult;
 import com.ajaxjs.util.WebUtils;
 import com.ajaxjs.util.httpremote.Get;
 import lombok.extern.slf4j.Slf4j;
@@ -33,13 +32,13 @@ public class LogLoginService implements LogLoginController, UserConstants {
         if (TenantService.getTenantId() != null)
             userLoginLog.setTenantId(TenantService.getTenantId());
 
-        CreateResult<Long> result = Entity.newInstance().input(userLoginLog).create(Long.class);
+        CreateResult<Long> result = new Action(userLoginLog).create().execute(true, Long.class);
 
         if (!result.isOk())
             log.warn("更新会员登录日志出错");
     }
 
-    void  saveIp(LogLogin bean, HttpServletRequest req) {
+    void saveIp(LogLogin bean, HttpServletRequest req) {
         if (req == null)
             return;
 
