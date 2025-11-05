@@ -17,10 +17,9 @@
     <dependencies>
         <dependency>
             <groupId>com.ajaxjs</groupId>
-            <artifactId>ajaxjs-util</artifactId>
-            <version>1.2.7</version>
+            <artifactId>aj-net</artifactId>
+            <version>1.6</version>
         </dependency>
-
         <!-- RedisTemplate -->
 <!--        <dependency>
             <groupId>org.springframework.data</groupId>
@@ -61,12 +60,6 @@
         <dependency>
             <groupId>javax.websocket</groupId>
             <artifactId>javax.websocket-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.ajaxjs</groupId>
-            <artifactId>aj-net</artifactId>
-            <version>1.5</version>
-            <scope>compile</scope>
         </dependency>
     </dependencies>
 </project>

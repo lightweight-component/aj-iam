@@ -1,6 +1,6 @@
 package com.ajaxjs.iam.user.service;
 
-import com.ajaxjs.framework.FastCrudController.Namespaces;
+import com.ajaxjs.framework.dataservice.fastcrud.Namespaces;
 import com.ajaxjs.iam.client.SecurityManager;
 import com.ajaxjs.sqlman.model.tablemodel.TableModel;
 import com.ajaxjs.sqlman.sqlgenerator.AutoQuery;
