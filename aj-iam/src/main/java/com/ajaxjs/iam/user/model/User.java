@@ -48,6 +48,7 @@ public class User extends BaseModel implements UserConstants, IBaseModel {
      * 数据字典：性别
      */
     private Gender gender;
+//    private String gender;
 
     /**
      * 出生日期

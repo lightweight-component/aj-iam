@@ -67,7 +67,7 @@ public interface UserController {
      * @return 是否成功
      */
     @PutMapping
-    Boolean update(User user);
+    Boolean update(@RequestBody User user);
 
     /**
      * 注销用户账号

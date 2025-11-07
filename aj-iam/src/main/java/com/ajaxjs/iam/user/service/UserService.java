@@ -91,6 +91,9 @@ public class UserService implements UserController, UserConstants {
 
     @Override
     public Boolean update(User user) {
+        Long userId = SecurityManager.getUser().getId();
+        user.setId(userId);
+
         return new Action(user, "user").update().withId().isOk();
     }
 
