@@ -1,8 +1,7 @@
 package com.ajaxjs.iam.server.controller;
 
 import com.ajaxjs.iam.annotation.AllowOpenAccess;
-import com.ajaxjs.iam.server.model.AccessToken;
-import com.ajaxjs.iam.server.model.JwtAccessToken;
+import com.ajaxjs.iam.jwt.JwtAccessToken;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;

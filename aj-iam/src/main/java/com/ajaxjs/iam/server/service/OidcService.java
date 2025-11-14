@@ -3,16 +3,18 @@ package com.ajaxjs.iam.server.service;
 import com.ajaxjs.framework.cache.Cache;
 import com.ajaxjs.framework.database.EnableTransaction;
 import com.ajaxjs.framework.model.BusinessException;
+import com.ajaxjs.iam.client.BaseOidcClientUserController;
 import com.ajaxjs.iam.jwt.JWebTokenMgr;
 import com.ajaxjs.iam.jwt.JwtUtils;
 import com.ajaxjs.iam.server.controller.OidcController;
-import com.ajaxjs.iam.server.model.JwtAccessToken;
+import com.ajaxjs.iam.jwt.JwtAccessToken;
 import com.ajaxjs.iam.server.model.po.AccessTokenPo;
 import com.ajaxjs.iam.server.model.po.App;
 import com.ajaxjs.iam.user.common.session.UserSession;
 import com.ajaxjs.iam.user.model.User;
 import com.ajaxjs.iam.user.service.UserLoginRegisterService;
 import com.ajaxjs.iam.user.service.UserService;
+import com.ajaxjs.spring.DiContextUtil;
 import com.ajaxjs.sqlman.Action;
 import com.ajaxjs.util.JsonUtil;
 import lombok.Data;
@@ -189,6 +191,8 @@ public class OidcService extends OAuthCommon implements OidcController {
         String key = JWT_TOKEN_USER_KEY + "-" + jWebToken;
         cache.put(key, tokenUser, getTokenExpires(app));
         log.info("save user {} to cache, key: {}", tokenUser, key);
+
+        BaseOidcClientUserController.setTokenToCookie(accessToken, DiContextUtil.getResponse());
 
         return accessToken;
     }

@@ -4,7 +4,7 @@ import com.ajaxjs.framework.cache.Cache;
 import com.ajaxjs.framework.database.EnableTransaction;
 import com.ajaxjs.framework.model.BusinessException;
 import com.ajaxjs.iam.server.controller.OAuthController;
-import com.ajaxjs.iam.server.model.AccessToken;
+import com.ajaxjs.iam.model.AccessToken;
 import com.ajaxjs.iam.server.model.po.AccessTokenPo;
 import com.ajaxjs.iam.server.model.po.App;
 import com.ajaxjs.iam.user.model.User;

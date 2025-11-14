@@ -69,12 +69,6 @@
             <version>1.0</version>
         </dependency>
 
-        <dependency>
-            <groupId>com.ajaxjs</groupId>
-            <artifactId>aj-dataservice</artifactId>
-            <version>1.0</version>
-        </dependency>
-
         <!-- 支持图片格式 WebP，用户头像用 -->
         <dependency>
             <groupId>org.sejda.imageio</groupId>

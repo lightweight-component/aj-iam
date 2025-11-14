@@ -9,7 +9,7 @@ import com.ajaxjs.iam.jwt.JwtUtils;
 import com.ajaxjs.iam.model.SimpleUser;
 import com.ajaxjs.iam.server.common.IamConstants;
 import com.ajaxjs.iam.server.controller.WechatController;
-import com.ajaxjs.iam.server.model.JwtAccessToken;
+import com.ajaxjs.iam.jwt.JwtAccessToken;
 import com.ajaxjs.iam.server.model.WechatAuthCode;
 import com.ajaxjs.iam.server.model.po.App;
 import com.ajaxjs.iam.server.model.wechat.MiniAppPhoneNumber;

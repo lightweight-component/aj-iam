@@ -219,7 +219,7 @@ public class UserLoginRegisterService implements UserLoginRegisterController, Us
         params.put("uid", SnowflakeId.get());
         params.put("bindState", UserFunction.BindState.IAM);
 
-        long userId = new Action(params, "user").create().create(true, Long.class).getNewlyId(); // 写入数据库
+        long userId = new Action(params, "user").create().execute(true, Long.class).getNewlyId(); // 写入数据库
 
         saveUserRole(userId, tenantId);
 
@@ -229,7 +229,7 @@ public class UserLoginRegisterService implements UserLoginRegisterController, Us
         auth.setRegisterType(LoginType.PASSWORD);
         auth.setRegisterIp(WebUtils.getClientIp(Objects.requireNonNull(DiContextUtil.getRequest())));
 
-        return new Action(auth, "user_account").create().create(true, Long.class).isOk();
+        return new Action(auth, "user_account").create().execute(true, Long.class).isOk();
     }
 
     /**

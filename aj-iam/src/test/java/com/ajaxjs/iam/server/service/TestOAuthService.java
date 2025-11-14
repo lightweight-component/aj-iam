@@ -2,7 +2,7 @@ package com.ajaxjs.iam.server.service;
 
 import com.ajaxjs.iam.BaseTest;
 import com.ajaxjs.iam.server.common.IamConstants;
-import com.ajaxjs.iam.server.model.AccessToken;
+import com.ajaxjs.iam.model.AccessToken;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.context.WebApplicationContext;
