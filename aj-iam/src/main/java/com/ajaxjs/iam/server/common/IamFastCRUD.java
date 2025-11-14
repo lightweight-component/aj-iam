@@ -3,6 +3,7 @@ package com.ajaxjs.iam.server.common;
 import com.ajaxjs.framework.database.DataBaseConnection;
 import com.ajaxjs.framework.dataservice.fastcrud.Namespaces;
 import com.ajaxjs.iam.client.SecurityManager;
+import com.ajaxjs.iam.user.service.TenantService;
 import com.ajaxjs.sqlman.JdbcConnection;
 import com.ajaxjs.sqlman.model.tablemodel.TableModel;
 import com.ajaxjs.sqlman.sqlgenerator.AutoQuery;
@@ -69,7 +70,7 @@ public class IamFastCRUD extends Namespaces {
     @EventListener
     public void loadConfig(ApplicationReadyEvent event) {
         DataBaseConnection.initDb();
-        loadFromDB(() -> SecurityManager.getUser().getId(), () -> null);
+        loadFromDB(() -> SecurityManager.getUser().getId(), TenantService::getTenantId);
         JdbcConnection.closeDb();
     }
 }
