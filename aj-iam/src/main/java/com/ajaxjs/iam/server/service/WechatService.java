@@ -62,7 +62,7 @@ public class WechatService extends OAuthCommon implements WechatController {
             Long userId = account.getUserId();
             user = UserService.getUserById(userId);
 
-            // saves session key
+            // saves a session key
             UserAccount saveSessionKey = new UserAccount();
             saveSessionKey.setId(account.getId());
             saveSessionKey.setIdentifier2(session.getSession_key());

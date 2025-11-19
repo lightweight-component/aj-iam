@@ -40,7 +40,7 @@ public class SecurityManager {
             user = new SimpleUser();
             user.setName("Jack");
             user.setId(888L);
-            user.setTenantId(8);
+            user.setTenantId(0);
         }
 
         return user;
