@@ -5,7 +5,7 @@ module.exports = function (eleventyConfig) {
     eleventyConfig.addPassthroughCopy('src/asset');
     // eleventyConfig.addPassthroughCopy("**/*.jpg");
     eleventyConfig.addPassthroughCopy('src/style/reset.css');
-    // eleventyConfig.addWatchTarget('src/style');
+//     eleventyConfig.addWatchTarget('src/asset');
     // eleventyConfig.addPassthroughCopy("bundle.css");
 
     	// the default is "copy"

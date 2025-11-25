@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "dev": "npx @11ty/eleventy --formats=md,html,gif,jpg,png,css --serve",
+    "dev": "npx @11ty/eleventy --formats=md,html,gif,jpg,png,css,less --serve",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
