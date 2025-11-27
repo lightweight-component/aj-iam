@@ -1,8 +1,11 @@
 package com.ajaxjs.iam.client;
 
+import com.ajaxjs.util.ObjectHelper;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.web.method.HandlerMethod;
 
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
@@ -72,5 +75,25 @@ public class ClientUtils {
         Class<?> controllerClass = handlerMethod.getBeanType();
 
         return AnnotatedElementUtils.findMergedAnnotation(controllerClass, annotationClass);
+    }
+
+    /**
+     * 尝试从 Cookie 中提取指定名称的 value
+     *
+     * @param request    The request object
+     * @param cookieName The name of cookie
+     * @return The value of the cookie
+     */
+    public static String getCookie(HttpServletRequest request, String cookieName) {
+        Cookie[] cookies = request.getCookies();
+
+        if (!ObjectHelper.isEmpty(cookies)) {
+            for (Cookie cookie : cookies) {
+                if (cookieName.equals(cookie.getName()))
+                    return cookie.getValue();
+            }
+        }
+
+        return null;
     }
 }

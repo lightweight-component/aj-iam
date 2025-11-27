@@ -11,14 +11,14 @@ import com.ajaxjs.iam.user.common.util.CheckStrength;
 import com.ajaxjs.iam.user.controller.UserLoginRegisterController;
 import com.ajaxjs.iam.user.model.User;
 import com.ajaxjs.iam.user.model.UserAccount;
+import com.ajaxjs.security.iplist.IpList;
 import com.ajaxjs.spring.DiContextUtil;
+import com.ajaxjs.sqlman.Action;
 import com.ajaxjs.sqlman.util.SnowflakeId;
 import com.ajaxjs.sqlman.util.Utils;
-import com.ajaxjs.sqlman.Action;
 import com.ajaxjs.util.CommonConstant;
 import com.ajaxjs.util.ObjectHelper;
 import com.ajaxjs.util.RandomTools;
-import com.ajaxjs.util.WebUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -227,7 +227,7 @@ public class UserLoginRegisterService implements UserLoginRegisterController, Us
         auth.setUserId(userId);
         auth.setPassword(passwordEncode.apply(psw));
         auth.setRegisterType(LoginType.PASSWORD);
-        auth.setRegisterIp(WebUtils.getClientIp(Objects.requireNonNull(DiContextUtil.getRequest())));
+        auth.setRegisterIp(IpList.getClientIp(Objects.requireNonNull(DiContextUtil.getRequest())));
 
         return new Action(auth, "user_account").create().execute(true, Long.class).isOk();
     }
