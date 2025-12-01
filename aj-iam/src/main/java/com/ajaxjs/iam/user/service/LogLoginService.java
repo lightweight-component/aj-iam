@@ -4,10 +4,10 @@ import com.ajaxjs.iam.UserConstants;
 import com.ajaxjs.iam.user.controller.LogLoginController;
 import com.ajaxjs.iam.user.model.LogLogin;
 import com.ajaxjs.iam.user.model.User;
-import com.ajaxjs.sqlman.model.CreateResult;
+import com.ajaxjs.security.iplist.IpList;
 import com.ajaxjs.sqlman.Action;
 import com.ajaxjs.sqlman.crud.page.PageResult;
-import com.ajaxjs.util.WebUtils;
+import com.ajaxjs.sqlman.model.CreateResult;
 import com.ajaxjs.util.httpremote.Get;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -42,7 +42,7 @@ public class LogLoginService implements LogLoginController, UserConstants {
         if (req == null)
             return;
 
-        String ip = WebUtils.getClientIp(req);
+        String ip = IpList.getClientIp(req);
 
         if ("127.0.0.1".equals(ip) || "0:0:0:0:0:0:0:1".equals(ip)) {
             ip = "localhost";

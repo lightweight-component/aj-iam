@@ -2,11 +2,11 @@ package com.ajaxjs.iam.client.filter;
 
 import com.ajaxjs.iam.UserConstants;
 import com.ajaxjs.iam.client.BaseOidcClientUserController;
+import com.ajaxjs.iam.client.ClientUtils;
 import com.ajaxjs.iam.client.model.TokenValidDetail;
 import com.ajaxjs.iam.jwt.JwtAccessToken;
 import com.ajaxjs.util.JsonUtil;
 import com.ajaxjs.util.ObjectHelper;
-import com.ajaxjs.util.WebUtils;
 import lombok.AllArgsConstructor;
 
 import javax.servlet.http.HttpServletRequest;
@@ -37,7 +37,8 @@ public class RefreshJWT {
 
         // 如果从请求头的"Authorization"字段提取不到 token，尝试从请求头的"token"字段提取
         if (token == null) {
-            token = WebUtils.getCookie(request, UserConstants.REFRESH_TOKEN_KEY);
+            token = ClientUtils.getCookie(request, UserConstants.REFRESH_TOKEN_KEY);
+
             if (token == null)
                 token = request.getParameter(UserConstants.REFRESH_TOKEN_KEY);
         }

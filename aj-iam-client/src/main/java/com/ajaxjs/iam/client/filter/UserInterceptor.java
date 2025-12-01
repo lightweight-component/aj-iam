@@ -338,7 +338,7 @@ public class UserInterceptor implements HandlerInterceptor {
 
             if (token == null) {
 
-                token = WebUtils.getCookie(request, UserConstants.ACCESS_TOKEN_KEY);
+                token = ClientUtils.getCookie(request, UserConstants.ACCESS_TOKEN_KEY);
                 // 如果从请求头的"token"字段提取不到token，尝试从请求参数的"access_token"字段提取
                 if (token == null) {
                     token = request.getParameter(UserConstants.ACCESS_TOKEN_KEY);
