@@ -5,7 +5,7 @@ description: 基本概念
 date: 2022-01-05
 tags:
   - 基本概念
-layout: layouts/docs-cn.njk
+layout: layouts/docs.njk
 ---
 
 # 基本概念
