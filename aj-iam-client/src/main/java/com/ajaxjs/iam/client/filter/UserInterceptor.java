@@ -98,7 +98,7 @@ public class UserInterceptor implements HandlerInterceptor {
                         jsonUser = getUserFromJvmHash.apply(token);
                     break;
                 case "jwt":
-                    JWebToken jwt = jWebTokenMgr.parse(token);
+                    JWebToken jwt = JWebTokenMgr.parse(token);
                     TokenValidDetail tokenValidDetail = jWebTokenMgr.validAndDetail(jwt);
 //                    boolean isValid = jWebTokenMgr.isValid(jwt);
                     RefreshJWT refreshJWT = new RefreshJWT(tokenValidDetail, request, response, this);

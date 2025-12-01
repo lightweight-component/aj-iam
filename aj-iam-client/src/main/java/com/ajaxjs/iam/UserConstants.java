@@ -37,8 +37,6 @@ public interface UserConstants {
 
     /**
      * 登录类型
-     *
-     * @author Frank Cheung
      */
     interface LoginType {
         /**

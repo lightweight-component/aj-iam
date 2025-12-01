@@ -8,12 +8,12 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = true)
 public class JwtAccessToken extends AccessToken {
     /**
-     * Token 类型
+     * The type of the token
      */
     private String token_type = "Bearer";
 
     /**
-     * JWT Token
+     * JWT Token encoded.
      */
     private String id_token;
 }

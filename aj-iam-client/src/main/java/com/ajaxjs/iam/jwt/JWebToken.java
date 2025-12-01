@@ -1,27 +1,24 @@
 package com.ajaxjs.iam.jwt;
 
 import com.ajaxjs.util.Base64Utils;
+import com.ajaxjs.util.HashHelper;
 import com.ajaxjs.util.ObjectHelper;
 import lombok.Data;
 
 /**
- * JWT Token
+ * JWT Token using HS256 algorithm.
+ * The structure of JWT looks like: Header.Payload.Signature, separated by dots.
  */
 @Data
 public class JWebToken {
     /**
-     * 头部
+     * The header part of JWT.
+     * It is encoded as Base64, the original string is "{\"alg\":\"HS256\",\"typ\":\"JWT\"}".
      */
-    public static final String JWT_HEADER = "{\"alg\":\"HS256\",\"typ\":\"JWT\"}";
+    public static final String HEADER = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9";
 
     /**
-     * 头部的 Base64 编码
-     */
-//    public static final String encodedHeader = JwtUtils.encode(JWT_HEADER);
-    public static final String encodedHeader = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9";
-
-    /**
-     * 载荷
+     * The payload（载荷） part of JWT.
      */
     private Payload payload;
 
@@ -33,7 +30,7 @@ public class JWebToken {
     private String payloadJson;
 
     /**
-     * 签名部分
+     * The signature part of JWT.
      */
     private String signature;
 
@@ -42,17 +39,29 @@ public class JWebToken {
     }
 
     /**
-     * 头部 + payload
+     * header + payload
      *
-     * @return 头部 + Payload
+     * @return header + payload
      */
     public String headerPayload() {
         if (ObjectHelper.isEmptyText(payloadJson))
-            throw new IllegalArgumentException("头 Payload 参数有问题");
+            throw new IllegalArgumentException("Missing the JWT payload.");
 
         String p = new Base64Utils(payloadJson).setWithoutPadding(true).encodeAsString();
 
-        return encodedHeader + "." + p;
+        return HEADER + "." + p;
+    }
+
+    /**
+     * Generate the signature.
+     *
+     * @param secretKey The secret key
+     * @return The signature
+     */
+    public String signature(String secretKey) {
+        String headerPayload = headerPayload();
+
+        return HashHelper.getHmacSHA256(headerPayload, secretKey, true);
     }
 
     /**

@@ -1,10 +1,10 @@
 package com.ajaxjs.iam.jwt;
 
+import com.ajaxjs.util.date.Formatter;
+
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.format.DateTimeFormatter;
-import java.time.temporal.ChronoUnit;
 
 public class JwtUtils {
     /**
@@ -13,7 +13,7 @@ public class JwtUtils {
      * @return 当前时间
      */
     public static long now() {
-        return LocalDateTime.now().toEpochSecond(ZoneOffset.UTC);
+        return System.currentTimeMillis() / 1000;
     }
 
     /**
@@ -23,7 +23,7 @@ public class JwtUtils {
      * @return 过期时间的时间戳
      */
     public static long setExpire(int hours) {
-        return LocalDateTime.now().plus(hours, ChronoUnit.HOURS).toEpochSecond(ZoneOffset.UTC);
+        return now() + hours * 3600L;
     }
 
     /**
@@ -32,10 +32,8 @@ public class JwtUtils {
      * @return 真实的时间
      */
     public static String toRealTime(long timestamp) {
-        ZoneId zoneId = ZoneId.of("Asia/Shanghai");
-        LocalDateTime localDateTime = java.time.Instant.ofEpochSecond(timestamp).atZone(zoneId).toLocalDateTime();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        LocalDateTime localDateTime = Instant.ofEpochSecond(timestamp).atZone(ZoneId.systemDefault()).toLocalDateTime();
 
-        return formatter.format(localDateTime);
+        return Formatter.getDateTimeFormatter().format(localDateTime);
     }
 }
