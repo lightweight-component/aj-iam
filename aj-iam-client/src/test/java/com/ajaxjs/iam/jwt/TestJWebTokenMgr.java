@@ -14,7 +14,7 @@ public class TestJWebTokenMgr {
                 "eyJzdWIiOiJ1c2VyIiwibmFtZSI6IkpvaG4gRG9lIiwiYXVkIjoiaW1hZ2UiLCJleHAiOjE2MTQ0NzIwMzQs" +
                 "ImlzcyI6ImZvb0BiYXIuY29tIiwiaWF0IjoxNjE0NDY4MDM0fQ." +
                 "C1Qc0RwN1V1S1V5T0VSWnBtR0VSWkFRT1lYUzRqT1V6T0VSVk1qWmhiR1V5T0VSVk1qWmhiR1U9";
-        JWebToken token = jWebTokenMgr.parse(tokenStr);
+        JWebToken token = JWebTokenMgr.parse(tokenStr);
 
         assertNotNull(token);
         assertEquals("user", token.getPayload().getSub());
@@ -62,7 +62,7 @@ public class TestJWebTokenMgr {
         payload.setExp(expires);
 
         JWebToken token = jWebTokenMgr.tokenFactory(payload);
-        assertTrue(jWebTokenMgr.isValid(token));
+        assertTrue(jWebTokenMgr.validAndDetail(token).isValid());
     }
 
     @Test
@@ -87,9 +87,9 @@ public class TestJWebTokenMgr {
     public void test() {
         JWebTokenMgr mgr = new JWebTokenMgr();
         mgr.setSecretKey("aEsc65643vb3");
-        JWebToken jwt = mgr.parse(token);
+        JWebToken jwt = JWebTokenMgr.parse(token);
 
-        boolean valid = mgr.isValid(jwt);
+        boolean valid = mgr.validAndDetail(jwt).isValid();
         System.out.println(valid);
 
         String jsonUser = "{\"id\": %s, \"name\": \"%s\"}";
