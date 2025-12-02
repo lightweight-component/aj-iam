@@ -1,4 +1,4 @@
-package com.ajaxjs.iam.permission;
+package com.ajaxjs.iam.server.module_permission;
 
 import lombok.Data;
 

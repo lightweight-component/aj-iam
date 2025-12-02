@@ -89,8 +89,8 @@ public class RefreshJWT {
 
         if (refreshToken != null) {
             refreshToken(refreshToken);
-            // 刷新成功，生成新的 Access Token
-            return true;
+
+            return true; // 刷新成功，生成新的 Access Token
         } else
             return false;
     }

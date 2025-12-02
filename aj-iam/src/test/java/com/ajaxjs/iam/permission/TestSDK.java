@@ -1,6 +1,7 @@
 package com.ajaxjs.iam.permission;
 
 import com.ajaxjs.iam.BaseTest;
+import com.ajaxjs.iam.server.module_permission.PermissionService;
 import com.ajaxjs.util.ObjectHelper;
 import com.ajaxjs.util.httpremote.Get;
 import org.junit.jupiter.api.Test;

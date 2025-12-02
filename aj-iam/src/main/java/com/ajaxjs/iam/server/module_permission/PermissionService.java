@@ -1,6 +1,9 @@
-package com.ajaxjs.iam.permission;
+package com.ajaxjs.iam.server.module_permission;
 
 import com.ajaxjs.framework.tree.FlatArrayToTree;
+import com.ajaxjs.iam.permission.Permission;
+import com.ajaxjs.iam.permission.PermissionControl;
+import com.ajaxjs.iam.permission.PermissionEntity;
 import com.ajaxjs.iam.server.controller.PermissionController;
 import com.ajaxjs.sqlman.Action;
 import com.ajaxjs.util.ObjectHelper;

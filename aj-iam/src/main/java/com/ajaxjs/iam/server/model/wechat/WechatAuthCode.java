@@ -1,4 +1,4 @@
-package com.ajaxjs.iam.server.model;
+package com.ajaxjs.iam.server.model.wechat;
 
 import lombok.Data;
 

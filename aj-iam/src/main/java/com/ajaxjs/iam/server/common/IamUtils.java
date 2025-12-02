@@ -22,25 +22,21 @@ public class IamUtils {
         resp.setHeader("Location", newUrl);  // 设置重定向的目标 URL
     }
 
-
     /**
-     * 向HTTP响应中写入HTML内容。
+     * 向 HTTP 响应中写入 HTML 内容。
      * <p>
-     * 此方法用于设置响应的类型为HTML，并将提供的HTML字符串写入响应体。它不直接返回任何值，但通过HTTP响应向客户端发送HTML内容。
+     * 此方法用于设置响应的类型为 HTML，并将提供的HTML字符串写入响应体。它不直接返回任何值，但通过HTTP响应向客户端发送HTML内容。
      *
      * @param resp HTTP响应对象，用于设置响应类型和写入响应体。
      * @param html 要写入响应体的HTML字符串。
      */
     public static void responseHTML(HttpServletResponse resp, String html) {
-        // 设置响应的Content-Type为text/html，告知客户端将要接收的內容类型。
         resp.setContentType("text/html; charset=UTF-8");
         resp.setCharacterEncoding(CommonConstant.UTF8);
 
         try {
-            // 通过响应对象的getWriter方法获取到输出流，然后将HTML字符串写入到输出流中。
             resp.getWriter().write(html);
         } catch (IOException e) {
-            // 捕获并打印写入过程中可能出现的IOException。
             e.printStackTrace();
         }
     }
