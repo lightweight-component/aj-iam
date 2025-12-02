@@ -23,19 +23,23 @@ public class LogLoginService implements LogLoginController, UserConstants {
      * 用户登录日志
      */
     public void saveLoginLog(User user, HttpServletRequest req) {
-        LogLogin userLoginLog = new LogLogin();
-        userLoginLog.setUserId(user.getId());
-        userLoginLog.setLoginType(LoginType.PASSWORD);
-        userLoginLog.setUserName(user.getLoginId());
-        saveIp(userLoginLog, req);
+        try {
+            LogLogin userLoginLog = new LogLogin();
+            userLoginLog.setUserId(user.getId());
+            userLoginLog.setLoginType(LoginType.PASSWORD);
+            userLoginLog.setUserName(user.getLoginId());
+            saveIp(userLoginLog, req);
 
-        if (TenantService.getTenantId() != null)
-            userLoginLog.setTenantId(TenantService.getTenantId());
+            if (TenantService.getTenantId() != null)
+                userLoginLog.setTenantId(TenantService.getTenantId());
 
-        CreateResult<Long> result = new Action(userLoginLog).create().execute(true, Long.class);
+            CreateResult<Long> result = new Action(userLoginLog).create().execute(true, Long.class);
 
-        if (!result.isOk())
-            log.warn("更新会员登录日志出错");
+            if (!result.isOk())
+                log.warn("更新会员登录日志出错");
+        } catch (Throwable e) {
+            log.warn("保存会员登录日志出错", e);
+        }
     }
 
     void saveIp(LogLogin bean, HttpServletRequest req) {

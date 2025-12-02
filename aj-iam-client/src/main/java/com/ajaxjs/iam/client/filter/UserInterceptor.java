@@ -177,6 +177,9 @@ public class UserInterceptor implements HandlerInterceptor {
                     return false;
             }
 
+            if(!(handler instanceof HandlerMethod)) // might be ResourceHttpRequestHandler, pass it
+                return true;
+
             PermissionCheck ann = ClientUtils.getAnnotationFromMethodAndClz((HandlerMethod) handler, PermissionCheck.class);
 
             if (ann != null && StringUtils.hasText(ann.modulePermissionCode())) {

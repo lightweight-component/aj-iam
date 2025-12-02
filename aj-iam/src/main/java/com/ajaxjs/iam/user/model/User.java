@@ -3,7 +3,6 @@ package com.ajaxjs.iam.user.model;
 import com.ajaxjs.framework.model.BaseModel;
 import com.ajaxjs.framework.model.IBaseModel;
 import com.ajaxjs.iam.UserConstants;
-import com.ajaxjs.sqlman.annotation.Id;
 import com.ajaxjs.sqlman.annotation.Table;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -56,6 +55,11 @@ public class User extends BaseModel implements UserConstants, IBaseModel {
     private Date birthday;
 
     /**
+     * 地区
+     */
+    private String location;
+
+    /**
      * 头像
      */
     private String avatar;
@@ -84,7 +88,7 @@ public class User extends BaseModel implements UserConstants, IBaseModel {
     /**
      * 绑定第三方登录账号的状态总值，采用 8421 码
      */
-    private Integer  bindState;
+    private Integer bindState;
 
     /**
      * 身份证号码
@@ -95,10 +99,10 @@ public class User extends BaseModel implements UserConstants, IBaseModel {
 
     private String address;
 
-    private Long locationProvince;
-
-    private Long locationCity;
-
-    private Long locationDistrict;
+//    private Long locationProvince;
+//
+//    private Long locationCity;
+//
+//    private Long locationDistrict;
 
 }

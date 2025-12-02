@@ -12,6 +12,7 @@ import com.ajaxjs.iam.server.model.po.AccessTokenPo;
 import com.ajaxjs.iam.server.model.po.App;
 import com.ajaxjs.iam.user.common.session.UserSession;
 import com.ajaxjs.iam.user.model.User;
+import com.ajaxjs.iam.user.service.LogLoginService;
 import com.ajaxjs.iam.user.service.UserLoginRegisterService;
 import com.ajaxjs.iam.user.service.UserService;
 import com.ajaxjs.spring.DiContextUtil;
@@ -157,6 +158,9 @@ public class OidcService extends OAuthCommon implements OidcController {
     @Autowired
     UserLoginRegisterService userLoginRegisterService;
 
+    @Autowired
+    LogLoginService logLoginService;
+
     @Override
     public JwtAccessToken ropcToken(String grant_type, String username, String password, String client_id, String client_secret, String scope) {
         if (!"password".equals(grant_type))
@@ -193,6 +197,7 @@ public class OidcService extends OAuthCommon implements OidcController {
         log.info("save user {} to cache, key: {}", tokenUser, key);
 
         BaseOidcClientUserController.setTokenToCookie(accessToken, DiContextUtil.getResponse());
+        logLoginService.saveLoginLog(user, DiContextUtil.getRequest());
 
         return accessToken;
     }

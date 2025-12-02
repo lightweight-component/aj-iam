@@ -89,7 +89,7 @@ public class WechatService extends OAuthCommon implements WechatController {
             account.setIdentifier2(session.getSession_key());
             account.setType(UserAccountType.WECHAT_MINI);
 
-            new Action(account).create();
+            new Action(account).create().execute(true);
         }
 
         // 生成 JWT Token
