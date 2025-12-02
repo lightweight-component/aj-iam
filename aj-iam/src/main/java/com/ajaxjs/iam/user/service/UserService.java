@@ -1,6 +1,5 @@
 package com.ajaxjs.iam.user.service;
 
-
 import com.ajaxjs.framework.fileupload.DetectType;
 import com.ajaxjs.framework.fileupload.FileUploadAction;
 import com.ajaxjs.framework.fileupload.UploadUtils;

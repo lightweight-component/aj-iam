@@ -22,13 +22,6 @@ public interface UserConstants {
         MALE, FEMALE, UNKNOWN
     }
 
-    String USER_KEY = "USER_INFO";
-
-    /**
-     * 授权码有效时间
-     */
-    int AUTHORIZATION_CODE_TIMEOUT = 5 * 60 * 1000;
-
     interface LoginIdType {
         int PSW_LOGIN_ID = 1;
         int PSW_LOGIN_EMAIL = 2;

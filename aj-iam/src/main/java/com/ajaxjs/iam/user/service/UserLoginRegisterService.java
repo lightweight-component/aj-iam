@@ -1,6 +1,5 @@
 package com.ajaxjs.iam.user.service;
 
-
 import com.ajaxjs.framework.database.EnableTransaction;
 import com.ajaxjs.framework.model.BusinessException;
 import com.ajaxjs.iam.UserConstants;
@@ -201,7 +200,6 @@ public class UserLoginRegisterService implements UserLoginRegisterController, Us
         if (!ObjectUtils.isEmpty(extract))
             params.put("extend", extract);
 
-        System.out.println(extract);
 
         // 有些字段不要
         String psw = params.get("password").toString();

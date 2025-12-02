@@ -56,5 +56,4 @@ public class ClientController extends BaseOidcClientUserController {
     public ModelAndView callbackToken(@RequestParam String code, @RequestParam String state, @RequestParam(required = false) String web_url, HttpServletResponse resp) {
         return callbackToken(getClientId(), getClientSecret(), code, state, web_url, resp);
     }
-
 }

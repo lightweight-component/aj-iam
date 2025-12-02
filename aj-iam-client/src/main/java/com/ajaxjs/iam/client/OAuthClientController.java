@@ -96,8 +96,6 @@ public class OAuthClientController {
     @Value("${User.home}")
     private String userHome;
 
-    static final String GRANT_TYPE = "authorization_code";
-
     /**
      * 发起客户端认证
      *

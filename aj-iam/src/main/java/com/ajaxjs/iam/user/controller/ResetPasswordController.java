@@ -10,8 +10,6 @@ import org.springframework.web.bind.annotation.*;
 
 /**
  * 重置密码
- *
- * @author Frank Cheung
  */
 @RestController
 @RequestMapping("/reset_psw")

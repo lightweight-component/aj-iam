@@ -17,9 +17,9 @@ public interface UserController {
      *
      * @return 用户详情
      */
+    @GetMapping("/info")
     @CrossOrigin
     @BizAction("获取当前用户详情")
-    @GetMapping("/info")
     User currentUserInfo();
 
     /**
