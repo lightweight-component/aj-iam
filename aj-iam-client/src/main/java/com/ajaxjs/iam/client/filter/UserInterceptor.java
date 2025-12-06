@@ -408,7 +408,7 @@ public class UserInterceptor implements HandlerInterceptor {
         String tokenApi = iamService + "/iam_api/oidc/refresh_token";
 
         Map<String, String> params = ObjectHelper.mapOf("grant_type", "refresh_token", "refresh_token", refreshToken);
-        Map<String, Object> result = Post.api(tokenApi, params, conn -> conn.setRequestProperty("Authorization", ClientCredentials.encodeClient(clientId, clientSecret)));
+        Map<String, Object> result = Post.form(tokenApi, params, conn -> conn.setRequestProperty("Authorization", ClientCredentials.encodeClient(clientId, clientSecret)));
 
         if (result == null)
             throw new IllegalAccessError("通讯失败");
