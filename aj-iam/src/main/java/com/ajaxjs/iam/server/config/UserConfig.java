@@ -1,6 +1,6 @@
 package com.ajaxjs.iam.server.config;
 
-import com.ajaxjs.iam.user.common.PasswordEncoder;
+import com.ajaxjs.iam.server.service.password.PasswordEncoder;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

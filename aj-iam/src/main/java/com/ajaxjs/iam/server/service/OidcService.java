@@ -10,11 +10,8 @@ import com.ajaxjs.iam.server.controller.OidcController;
 import com.ajaxjs.iam.jwt.JwtAccessToken;
 import com.ajaxjs.iam.server.model.po.AccessTokenPo;
 import com.ajaxjs.iam.server.model.po.App;
-import com.ajaxjs.iam.user.common.session.UserSession;
-import com.ajaxjs.iam.user.model.User;
-import com.ajaxjs.iam.user.service.LogLoginService;
-import com.ajaxjs.iam.user.service.UserLoginRegisterService;
-import com.ajaxjs.iam.user.service.UserService;
+import com.ajaxjs.iam.server.common.session.UserSession;
+import com.ajaxjs.iam.server.model.User;
 import com.ajaxjs.spring.DiContextUtil;
 import com.ajaxjs.sqlman.Action;
 import com.ajaxjs.util.JsonUtil;
@@ -156,7 +153,7 @@ public class OidcService extends OAuthCommon implements OidcController {
     }
 
     @Autowired
-    UserLoginRegisterService userLoginRegisterService;
+    UserRegisterService userLoginRegisterService;
 
     @Autowired
     LogLoginService logLoginService;

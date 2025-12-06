@@ -4,14 +4,13 @@ import com.ajaxjs.framework.cache.Cache;
 import com.ajaxjs.framework.model.BusinessException;
 import com.ajaxjs.iam.jwt.JwtUtils;
 import com.ajaxjs.iam.server.common.IamConstants;
-import com.ajaxjs.iam.server.common.IamUtils;
 import com.ajaxjs.iam.model.AccessToken;
 import com.ajaxjs.iam.jwt.JwtAccessToken;
 import com.ajaxjs.iam.server.model.po.AccessTokenPo;
 import com.ajaxjs.iam.server.model.po.App;
-import com.ajaxjs.iam.user.common.session.UserSession;
-import com.ajaxjs.iam.user.model.User;
-import com.ajaxjs.iam.user.service.TenantService;
+import com.ajaxjs.iam.server.common.session.UserSession;
+import com.ajaxjs.iam.server.model.User;
+import com.ajaxjs.iam.server.common.UserUtils;
 import com.ajaxjs.sqlman.Action;
 import com.ajaxjs.util.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,7 +58,7 @@ public abstract class OAuthCommon implements IamConstants {
                 throw new BusinessException("应用或登录地址不存在");
 
             String html = String.format(NOT_LOGIN_TEXT, loginPage + "?" + qs);
-            IamUtils.responseHTML(resp, html);
+            UserUtils.responseHTML(resp, html);
         } else {// 已登录，发送授权码
             StringBuilder sb = new StringBuilder();
             sb.append("?state=").append(state);
@@ -79,7 +78,7 @@ public abstract class OAuthCommon implements IamConstants {
             cache.put(code + ":user", user, AUTHORIZATION_CODE_TIMEOUT); // 保存本次请求所属的用户信息
             cache.put(code + ":scope", scope, AUTHORIZATION_CODE_TIMEOUT);// 保存本次请求的授权范围
 
-            IamUtils.send303Redirect(resp, redirectUri + sb); // 跳转到客户机
+            UserUtils.send303Redirect(resp, redirectUri + sb); // 跳转到客户机
         }
     }
 

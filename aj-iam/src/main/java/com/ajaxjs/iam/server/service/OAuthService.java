@@ -7,7 +7,7 @@ import com.ajaxjs.iam.server.controller.OAuthController;
 import com.ajaxjs.iam.model.AccessToken;
 import com.ajaxjs.iam.server.model.po.AccessTokenPo;
 import com.ajaxjs.iam.server.model.po.App;
-import com.ajaxjs.iam.user.model.User;
+import com.ajaxjs.iam.server.model.User;
 import com.ajaxjs.sqlman.Action;
 import com.ajaxjs.util.RandomTools;
 import lombok.Data;

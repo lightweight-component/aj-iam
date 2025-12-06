@@ -1,6 +1,6 @@
 package com.ajaxjs.iam.server.service;
 
-import com.ajaxjs.iam.BaseTest;
+import com.ajaxjs.iam.server.BaseTest;
 import com.ajaxjs.sqlman.model.UpdateResult;
 import com.ajaxjs.sqlman.Action;
 import com.ajaxjs.util.io.Resources;

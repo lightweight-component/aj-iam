@@ -4,9 +4,9 @@ import com.ajaxjs.framework.cache.Cache;
 import com.ajaxjs.framework.cache.delayqueue.ExpiryCache;
 import com.ajaxjs.framework.cache.lru.LRUCache;
 import com.ajaxjs.iam.client.CacheProvider;
+import com.ajaxjs.iam.server.common.session.ServletUserSession;
+import com.ajaxjs.iam.server.common.session.UserSession;
 import com.ajaxjs.iam.server.service.OidcService;
-import com.ajaxjs.iam.user.common.session.ServletUserSession;
-import com.ajaxjs.iam.user.common.session.UserSession;
 import com.ajaxjs.message.email.ISendEmail;
 import com.ajaxjs.message.email.resend.Resend;
 import com.ajaxjs.security.captcha.image.ImageCaptchaConfig;
@@ -145,36 +145,4 @@ public class IamConfig implements WebMvcConfigurer {
     UserSession UserSession() {
         return new ServletUserSession();
     }
-
-    @Value("${BaseService.endPoint: }")
-    private String baseServiceEndPoint;
-
-//    @Bean
-//    CrossFilter CrossFilter() {
-//        return new CrossFilter();
-//    }
-
-//    /**
-//     * 跨域
-//     *
-//     * @param registry 注册跨域
-//     */
-//    @Override
-//    public void addCorsMappings(CorsRegistry registry) {
-//        registry.addMapping("/**").allowedHeaders("*").allowedMethods("POST", "GET", "PUT", "OPTIONS", "DELETE").allowedOrigins("*").allowCredentials(false);
-//    }
-
-//    @Bean
-//    public CorsFilter corsFilter() {
-//        CorsConfiguration config = new CorsConfiguration();
-//        config.setAllowCredentials(true);
-//        config.addAllowedOrigin("*");
-//        config.addAllowedHeader("*");
-//        config.addAllowedMethod("*");
-//
-//        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-//        source.registerCorsConfiguration("/**", config);
-//
-//        return new CorsFilter(source);
-//    }
 }

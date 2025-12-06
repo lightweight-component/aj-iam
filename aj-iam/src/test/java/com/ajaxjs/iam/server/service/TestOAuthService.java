@@ -1,6 +1,6 @@
 package com.ajaxjs.iam.server.service;
 
-import com.ajaxjs.iam.BaseTest;
+import com.ajaxjs.iam.server.BaseTest;
 import com.ajaxjs.iam.server.common.IamConstants;
 import com.ajaxjs.iam.model.AccessToken;
 import org.junit.jupiter.api.Test;
