@@ -267,7 +267,17 @@ public class UserInterceptor implements HandlerInterceptor {
         return false;
     }
 
-    private final static String ERR_JSON = "{\"error\":\"%s\",\"error_description\":\"%s\"}";
+    /**
+     * This was the return format that OAuth recommended.
+     * However, if we use this,
+     * it would become two return formats on the system;
+     * it's challenging for front-end to handle two return messages.
+     * Hence, we should use a unified return format.
+     * And, as an SDK, it's better to provide a custom way to specify the return format.
+     * But right now, we just specify one.
+     */
+//    private final static String ERR_JSON = "{\"error\":\"%s\",\"error_description\":\"%s\"}";
+    private final static String ERR_JSON = "{\"status\":0,\"errorCode\":\"%s\",\"error\":\"%s\",\"message\":\"%s\"}";
 
     /**
      * 向客户端返回服务器错误信息。
@@ -288,7 +298,7 @@ public class UserInterceptor implements HandlerInterceptor {
      * @param message     错误信息
      */
     private void returnMsg(HttpServletResponse resp, int httpErrCode, String title, String message) {
-        returnMsg(resp, httpErrCode, String.format(ERR_JSON, title, message));
+        returnMsg(resp, httpErrCode, String.format(ERR_JSON, httpErrCode, title, message));
     }
 
     /**
