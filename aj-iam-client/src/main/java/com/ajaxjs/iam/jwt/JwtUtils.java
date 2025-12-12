@@ -18,6 +18,7 @@ public class JwtUtils {
 
     /**
      * 返回过期时间
+     * 转换小时数为时间戳
      *
      * @param hours 小时数
      * @return 过期时间的时间戳

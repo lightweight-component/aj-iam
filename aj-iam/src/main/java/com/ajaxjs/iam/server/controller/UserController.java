@@ -76,7 +76,7 @@ public interface UserController {
      * @return 是否成功
      */
     @DeleteMapping("/{id}")
-    Boolean delete(Long id);
+    Boolean delete(@PathVariable Long id);
 
     /**
      * 修改用户头像

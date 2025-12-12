@@ -63,7 +63,7 @@ public class RefreshJWT {
             System.err.println("刷新失败:" + result.get("message"));
     }
 
-    private static final long REFRESH_THRESHOLD = 60 * 1000; // 60秒内过期就刷新
+    private static final long REFRESH_THRESHOLD = 60 * 1000; // 一小时内过期就刷新
 
     /**
      * 检查 Access Token 是否快过期了，且有有效的 Refresh Token，则刷新

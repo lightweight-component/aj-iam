@@ -47,7 +47,7 @@ public class WechatService extends OAuthCommon implements WechatController {
     @EnableTransaction
     public JwtAccessToken miniAppLogin(WechatAuthCode data) {
         Code2SessionResult session = getOpenIdByCode(data);
-        UserAccount account = new Action("SELECT * FROM user_account WHERE identifier = ? AND type = 'WECHAT_MINI'")
+        UserAccount account = new Action("SELECT * FROM user_account WHERE stat != 1 AND identifier = ? AND type = 'WECHAT_MINI'")
                 .query(session.getOpenid()).one(UserAccount.class);
         User user;
 

@@ -10,13 +10,12 @@ import com.ajaxjs.framework.model.BusinessException;
 import com.ajaxjs.iam.UserConstants;
 import com.ajaxjs.iam.client.SecurityManager;
 import com.ajaxjs.iam.model.SimpleUser;
-import com.ajaxjs.iam.server.model.po.App;
-import com.ajaxjs.iam.server.service.OAuthCommon;
 import com.ajaxjs.iam.server.controller.UserController;
 import com.ajaxjs.iam.server.model.User;
+import com.ajaxjs.iam.server.model.po.App;
 import com.ajaxjs.spring.DiContextUtil;
-import com.ajaxjs.sqlman.util.Utils;
 import com.ajaxjs.sqlman.Action;
+import com.ajaxjs.sqlman.util.Utils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -98,6 +97,9 @@ public class UserService implements UserController, UserConstants {
 
     @Override
     public Boolean delete(Long id) {
+        String sql = "UPDATE user_account SET stat = 1 WHERE user_id = ?";
+        new Action(sql).update(id).execute();
+
         User user = new User();
         user.setId(id);
         user.setStat(BaseEntityConstants.STATUS_DELETED);  // 逻辑删除
