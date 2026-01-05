@@ -5,17 +5,18 @@ import com.ajaxjs.framework.wechat.applet.AppletService;
 import com.ajaxjs.framework.wechat.applet.model.Code2SessionResult;
 import com.ajaxjs.iam.client.SecurityManager;
 import com.ajaxjs.iam.jwt.JWebTokenMgr;
+import com.ajaxjs.iam.jwt.JwtAccessToken;
 import com.ajaxjs.iam.jwt.JwtUtils;
 import com.ajaxjs.iam.model.SimpleUser;
 import com.ajaxjs.iam.server.common.IamConstants;
 import com.ajaxjs.iam.server.controller.WechatController;
-import com.ajaxjs.iam.jwt.JwtAccessToken;
-import com.ajaxjs.iam.server.model.po.App;
-import com.ajaxjs.iam.server.model.wechat.MiniAppPhoneNumber;
-import com.ajaxjs.iam.server.model.wechat.WechatAuthCode;
 import com.ajaxjs.iam.server.model.User;
 import com.ajaxjs.iam.server.model.UserAccount;
 import com.ajaxjs.iam.server.model.UserAccountType;
+import com.ajaxjs.iam.server.model.po.App;
+import com.ajaxjs.iam.server.model.wechat.MiniAppPhoneNumber;
+import com.ajaxjs.iam.server.model.wechat.PhoneNumberLoginDTO;
+import com.ajaxjs.iam.server.model.wechat.WechatAuthCode;
 import com.ajaxjs.sqlman.Action;
 import com.ajaxjs.util.Base64Utils;
 import com.ajaxjs.util.JsonUtil;
@@ -50,13 +51,10 @@ public class WechatService extends OAuthCommon implements WechatController {
         UserAccount account = new Action("SELECT * FROM user_account WHERE stat != 1 AND identifier = ? AND type = 'WECHAT_MINI'")
                 .query(session.getOpenid()).one(UserAccount.class);
         User user;
+        App app = getApp(data.getAppId());
+        Boolean isNewlyUser = account == null;
 
-        App app = new Action("SELECT * FROM app WHERE stat != 1 AND client_id = ?").query(data.getAppId()).one(App.class);
-
-        if (app == null)
-            throw new UnsupportedOperationException("App Not found: " + data.getAppId());
-
-        if (account != null) { // exists account
+        if (!isNewlyUser) { // exists account
             Long userId = account.getUserId();
             user = UserService.getUserById(userId);
 
@@ -67,31 +65,57 @@ public class WechatService extends OAuthCommon implements WechatController {
 
             new Action(saveSessionKey).update().withId();
 
-            User updateBindState = new User();
+            User updateBindState = new User(); // why does it every time?
             updateBindState.setId(user.getId());
             updateBindState.setBindState(user.getBindState() + UserFunction.BindState.WECHAT);
 
             new Action(updateBindState).update();
         } else { // to create a new account
-            user = new User();
-            user.setLoginId("WxMiniUser_" + RandomTools.generateRandomString(5));
-            user.setTenantId(app.getTenantId().longValue());
-            user.setBindState(UserFunction.BindState.WECHAT);
-
-            Long userId = new Action(user).create().execute(true, Long.class).getNewlyId();
-            user.setId(userId);
-
-            account = new UserAccount();
-            account.setUserId(userId);
-            account.setIdentifier(session.getOpenid());
-            account.setIdentifier2(session.getSession_key());
-            account.setType(UserAccountType.WECHAT_MINI);
-
-            new Action(account).create().execute(true);
+            user = createUser(app.getTenantId().longValue(), null);
+            createUserAccount(user.getId(), session);
         }
 
+        return createToken(user, app, isNewlyUser);
+    }
+
+    private User createUser(Long tenantId, String phoneNumber) {
+        User user = new User();
+        user.setLoginId("WxMiniUser_" + RandomTools.generateRandomString(5));
+        user.setTenantId(tenantId);
+        user.setBindState(UserFunction.BindState.WECHAT);
+
+        if(ObjectHelper.hasText(phoneNumber))
+            user.setPhone(phoneNumber);
+
+        Long newlyId = new Action(user).create().execute(true, Long.class).getNewlyId();
+        user.setId(newlyId);
+
+        return user;
+    }
+
+    private void createUserAccount(Long userId, Code2SessionResult session) {
+        UserAccount account = new UserAccount();
+        account.setUserId(userId);
+        account.setIdentifier(session.getOpenid());
+        account.setIdentifier2(session.getSession_key());
+        account.setType(UserAccountType.WECHAT_MINI);
+
+        new Action(account).create().execute(true);
+    }
+
+    private static App getApp(String appId) {
+        App app = new Action("SELECT * FROM app WHERE stat != 1 AND client_id = ?").query(appId).one(App.class);
+
+        if (app == null)
+            throw new UnsupportedOperationException("App Not found: " + appId);
+
+        return app;
+    }
+
+    private JwtAccessToken createToken(User user, App app, Boolean isNewlyUser) {
         // 生成 JWT Token
         JwtAccessToken accessToken = new JwtAccessToken();
+        accessToken.setIsNewlyUser(isNewlyUser);
 
         // TODO user.getName() 中文名会乱码
         Long[][] userPermissions = OidcService.getUserPermissions(user.getId());
@@ -148,6 +172,48 @@ public class WechatService extends OAuthCommon implements WechatController {
         String json = aesDecryptPhone(iv, data, sessionKey);
 
         return JsonUtil.fromJson(json, MiniAppPhoneNumber.class);
+    }
+
+    static String EXIST_USER_SQL = "SELECT u.*, a.identifier FROM user u LEFT JOIN user_account a ON u.id = a.user_id WHERE u.phone = ? AND a.identifier = ?";
+
+    @Override
+    @EnableTransaction
+    public JwtAccessToken loginByMiniAppPhoneNumber(PhoneNumberLoginDTO dto) {
+        WechatAuthCode wechatAuthCode = new WechatAuthCode();
+        wechatAuthCode.setAppId(dto.getAppId());
+        wechatAuthCode.setCode(dto.getCode());
+
+        Code2SessionResult openIdByCode = getOpenIdByCode(wechatAuthCode);
+
+        String sessionKey = openIdByCode.getSession_key();
+        String iv = dto.getIv();
+        String data = dto.getData();
+        String json = aesDecryptPhone(iv, data, sessionKey);
+
+        MiniAppPhoneNumber phoneNumber = JsonUtil.fromJson(json, MiniAppPhoneNumber.class);
+        String phone = phoneNumber.getPhoneNumber();
+        log.info("phone:" + phone);
+        String openId = openIdByCode.getOpenid();
+        Integer tenantId = TenantService.getTenantId();
+
+        User user;
+        User existUser = new Action("SELECT * FROM user WHERE stat = 0 AND phone = ? AND tenant_id = ?").query(phone, tenantId).one(User.class);
+        Boolean isNewlyUser = existUser == null;
+
+        if (isNewlyUser) { // to create a new user
+            user = createUser(tenantId.longValue(), phone);
+            phoneNumber.setIsNewlyUser(true);
+        } else {
+            user = existUser;
+            phoneNumber.setIsNewlyUser(false);
+            UserAccount existAccount = new Action("SELECT * FROM user_account WHERE identifier = ? AND user_id = ? AND type = 'WECHAT_MINI' AND stat= 0")
+                    .query(openId, existUser.getId()).one(UserAccount.class);
+
+            if (existAccount == null)
+                createUserAccount(existUser.getId(), openIdByCode);
+        }
+
+        return createToken(user, getApp(dto.getAppId()), isNewlyUser);
     }
 
     /**

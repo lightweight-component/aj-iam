@@ -16,4 +16,9 @@ public class JwtAccessToken extends AccessToken {
      * JWT Token encoded.
      */
     private String id_token;
+
+    /**
+     * 是否是新注册的用户
+     */
+    private Boolean isNewlyUser = false;
 }

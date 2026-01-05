@@ -11,4 +11,9 @@ public class MiniAppPhoneNumber {
     String purePhoneNumber;
 
     String countryCode;
+
+    /**
+     * 是否新注册的用户
+     */
+    Boolean isNewlyUser = false;
 }

@@ -3,9 +3,13 @@ package com.ajaxjs.iam.server.controller;
 import com.ajaxjs.framework.mvc.unifiedreturn.BizAction;
 import com.ajaxjs.iam.annotation.AllowOpenAccess;
 import com.ajaxjs.iam.jwt.JwtAccessToken;
-import com.ajaxjs.iam.server.model.wechat.WechatAuthCode;
 import com.ajaxjs.iam.server.model.wechat.MiniAppPhoneNumber;
-import org.springframework.web.bind.annotation.*;
+import com.ajaxjs.iam.server.model.wechat.PhoneNumberLoginDTO;
+import com.ajaxjs.iam.server.model.wechat.WechatAuthCode;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Map;
 
@@ -39,6 +43,7 @@ public interface WechatController {
 
     /**
      * 解密小程序提供的加密数据，返回包含手机号码等信息的 JSON 对象
+     * 这个适用于用户已经登录有 token 的情况下
      *
      * @param data 加密数据
      * @return 手机号码等信息的 JSON 对象
@@ -46,4 +51,16 @@ public interface WechatController {
     @PostMapping("/phone_number")
     @BizAction("解密小程序提供的加密数据，返回包含手机号码等信息的 JSON 对象")
     MiniAppPhoneNumber getMiniAppPhoneNumber(@RequestBody Map<String, String> data);
+
+    /**
+     * 解密小程序提供的加密数据，返回包含手机号码等信息的 JSON 对象
+     * 用于登录、注册
+     *
+     * @param dto 加密数据
+     * @return 手机号码等信息的 JSON 对象
+     */
+    @PostMapping("/phone_number_login")
+    @AllowOpenAccess
+    @BizAction("解密小程序提供的加密数据，返回包含手机号码等信息的 JSON 对象")
+    JwtAccessToken loginByMiniAppPhoneNumber(@RequestBody PhoneNumberLoginDTO dto);
 }
