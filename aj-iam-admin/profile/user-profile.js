@@ -122,8 +122,7 @@ const UserCenterMain = {
         </tr>
         <tr>
             <td>简介</td>
-            <td colspan="3"><textarea style="width:92%;min-height:50px;padding:5px"
-                    v-model="$parent.USER.content"></textarea>
+            <td colspan="3"><textarea style="width:92%;min-height:50px;padding:5px" v-model="$parent.USER.content"></textarea>
             </td>
         </tr>
         </tbody>

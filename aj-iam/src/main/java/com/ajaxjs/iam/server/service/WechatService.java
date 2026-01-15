@@ -194,7 +194,7 @@ public class WechatService extends OAuthCommon implements WechatController {
         String phone = phoneNumber.getPhoneNumber();
         log.info("phone:" + phone);
         String openId = openIdByCode.getOpenid();
-        Integer tenantId = TenantService.getTenantId();
+        Integer tenantId = TenantService.getTenantId(false);
 
         User user;
         User existUser = new Action("SELECT * FROM user WHERE stat = 0 AND phone = ? AND tenant_id = ?").query(phone, tenantId).one(User.class);
