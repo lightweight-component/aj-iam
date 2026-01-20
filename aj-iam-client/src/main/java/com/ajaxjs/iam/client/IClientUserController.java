@@ -8,7 +8,6 @@ import org.springframework.web.servlet.view.RedirectView;
 
 import javax.servlet.http.HttpServletResponse;
 
-
 public interface IClientUserController {
     @GetMapping("/to_login")
     RedirectView loginPageUrl(@RequestParam(required = false) String callback_url, @RequestParam(required = false) String web_url);

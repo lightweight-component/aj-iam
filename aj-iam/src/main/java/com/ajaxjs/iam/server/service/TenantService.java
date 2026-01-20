@@ -33,6 +33,16 @@ public class TenantService {
      * @return 租户 id
      */
     public static Integer getTenantId() {
+        return getTenantId(true);
+    }
+
+    /**
+     * 从 HTTP 头中获取租户 id
+     *
+     * @param checkUserPrivilege 是否检查用户权限
+     * @return 租户 id
+     */
+    public static Integer getTenantId(boolean checkUserPrivilege) {
         HttpServletRequest request = DiContextUtil.getRequest();
 
         if (request == null)
@@ -47,7 +57,8 @@ public class TenantService {
             Integer tenantId = Integer.parseInt(tenantIdStr);
             request.setAttribute(AUTH_TENANT_ID, tenantId);
 
-            checkUserPrivilegeOfTenant(request, tenantId);
+            if (checkUserPrivilege)
+                checkUserPrivilegeOfTenant(request, tenantId);
 
             return tenantId;
         } else

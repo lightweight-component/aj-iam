@@ -2,15 +2,15 @@ package com.ajaxjs.iam.server.service;
 
 import com.ajaxjs.framework.cache.Cache;
 import com.ajaxjs.framework.model.BusinessException;
-import com.ajaxjs.iam.jwt.JwtUtils;
-import com.ajaxjs.iam.server.common.IamConstants;
-import com.ajaxjs.iam.model.AccessToken;
 import com.ajaxjs.iam.jwt.JwtAccessToken;
-import com.ajaxjs.iam.server.model.po.AccessTokenPo;
-import com.ajaxjs.iam.server.model.po.App;
+import com.ajaxjs.iam.jwt.JwtUtils;
+import com.ajaxjs.iam.model.AccessToken;
+import com.ajaxjs.iam.server.common.IamConstants;
+import com.ajaxjs.iam.server.common.UserUtils;
 import com.ajaxjs.iam.server.common.session.UserSession;
 import com.ajaxjs.iam.server.model.User;
-import com.ajaxjs.iam.server.common.UserUtils;
+import com.ajaxjs.iam.server.model.po.AccessTokenPo;
+import com.ajaxjs.iam.server.model.po.App;
 import com.ajaxjs.sqlman.Action;
 import com.ajaxjs.util.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -184,8 +184,10 @@ public abstract class OAuthCommon implements IamConstants {
         save.setClientId(app.getClientId());
         save.setCreateDate(new Date());
 
-        if (TenantService.getTenantId() != null)
-            save.setTenantId(TenantService.getTenantId());
+        if (TenantService.getTenantId(false) != null) {
+//            System.out.println("保存租户ID---------------------" + TenantService.getTenantId(false));
+            save.setTenantId(TenantService.getTenantId(false));
+        }
 
         if (user != null) {
             save.setUserId(user.getId());
