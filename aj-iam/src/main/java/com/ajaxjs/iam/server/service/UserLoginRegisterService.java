@@ -3,11 +3,13 @@ package com.ajaxjs.iam.server.service;
 import com.ajaxjs.framework.database.EnableTransaction;
 import com.ajaxjs.framework.model.BusinessException;
 import com.ajaxjs.iam.UserConstants;
+import com.ajaxjs.iam.jwt.JwtAccessToken;
 import com.ajaxjs.iam.server.common.UserUtils;
-import com.ajaxjs.iam.server.service.password.CheckStrength;
-import com.ajaxjs.iam.server.controller.UserRegisterController;
+import com.ajaxjs.iam.server.controller.UserLoginRegisterController;
 import com.ajaxjs.iam.server.model.User;
 import com.ajaxjs.iam.server.model.UserAccount;
+import com.ajaxjs.iam.server.model.po.App;
+import com.ajaxjs.iam.server.service.password.CheckStrength;
 import com.ajaxjs.security.iplist.IpList;
 import com.ajaxjs.spring.DiContextUtil;
 import com.ajaxjs.sqlman.Action;
@@ -27,7 +29,7 @@ import java.util.function.Function;
 
 @Service
 @Slf4j
-public class UserRegisterService implements UserRegisterController, UserConstants {
+public class UserLoginRegisterService implements UserLoginRegisterController, UserConstants {
     @Value("${user.loginIdType:1}")
     int loginIdType;
 
@@ -64,6 +66,25 @@ public class UserRegisterService implements UserRegisterController, UserConstant
 
     @Value("${auth.user.CheckStrength:true}")
     boolean isCheckPasswordStrength;
+
+    @Autowired
+    UserLoginRegisterService userLoginRegisterService;
+
+    @Autowired
+    OidcService oidcService;
+
+    @Override
+    public JwtAccessToken login(String username, String password, String appId) {
+        App app = new Action("SELECT * FROM app WHERE stat != 1 AND client_id = ? ").query(appId).one(App.class);
+
+        if (app == null)
+            throw new UnsupportedOperationException("App Not found: " + appId);
+
+        Integer tenantId = TenantService.getTenantId(false);
+        User user = getUserLoginByPassword(username, password, tenantId);
+
+        return oidcService.createJWTByUser(user, app);
+    }
 
     @Override
     @EnableTransaction

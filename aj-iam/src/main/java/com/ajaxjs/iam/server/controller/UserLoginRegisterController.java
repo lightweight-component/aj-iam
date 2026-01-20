@@ -4,6 +4,7 @@ package com.ajaxjs.iam.server.controller;
 
 import com.ajaxjs.framework.mvc.unifiedreturn.BizAction;
 import com.ajaxjs.iam.annotation.AllowOpenAccess;
+import com.ajaxjs.iam.jwt.JwtAccessToken;
 import com.ajaxjs.security.captcha.image.ImageCaptchaCheck;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,7 +15,21 @@ import java.util.Map;
  */
 @RestController
 @RequestMapping("/user")
-public interface UserRegisterController {
+public interface UserLoginRegisterController {
+    /**
+     * 用户登录
+     *
+     * @param username 用户名/手机号/邮箱
+     * @param password 密码
+     * @param appId    应用 id
+     * @return 应用的 JWT AccessToken
+     */
+    @PostMapping("/login")
+    @AllowOpenAccess
+    @ImageCaptchaCheck
+    @BizAction("用户登录")
+    JwtAccessToken login(@RequestParam String username, @RequestParam String password, @RequestParam String appId);
+
     /**
      * 用户注册
      * <p>

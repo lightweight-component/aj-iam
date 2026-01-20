@@ -5,13 +5,13 @@ import com.ajaxjs.framework.database.EnableTransaction;
 import com.ajaxjs.framework.model.BusinessException;
 import com.ajaxjs.iam.client.BaseOidcClientUserController;
 import com.ajaxjs.iam.jwt.JWebTokenMgr;
-import com.ajaxjs.iam.jwt.JwtUtils;
-import com.ajaxjs.iam.server.controller.OidcController;
 import com.ajaxjs.iam.jwt.JwtAccessToken;
+import com.ajaxjs.iam.jwt.JwtUtils;
+import com.ajaxjs.iam.server.common.session.UserSession;
+import com.ajaxjs.iam.server.controller.OidcController;
+import com.ajaxjs.iam.server.model.User;
 import com.ajaxjs.iam.server.model.po.AccessTokenPo;
 import com.ajaxjs.iam.server.model.po.App;
-import com.ajaxjs.iam.server.common.session.UserSession;
-import com.ajaxjs.iam.server.model.User;
 import com.ajaxjs.spring.DiContextUtil;
 import com.ajaxjs.sqlman.Action;
 import com.ajaxjs.util.JsonUtil;
@@ -153,7 +153,7 @@ public class OidcService extends OAuthCommon implements OidcController {
     }
 
     @Autowired
-    UserRegisterService userLoginRegisterService;
+    UserLoginRegisterService userLoginRegisterService;
 
     @Autowired
     LogLoginService logLoginService;
@@ -169,9 +169,22 @@ public class OidcService extends OAuthCommon implements OidcController {
             throw new UnsupportedOperationException("App Not found: " + client_id);
 
         Integer tenantId = app.getTenantId();
+
         User user = userLoginRegisterService.getUserLoginByPassword(username, password, tenantId);
 
-        // 生成 Access Token
+        return createJWTByUser(user, app, scope);
+    }
+
+    public JwtAccessToken createJWTByUser(User user, App app) {
+        return createJWTByUser(user, app, DEFAULT_SCOPE);
+    }
+
+    /**
+     * 生成 JWT Token
+     *
+     * @return JWT Token
+     */
+    public JwtAccessToken createJWTByUser(User user, App app, String scope) {
         JwtAccessToken accessToken = new JwtAccessToken();
 
         // 生成 JWT Token

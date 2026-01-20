@@ -21,7 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class TestUserLoginRegisterService extends BaseTest {
     @Autowired
-    UserRegisterService userLoginRegisterService;
+    UserLoginRegisterService userLoginRegisterService;
 
     HttpServletRequest request = mock(HttpServletRequest.class);
 
