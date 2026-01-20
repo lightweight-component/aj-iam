@@ -1,8 +1,6 @@
 package com.ajaxjs.iam.server.service;
 
 import com.ajaxjs.framework.database.EnableTransaction;
-import com.ajaxjs.framework.wechat.applet.AppletService;
-import com.ajaxjs.framework.wechat.applet.model.Code2SessionResult;
 import com.ajaxjs.iam.client.SecurityManager;
 import com.ajaxjs.iam.jwt.JWebTokenMgr;
 import com.ajaxjs.iam.jwt.JwtAccessToken;
@@ -14,6 +12,7 @@ import com.ajaxjs.iam.server.model.User;
 import com.ajaxjs.iam.server.model.UserAccount;
 import com.ajaxjs.iam.server.model.UserAccountType;
 import com.ajaxjs.iam.server.model.po.App;
+import com.ajaxjs.iam.server.model.wechat.Code2SessionResult;
 import com.ajaxjs.iam.server.model.wechat.MiniAppPhoneNumber;
 import com.ajaxjs.iam.server.model.wechat.PhoneNumberLoginDTO;
 import com.ajaxjs.iam.server.model.wechat.WechatAuthCode;
@@ -235,6 +234,8 @@ public class WechatService extends OAuthCommon implements WechatController {
         return cryptography.doCipherAsStr();
     }
 
+    private final static String LOGIN_API = "https://api.weixin.qq.com/sns/jscode2session?grant_type=authorization_code&appid=%s&secret=%s&js_code=%s";
+
     /**
      * 通过微信小程序的 code 获取 openId
      *
@@ -244,7 +245,7 @@ public class WechatService extends OAuthCommon implements WechatController {
     static Code2SessionResult getOpenIdByCode(WechatAuthCode data) {
         Map<String, Object> query = new Action("SELECT app_id, app_secret FROM app_secret_mgr WHERE owner = ?").query(data.getAppId()).one();
         log.info(":::" + query);
-        String url = String.format(AppletService.LOGIN_API, query.get("appId"), query.get("appSecret"), data.getCode());
+        String url = String.format(LOGIN_API, query.get("appId"), query.get("appSecret"), data.getCode());
         Code2SessionResult session = Get.api(url, Code2SessionResult.class);
         log.info("session: " + session);
 
