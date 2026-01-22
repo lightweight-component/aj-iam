@@ -15,6 +15,7 @@ import com.ajaxjs.spring.DiContextUtil;
 import com.ajaxjs.sqlman.Action;
 import com.ajaxjs.sqlman.util.SnowflakeId;
 import com.ajaxjs.sqlman.util.Utils;
+import com.ajaxjs.util.CommonConstant;
 import com.ajaxjs.util.ObjectHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +25,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.util.*;
 import java.util.function.Function;
 
@@ -216,5 +220,23 @@ public class UserLoginRegisterService implements UserLoginRegisterController, Us
         sql = String.format(sql, field.trim());
 
         return new Action(sql).query(value.trim(), tenantId).oneValue(Long.class) != null; // 有这个数据表示重复
+    }
+
+    @Override
+    public boolean logout(String returnUrl, HttpServletResponse resp, HttpSession session) {
+        session.invalidate(); // 销毁会话
+        // 清除 HttpOnly Cookie
+        Cookie cookie = new Cookie(UserConstants.ACCESS_TOKEN_KEY, CommonConstant.EMPTY_STRING);
+        cookie.setHttpOnly(true);
+        cookie.setSecure(false);
+        cookie.setPath("/");
+        cookie.setMaxAge(0);
+        resp.addCookie(cookie);
+
+        if (ObjectHelper.hasText(returnUrl)) {
+            // TODO
+        }
+
+        return true;
     }
 }

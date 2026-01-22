@@ -8,6 +8,8 @@ import com.ajaxjs.iam.jwt.JwtAccessToken;
 import com.ajaxjs.security.captcha.image.ImageCaptchaCheck;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.util.Map;
 
 /**
@@ -53,4 +55,12 @@ public interface UserLoginRegisterController {
     @GetMapping("/checkRepeat")
     @BizAction("查用户某个值是否已经存在一样的值")
     Boolean checkRepeat(@RequestParam String field, @RequestParam String value);
+
+    /**
+     * 用户登出
+     */
+    @PostMapping("/logout")
+    @BizAction("用户登出")
+    @AllowOpenAccess
+    boolean logout(@RequestParam(required = false) String returnUrl, HttpServletResponse resp, HttpSession session);
 }
