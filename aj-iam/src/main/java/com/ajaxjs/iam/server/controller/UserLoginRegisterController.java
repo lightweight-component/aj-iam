@@ -26,7 +26,7 @@ public interface UserLoginRegisterController {
      */
     @PostMapping("/login")
     @AllowOpenAccess
-    @ImageCaptchaCheck
+//    @ImageCaptchaCheck
     @BizAction("用户登录")
     JwtAccessToken login(@RequestParam String username, @RequestParam String password, @RequestParam String appId);
 

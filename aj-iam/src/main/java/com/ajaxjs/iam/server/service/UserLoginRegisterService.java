@@ -67,11 +67,8 @@ public class UserLoginRegisterService implements UserLoginRegisterController, Us
     @Value("${auth.user.CheckStrength:true}")
     boolean isCheckPasswordStrength;
 
-    @Autowired
-    UserLoginRegisterService userLoginRegisterService;
-
-    @Autowired
-    OidcService oidcService;
+//    @Autowired
+//    OidcService oidcService;
 
     @Override
     public JwtAccessToken login(String username, String password, String appId) {
@@ -83,7 +80,7 @@ public class UserLoginRegisterService implements UserLoginRegisterController, Us
         Integer tenantId = TenantService.getTenantId(false);
         User user = getUserLoginByPassword(username, password, tenantId);
 
-        return oidcService.createJWTByUser(user, app);
+        return DiContextUtil.getBean(OidcService.class).createJWTByUser(user, app);
     }
 
     @Override
