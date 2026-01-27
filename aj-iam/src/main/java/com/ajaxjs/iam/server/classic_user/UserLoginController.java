@@ -1,5 +1,6 @@
 package com.ajaxjs.iam.server.classic_user;
 
+import com.ajaxjs.iam.annotation.AllowOpenAccess;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -32,5 +33,6 @@ public interface UserLoginController {
      * 用户登出
      */
     @PostMapping("/logout")
+    @AllowOpenAccess
     boolean logout(@RequestParam(required = false) String returnUrl, HttpServletResponse resp, HttpSession session);
 }

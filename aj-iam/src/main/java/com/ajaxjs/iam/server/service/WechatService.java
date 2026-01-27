@@ -12,10 +12,7 @@ import com.ajaxjs.iam.server.model.User;
 import com.ajaxjs.iam.server.model.UserAccount;
 import com.ajaxjs.iam.server.model.UserAccountType;
 import com.ajaxjs.iam.server.model.po.App;
-import com.ajaxjs.iam.server.model.wechat.Code2SessionResult;
-import com.ajaxjs.iam.server.model.wechat.MiniAppPhoneNumber;
-import com.ajaxjs.iam.server.model.wechat.PhoneNumberLoginDTO;
-import com.ajaxjs.iam.server.model.wechat.WechatAuthCode;
+import com.ajaxjs.iam.server.model.wechat.*;
 import com.ajaxjs.sqlman.Action;
 import com.ajaxjs.util.Base64Utils;
 import com.ajaxjs.util.JsonUtil;
@@ -159,8 +156,8 @@ public class WechatService extends OAuthCommon implements WechatController {
     }
 
     @Override
-    public MiniAppPhoneNumber getMiniAppPhoneNumber(Map<String, String> _data) {
-        String data = _data.get("data"), iv = _data.get("iv");
+    public MiniAppPhoneNumber getMiniAppPhoneNumber(PhoneChangeDTO dto) {
+        String data = dto.getCipherText(), iv = dto.getIv();
         SimpleUser user = SecurityManager.getUser();
 
         String sessionKey = new Action("SELECT identifier2 FROM user_account WHERE user_id = ? AND type = 'WECHAT_MINI'").query(user.getId()).oneValue(String.class);

@@ -4,6 +4,7 @@ import com.ajaxjs.framework.mvc.unifiedreturn.BizAction;
 import com.ajaxjs.iam.annotation.AllowOpenAccess;
 import com.ajaxjs.iam.jwt.JwtAccessToken;
 import com.ajaxjs.iam.server.model.wechat.MiniAppPhoneNumber;
+import com.ajaxjs.iam.server.model.wechat.PhoneChangeDTO;
 import com.ajaxjs.iam.server.model.wechat.PhoneNumberLoginDTO;
 import com.ajaxjs.iam.server.model.wechat.WechatAuthCode;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -50,7 +51,7 @@ public interface WechatController {
      */
     @PostMapping("/phone_number")
     @BizAction("解密小程序提供的加密数据，返回包含手机号码等信息的 JSON 对象")
-    MiniAppPhoneNumber getMiniAppPhoneNumber(@RequestBody Map<String, String> data);
+    MiniAppPhoneNumber getMiniAppPhoneNumber(@RequestBody PhoneChangeDTO data);
 
     /**
      * 解密小程序提供的加密数据，返回包含手机号码等信息的 JSON 对象
