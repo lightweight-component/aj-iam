@@ -26,6 +26,6 @@ Runs on Java 8+. This is the maven of IAM client SDK:
 <dependency>
     <groupId>com.ajaxjs</groupId>
     <artifactId>aj-iam-client</artifactId>
-    <version>1.0</version>
+    <version>1.1</version>
 </dependency>
 ```
