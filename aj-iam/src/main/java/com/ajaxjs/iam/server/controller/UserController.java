@@ -3,8 +3,11 @@ package com.ajaxjs.iam.server.controller;
 import com.ajaxjs.framework.fileupload.UploadedResult;
 import com.ajaxjs.framework.mvc.unifiedreturn.BizAction;
 import com.ajaxjs.iam.server.model.User;
+import com.ajaxjs.iam.server.model.UserAccount;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 /**
  * 用户相关控制器
@@ -86,4 +89,13 @@ public interface UserController {
     @BizAction("修改用户头像")
     @PostMapping(value = "/avatar", consumes = "multipart/form-data")
     UploadedResult avatar(@RequestParam("file") MultipartFile file);
+
+    /**
+     * 获取用户多个账号信息（微信、支付宝……）
+     *
+     * @return 用户多个账号信息
+     */
+    @GetMapping("/accounts")
+    @BizAction("用户多个账号信息")
+    List<UserAccount> getUserAccountInfo();
 }
