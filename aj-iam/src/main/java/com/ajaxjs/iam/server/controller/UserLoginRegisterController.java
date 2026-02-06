@@ -39,9 +39,9 @@ public interface UserLoginRegisterController {
      * @param params 用户参数
      * @return 是否成功
      */
-    @PostMapping
+    @PostMapping("/register")
     @AllowOpenAccess
-    @ImageCaptchaCheck
+//    @ImageCaptchaCheck
     @BizAction("用户注册")
     Boolean register(@RequestBody Map<String, Object> params);
 
