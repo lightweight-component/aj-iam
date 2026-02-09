@@ -2,6 +2,7 @@ package com.ajaxjs.iam.server.controller;
 
 import com.ajaxjs.framework.fileupload.UploadedResult;
 import com.ajaxjs.framework.mvc.unifiedreturn.BizAction;
+import com.ajaxjs.iam.annotation.AllowOpenAccess;
 import com.ajaxjs.iam.server.model.User;
 import com.ajaxjs.iam.server.model.UserAccount;
 import org.springframework.web.bind.annotation.*;

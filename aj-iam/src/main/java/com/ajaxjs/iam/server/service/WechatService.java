@@ -198,6 +198,7 @@ public class WechatService extends OAuthCommon implements WechatController {
 
         if (isNewlyUser) { // to create a new user
             user = createUser(tenantId.longValue(), phone);
+            createUserAccount(user.getId(), openIdByCode);
             phoneNumber.setIsNewlyUser(true);
         } else {
             user = existUser;
