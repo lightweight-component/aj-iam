@@ -84,7 +84,7 @@ public class UserLoginRegisterService implements UserLoginRegisterController, Us
         Integer tenantId = TenantService.getTenantId(false);
         User user = getUserLoginByPassword(username, password, tenantId);
 
-        return DiContextUtil.getBean(OidcService.class).createJWTByUser(user, app);
+        return DiContextUtil.getBeanNonNull(OidcService.class).createJWTByUser(user, app);
     }
 
     @Override
