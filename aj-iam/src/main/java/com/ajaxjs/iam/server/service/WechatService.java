@@ -80,7 +80,7 @@ public class WechatService extends OAuthCommon implements WechatController {
         user.setTenantId(tenantId);
         user.setBindState(UserFunction.BindState.WECHAT);
 
-        if(ObjectHelper.hasText(phoneNumber))
+        if (ObjectHelper.hasText(phoneNumber))
             user.setPhone(phoneNumber);
 
         Long newlyId = new Action(user).create().execute(true, Long.class).getNewlyId();
@@ -242,6 +242,9 @@ public class WechatService extends OAuthCommon implements WechatController {
      */
     static Code2SessionResult getOpenIdByCode(WechatAuthCode data) {
         Map<String, Object> query = new Action("SELECT app_id, app_secret FROM app_secret_mgr WHERE owner = ?").query(data.getAppId()).one();
+        if (query == null)
+            throw new NullPointerException("Please provide the App information.");
+
         log.info(":::" + query);
         String url = String.format(LOGIN_API, query.get("appId"), query.get("appSecret"), data.getCode());
         Code2SessionResult session = Get.api(url, Code2SessionResult.class);
