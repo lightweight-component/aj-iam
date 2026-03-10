@@ -12,6 +12,7 @@ import com.ajaxjs.iam.client.SecurityManager;
 import com.ajaxjs.iam.model.SimpleUser;
 import com.ajaxjs.iam.server.controller.UserController;
 import com.ajaxjs.iam.server.model.User;
+import com.ajaxjs.iam.server.model.UserAccount;
 import com.ajaxjs.iam.server.model.po.App;
 import com.ajaxjs.spring.DiContextUtil;
 import com.ajaxjs.sqlman.Action;
@@ -24,6 +25,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
 
@@ -128,6 +130,13 @@ public class UserService implements UserController, UserConstants {
 
             return result;
         });
+    }
+
+    @Override
+    public List<UserAccount> getUserAccountInfo() {
+        Long userId = SecurityManager.getUser().getId();
+
+        return new Action("SELECT id, identifier, login_type, type, create_date FROM user_account WHERE stat = 0 AND user_id = ?").query(userId).list(UserAccount.class);
     }
 
     public static User getUserById(Long id) {

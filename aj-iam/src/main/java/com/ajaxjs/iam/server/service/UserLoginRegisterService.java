@@ -84,7 +84,7 @@ public class UserLoginRegisterService implements UserLoginRegisterController, Us
         Integer tenantId = TenantService.getTenantId(false);
         User user = getUserLoginByPassword(username, password, tenantId);
 
-        return DiContextUtil.getBean(OidcService.class).createJWTByUser(user, app);
+        return DiContextUtil.getBeanNonNull(OidcService.class).createJWTByUser(user, app);
     }
 
     @Override
@@ -167,9 +167,9 @@ public class UserLoginRegisterService implements UserLoginRegisterController, Us
                 throw new UnsupportedOperationException("密码强度太低");
         }
 
-        params = Utils.changeFieldToColumnName(params);
         params.put("uid", SnowflakeId.get());
         params.put("bindState", UserFunction.BindState.IAM);
+        params = Utils.changeFieldToColumnName(params);
 
         long userId = new Action(params, "user").create().execute(true, Long.class).getNewlyId(); // 写入数据库
 
