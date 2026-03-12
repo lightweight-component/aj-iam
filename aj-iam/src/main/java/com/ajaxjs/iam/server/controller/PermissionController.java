@@ -1,6 +1,6 @@
 package com.ajaxjs.iam.server.controller;
 
-import com.ajaxjs.framework.mvc.unifiedreturn.BizAction;
+import com.ajaxjs.spring.annotation.BizAction;
 import com.ajaxjs.iam.annotation.AllowOpenAccess;
 import com.ajaxjs.iam.permission.Permission;
 import org.springframework.web.bind.annotation.*;

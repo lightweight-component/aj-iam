@@ -93,10 +93,10 @@ public class ResetPasswordByEmailLink extends BaseResetPasswordService {
         Integer tenantId = TenantService.getTenantId();
         User user = findUserBy("email", email, tenantId);
 
-        Map<String, Object> _user = new Action(
-                "SELECT u.*, a.id AS auth_id, a.password FROM user u LEFT JOIN user_account a ON u.id = a.user_id WHERE u.id = ?").query(user.getId()).one();
+//        UpdatePswUserInfoVO _user = new Action(
+//                "SELECT u.*, a.id AS auth_id, a.password FROM user u LEFT JOIN user_account a ON u.id = a.user_id WHERE u.id = ?").query(user.getId()).one(UpdatePswUserInfoVO.class);
 
-        return updatePwd(_user, newPsw);
+        return updatePwd(user.getId(), newPsw);
     }
 
     /**

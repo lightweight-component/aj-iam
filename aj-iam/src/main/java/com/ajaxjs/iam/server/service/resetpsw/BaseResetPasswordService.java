@@ -1,17 +1,16 @@
 package com.ajaxjs.iam.server.service.resetpsw;
 
-import com.ajaxjs.iam.server.service.password.CheckStrength;
 import com.ajaxjs.iam.server.model.User;
 import com.ajaxjs.iam.server.model.UserAccount;
+import com.ajaxjs.iam.server.service.password.CheckStrength;
 import com.ajaxjs.message.email.Email;
 import com.ajaxjs.message.email.ISendEmail;
-import com.ajaxjs.sqlman.util.Utils;
 import com.ajaxjs.sqlman.Action;
+import com.ajaxjs.sqlman.util.Utils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 
-import java.util.Map;
 import java.util.function.Function;
 
 public abstract class BaseResetPasswordService {
@@ -46,8 +45,22 @@ public abstract class BaseResetPasswordService {
     @Qualifier("passwordEncode")
     Function<String, String> passwordEncode;
 
+    public Function<String, String> getPasswordEncode() {
+        return passwordEncode;
+    }
+
     @Value("${auth.user.CheckStrength:true}")
     boolean isCheckPasswordStrength;
+
+    public boolean updatePwd(Long userId, String newPassword) {
+        UpdatePswUserInfoVO user = new Action(
+                "SELECT * FROM user_account WHERE type = 'PASSWORD' AND user_id = ?").query(userId).one(UpdatePswUserInfoVO.class);
+
+        if (user == null)
+            throw new NullPointerException("用户" + userId + "数据不完整");
+
+        return updatePwd(user, newPassword);
+    }
 
     /**
      * 更新用户密码
@@ -56,7 +69,7 @@ public abstract class BaseResetPasswordService {
      * @param newPassword 用户输入的新密码
      * @return 是否修改成功
      */
-    public boolean updatePwd(Map<String, Object> user, String newPassword) {
+    public boolean updatePwd(UpdatePswUserInfoVO user, String newPassword) {
         // 检测密码强度
         if (isCheckPasswordStrength) {
             CheckStrength.LEVEL passwordLevel = CheckStrength.getPasswordLevel(newPassword); // 检测密码强度
@@ -66,12 +79,13 @@ public abstract class BaseResetPasswordService {
         }
 
         newPassword = passwordEncode.apply(newPassword);
+        String pswInDb = user.getPassword();
 
-        if (newPassword.equalsIgnoreCase(user.get("password").toString()))
+        if (newPassword.equalsIgnoreCase(pswInDb))
             throw new UnsupportedOperationException("新密码与旧密码一致，没有修改");
 
         UserAccount updateAuth = new UserAccount();
-        updateAuth.setId(Long.parseLong(String.valueOf(user.get("authId"))));
+        updateAuth.setId(user.getId());
         updateAuth.setPassword(newPassword);
 
         return new Action(updateAuth).update().withId().isOk();

@@ -3,10 +3,7 @@ package com.ajaxjs.iam.server.service.resetpsw;
 import com.ajaxjs.framework.cache.Cache;
 import com.ajaxjs.iam.server.model.User;
 import com.ajaxjs.iam.server.service.TenantService;
-import com.ajaxjs.sqlman.Action;
 import org.springframework.util.StringUtils;
-
-import java.util.Map;
 
 public interface ByCode {
     boolean sendCode(String any);
@@ -15,7 +12,7 @@ public interface ByCode {
 
     boolean verifyCodeUpdatePsw(String code, String newPsw, String any);
 
-    boolean updatePwd(Map<String, Object> user, String newPassword);
+    boolean updatePwd(Long userId, String newPassword);
 
     default boolean _verifyCodeUpdatePsw(Cache<String, Object> cache, String code, String CACHE_PREFIX, String any, String newPsw) {
         Integer tenantId = TenantService.getTenantId();
@@ -33,9 +30,9 @@ public interface ByCode {
 
         cache.remove(key);// 验证码正确，删除缓存
 
-        Map<String, Object> user = new Action(
-                "SELECT u.*, a.id AS auth_id, a.password FROM user u LEFT JOIN user_account a ON u.id = a.user_id WHERE u.id = ?").query(userId).one();
+//        Map<String, Object> user = new Action(
+//                "SELECT u.*, a.id AS auth_id, a.password FROM user u LEFT JOIN user_account a ON u.id = a.user_id WHERE u.id = ?").query(userId).one();
 
-        return updatePwd(user, newPsw);
+        return updatePwd(Long.parseLong(userId), newPsw);
     }
 }

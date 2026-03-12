@@ -1,10 +1,11 @@
 package com.ajaxjs.iam.server.controller;
 
 import com.ajaxjs.iam.annotation.AllowOpenAccess;
-import com.ajaxjs.iam.server.service.resetpsw.ResetPasswordByEmailCode;
-import com.ajaxjs.iam.server.service.resetpsw.ResetPasswordByEmailLink;
-import com.ajaxjs.iam.server.service.resetpsw.ResetPasswordBySmsCode;
+import com.ajaxjs.iam.client.SecurityManager;
+import com.ajaxjs.iam.server.service.resetpsw.*;
 import com.ajaxjs.security.captcha.image.ImageCaptchaCheck;
+import com.ajaxjs.spring.annotation.BizAction;
+import com.ajaxjs.sqlman.Action;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,10 +14,36 @@ import org.springframework.web.bind.annotation.*;
  */
 @RestController
 @RequestMapping("/reset_psw")
-@AllowOpenAccess
 public class ResetPasswordController {
     @Autowired
     ResetPasswordByEmailCode resetPasswordByEmailCode;
+
+    /**
+     * 修改密码
+     * 直接根据旧的密码更新为新的密码
+     *
+     * @param dto 包含新密码及旧密码
+     * @return true 密码修改成功
+     */
+    @PostMapping("/modify_psw")
+    @BizAction("修改密码")
+    public boolean modifyPsw(@RequestBody PswDTO dto) {
+        Long userId = SecurityManager.getUser().getId();
+
+        UpdatePswUserInfoVO user = new Action(
+                "SELECT * FROM user_account WHERE type = 'PASSWORD' AND user_id = ?").query(userId).one(UpdatePswUserInfoVO.class);
+
+        if (user == null)
+            throw new NullPointerException("用户" + userId + "数据不完整");
+
+        String encryptedOldPsw = resetPasswordByEmailCode.getPasswordEncode().apply(dto.getOldPsw());
+        String pswInDb = user.getPassword();
+
+        if (!encryptedOldPsw.equalsIgnoreCase(pswInDb))
+            throw new UnsupportedOperationException("旧密码错误");
+
+        return resetPasswordByEmailCode.updatePwd(user, dto.getNewPsw());
+    }
 
     /**
      * 根据 email 重置密码 BY_CODE
@@ -26,6 +53,7 @@ public class ResetPasswordController {
      */
     @PostMapping("/send_reset_email_code/{email}")
     @ImageCaptchaCheck
+    @AllowOpenAccess
     public boolean sendCodeEmail(@PathVariable String email) {
         return resetPasswordByEmailCode.sendCode(email);
     }
@@ -40,6 +68,7 @@ public class ResetPasswordController {
      * @param email  用户邮件
      */
     @PostMapping("/verify_email_code_update_psw/{email}")
+    @AllowOpenAccess
     public boolean verifyEmailCodesUpdatePsw(@RequestParam String code, @RequestParam String newPsw, @PathVariable String email) {
         return resetPasswordByEmailCode.verifyCodeUpdatePsw(code, newPsw, email);
     }
@@ -54,6 +83,7 @@ public class ResetPasswordController {
      * @return true 表示发送成功
      */
     @PostMapping("/send_reset_phone/{phone}")
+    @AllowOpenAccess
     public boolean sendRestPhone(@PathVariable String phone) {
         return resetPasswordBySmsCode.sendCode(phone);
     }
@@ -82,6 +112,7 @@ public class ResetPasswordController {
      * @return true 表示发送成功
      */
     @PostMapping("/send_reset_email_link/{email}")
+    @AllowOpenAccess
     public boolean sendRestEmail(@PathVariable String email) {
         return resetPasswordByEmailLink.sendRestEmail(email);
     }

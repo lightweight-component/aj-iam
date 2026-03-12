@@ -1,6 +1,6 @@
 package com.ajaxjs.iam.server.service;
 
-import com.ajaxjs.framework.mvc.unifiedreturn.BizAction;
+import com.ajaxjs.spring.annotation.BizAction;
 import com.ajaxjs.iam.server.controller.AdminController;
 import com.ajaxjs.sqlman.Action;
 import org.springframework.stereotype.Service;

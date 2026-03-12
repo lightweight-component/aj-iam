@@ -1,6 +1,6 @@
 package com.ajaxjs.iam.server.module_permission;
 
-import com.ajaxjs.framework.mvc.unifiedreturn.BizAction;
+import com.ajaxjs.spring.annotation.BizAction;
 import com.ajaxjs.iam.permission.Permission;
 import com.ajaxjs.iam.permission.PermissionControl;
 import com.ajaxjs.sqlman.Action;

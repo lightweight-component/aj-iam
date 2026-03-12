@@ -2,7 +2,7 @@ package com.ajaxjs.iam.server.controller;
 
 //import com.ajaxjs.framework.filter.google_captcha.GoogleCaptchaCheck;
 
-import com.ajaxjs.framework.mvc.unifiedreturn.BizAction;
+import com.ajaxjs.spring.annotation.BizAction;
 import com.ajaxjs.iam.annotation.AllowOpenAccess;
 import com.ajaxjs.iam.jwt.JwtAccessToken;
 import com.ajaxjs.security.captcha.image.ImageCaptchaCheck;
