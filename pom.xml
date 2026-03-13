@@ -9,6 +9,8 @@
 
     <modules>
         <module>aj-iam-client</module>
+        <module>aj-iam-next/aj-iam-client-next</module>
         <module>aj-iam</module>
+        <module>aj-iam-next/aj-iam-server-next</module>
     </modules>
 </project>
