@@ -8,8 +8,8 @@ import com.ajaxjs.iam.jwt.JwtAccessToken;
 import com.ajaxjs.security.captcha.image.ImageCaptchaCheck;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import java.util.Map;
 
 /**

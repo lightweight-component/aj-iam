@@ -2,7 +2,7 @@ package com.ajaxjs.iam.server.common;
 
 import com.ajaxjs.util.CommonConstant;
 
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;

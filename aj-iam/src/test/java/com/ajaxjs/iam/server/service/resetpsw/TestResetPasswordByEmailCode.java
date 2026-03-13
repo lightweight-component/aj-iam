@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 import static com.ajaxjs.iam.server.service.TenantService.AUTH_TENANT_ID;
 import static org.junit.jupiter.api.Assertions.assertTrue;

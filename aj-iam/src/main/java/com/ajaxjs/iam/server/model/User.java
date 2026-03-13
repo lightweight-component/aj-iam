@@ -6,9 +6,6 @@ import com.ajaxjs.iam.UserConstants;
 import com.ajaxjs.sqlman.annotation.Table;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotNull;
 import java.util.Date;
 
 @Data
@@ -30,7 +27,7 @@ public class User extends BaseModel implements UserConstants, IBaseModel {
     /**
      * 登录名、用户登录 id，不可重复
      */
-    @NotNull
+//    @NotNull
     private String loginId;
 
     /**
@@ -72,7 +69,7 @@ public class User extends BaseModel implements UserConstants, IBaseModel {
     /**
      * 邮件
      */
-    @Email
+//    @Email
     private String email;
 
     /**

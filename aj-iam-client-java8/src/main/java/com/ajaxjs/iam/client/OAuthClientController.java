@@ -14,9 +14,9 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.view.RedirectView;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 /**
  * OAuth 授权客户端控制器
@@ -50,7 +50,7 @@ public class OAuthClientController {
         String state = RandomTools.generateRandomString(5);
         session.setAttribute(ClientUtils.OAUTH_STATE, state);// 将 state 值保存到会话中
 
-        String authorizationUrl = UriComponentsBuilder.fromUriString(authorizeUrl)
+        String authorizationUrl = UriComponentsBuilder.fromHttpUrl(authorizeUrl)
                 .queryParam("response_type", "code") // 必选，希望 OP 采用哪种 OAuth 2.0 授权流程来响应，code 代表授权码流程
                 .queryParam("client_id", clientId)          // 必选，RP 在 OP 注册的 client_id
                 .queryParam("redirect_uri", redirectUri)    // 必选，用户登录成功后，OP 回传授权码等信息给RP的接口

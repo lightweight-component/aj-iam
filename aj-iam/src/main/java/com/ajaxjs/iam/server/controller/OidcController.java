@@ -4,8 +4,8 @@ import com.ajaxjs.iam.annotation.AllowOpenAccess;
 import com.ajaxjs.iam.jwt.JwtAccessToken;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * OIDC 控制器

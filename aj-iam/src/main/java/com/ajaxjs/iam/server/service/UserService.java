@@ -1,10 +1,10 @@
 package com.ajaxjs.iam.server.service;
 
-import com.ajaxjs.framework.fileupload.DetectType;
-import com.ajaxjs.framework.fileupload.FileUploadAction;
-import com.ajaxjs.framework.fileupload.UploadUtils;
-import com.ajaxjs.framework.fileupload.UploadedResult;
-import com.ajaxjs.framework.fileupload.policy.StorageType;
+import com.ajaxjs.fileupload.DetectType;
+import com.ajaxjs.fileupload.FileUploadAction;
+import com.ajaxjs.fileupload.UploadUtils;
+import com.ajaxjs.fileupload.UploadedResult;
+import com.ajaxjs.fileupload.policy.StorageType;
 import com.ajaxjs.framework.model.BaseEntityConstants;
 import com.ajaxjs.framework.model.BusinessException;
 import com.ajaxjs.iam.UserConstants;
@@ -22,7 +22,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.List;

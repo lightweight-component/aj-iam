@@ -1,7 +1,7 @@
 package com.ajaxjs.iam.server.common;
 
 import com.ajaxjs.framework.database.DataBaseConnection;
-import com.ajaxjs.framework.dataservice.fastcrud.Namespaces;
+import com.ajaxjs.dataservice.fastcrud.Namespaces;
 import com.ajaxjs.iam.client.SecurityManager;
 import com.ajaxjs.iam.server.service.TenantService;
 import com.ajaxjs.sqlman.JdbcConnection;

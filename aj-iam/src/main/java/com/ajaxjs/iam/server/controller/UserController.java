@@ -1,6 +1,6 @@
 package com.ajaxjs.iam.server.controller;
 
-import com.ajaxjs.framework.fileupload.UploadedResult;
+import com.ajaxjs.fileupload.UploadedResult;
 import com.ajaxjs.spring.annotation.BizAction;
 import com.ajaxjs.iam.annotation.AllowOpenAccess;
 import com.ajaxjs.iam.server.model.User;

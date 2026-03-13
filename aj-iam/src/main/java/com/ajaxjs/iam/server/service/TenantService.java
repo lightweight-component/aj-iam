@@ -5,7 +5,7 @@ import com.ajaxjs.spring.DiContextUtil;
 import com.ajaxjs.util.DebugTools;
 import org.springframework.util.StringUtils;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import java.util.Objects;
 
 /**

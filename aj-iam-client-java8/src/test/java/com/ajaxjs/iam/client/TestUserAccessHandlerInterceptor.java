@@ -10,7 +10,7 @@ import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.web.method.HandlerMethod;
 
-import jakarta.servlet.http.HttpSession;
+import javax.servlet.http.HttpSession;
 import java.lang.reflect.Method;
 
 

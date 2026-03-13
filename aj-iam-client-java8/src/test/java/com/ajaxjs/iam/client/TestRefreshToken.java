@@ -4,8 +4,8 @@ import com.ajaxjs.iam.client.filter.UserInterceptor;
 import com.ajaxjs.iam.jwt.JWebTokenMgr;
 import org.junit.jupiter.api.Test;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import static com.ajaxjs.iam.UserConstants.ACCESS_TOKEN_KEY;
 import static com.ajaxjs.iam.UserConstants.REFRESH_TOKEN_KEY;
