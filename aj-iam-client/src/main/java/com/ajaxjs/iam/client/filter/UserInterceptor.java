@@ -164,7 +164,7 @@ public class UserInterceptor implements HandlerInterceptor {
         }
 
         if (permissionConfig != null) {
-            Long[] mp = payload.getMP(); // 通过 code 加载 index，权限数据保存在 IAM
+            Long[] mp = payload.getMp(); // 通过 code 加载 index，权限数据保存在 IAM
 
             /* 这里采用比较”宽容“的模式，如果 token 没有 mp 字段那么是放行的。认为：如果有 Token 了但某些原因没有 mp 的话，是特殊的。
              * 健全的机制下在生成 Token 的时候，必须同时生成 mp 字段。日后如果需要更严格的校验，那么可以强制非空 mp 处理，即 mp 为空的一律作无权限

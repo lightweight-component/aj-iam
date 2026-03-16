@@ -50,7 +50,7 @@ public class Payload {
     /**
      * 模块权限值列表
      */
-    private Long[] mP;
+    private Long[] mp;
 
 //    /**
 //     * 编号，似乎不需要

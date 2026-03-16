@@ -61,7 +61,7 @@ public class JWebTokenMgr {
         payload.setExp(expires);
         payload.setT(tenantId);
         payload.setP(permissionValues);
-        payload.setMP(modulePermissionValues);
+        payload.setMp(modulePermissionValues);
 
         return tokenFactory(payload);
     }
