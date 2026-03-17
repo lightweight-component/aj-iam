@@ -25,7 +25,7 @@ import java.util.concurrent.CompletableFuture;
 @Configuration
 //@ComponentScan("com.ajaxjs.iam.client")
 @Slf4j
-public class AutoConfiguration implements WebMvcConfigurer {
+public class IamConfiguration implements WebMvcConfigurer {
     @Value("${auth.iam_service: }")
     private String iamService;
 

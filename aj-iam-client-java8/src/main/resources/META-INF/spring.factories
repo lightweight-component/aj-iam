@@ -1,2 +1,2 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-    com.ajaxjs.iam.client.AutoConfiguration
+    com.ajaxjs.iam.client.IamConfiguration
