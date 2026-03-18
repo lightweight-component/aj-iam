@@ -93,12 +93,12 @@ export default {
 // 合并单元格
 function megeCell(columnClass: string): void {
     // 收集所有的列
-    let arr: NodeListOf<Element> = document.querySelectorAll(columnClass);
-    let map: Record<string, number> = {};
+    const arr: NodeListOf<Element> = document.querySelectorAll(columnClass);
+    const map: Record<string, number> = {};
 
     for (var i = 0, j = arr.length; i < j; i++) {
-        var td: HTMLElement = arr[i] as HTMLElement;
-        var id: string = td.innerHTML;
+        const td: HTMLElement = arr[i] as HTMLElement;
+        const id: string = td.innerHTML;
 
         if (undefined === map[id])
             map[id] = 1; // 统计跨行的有多少，用一个 map 装着
@@ -106,11 +106,11 @@ function megeCell(columnClass: string): void {
             map[id] = ++map[id];
     }
 
-    let stack = [];
+    const stack = [];
     for (var i = 0, j = arr.length; i < j; i++) {
-        var td: HTMLElement = arr[i] as HTMLElement;
-        var id: string = td.innerHTML;
-        var tds: number = map[id];
+        const td: HTMLElement = arr[i] as HTMLElement;
+        const id: string = td.innerHTML;
+        const tds: number = map[id];
 
         if (tds > 1 && stack.length === 0) {// 标记
             for (var q = i; q < i + tds; q++) {// 连续 tds 个都是要合并单元格的

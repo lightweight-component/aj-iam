@@ -1,6 +1,6 @@
 <template>
     <div>
-        <h1 class="page-title">权限管理87887</h1>
+        <h1 class="page-title">权限管理</h1>
 
         <div class="main">
             <div class="left">
@@ -35,8 +35,8 @@
                     <legend>继承的父级权限：</legend>
                     <div class="inherited-permission">
                         <span v-for="(item, index) in permission.inheritPermissionList" :key="item.id">{{ item.roleName
-                            }}-{{ item.name }}
-                            <span v-if="index & lt; permission.inheritPermissionList.length - 1">、</span>
+                        }}-{{ item.name }}
+                            <span v-if="index < permission.inheritPermissionList.length - 1">、</span>
                         </span>
                     </div>
                 </fieldset>
@@ -44,7 +44,6 @@
                 <br />
                 <div>
                     <h2>{{ currentRole ? '角色 ' + currentRole.name + ' 的权限' : '请选择一个角色' }}
-
                         <span style="font-weight:normal;font-size:14px;"
                             v-if="currentRole.id == null">请从左侧选择一个角色以继续操作</span>
                     </h2>
@@ -90,7 +89,7 @@
                     <label><input type="radio" v-model="currentRole.stat" value="2" /> 禁用</label>
                 </FormItem>
                 <FormItem v-if="!roleForm.isCreate" style="color:gray;">
-                    创建于 {{ currentRole.createDate | formatDate }} 修改于 {{ currentRole.updateDate | formatDate }}
+                    创建于 {{ currentRole.createDate  }} 修改于 {{ currentRole.updateDate  }}
                 </FormItem>
             </Form>
         </Modal>
@@ -119,12 +118,12 @@ export default {
             // 当前角色
             currentRole: {
                 name: ''
-            },
+            } as Role,
             permission: {
-                inheritPermissionList: [],
-                permissionList: []
+                inheritPermissionList: [] as PermissionEntry[],
+                permissionList: [] as PermissionEntry[]
             },
-            selectedPermissions: []
+            selectedPermissions: [] as number[]
         }
     },
     mounted() {
@@ -136,7 +135,7 @@ export default {
         },
         removePermission(): void {
             for (const id of this.selectedPermissions) {
-                const index = this.permission.permissionList.findIndex(element => element.id === id);
+                const index: number = this.permission.permissionList.findIndex(element => element.id === id);
 
                 if (index !== -1)
                     this.permission.permissionList.splice(index, 1);
@@ -145,7 +144,6 @@ export default {
         clearPermission(): void {
             this.permission.permissionList = [];
         },
-
         savePermission(): void {
             let arr: string[] = [];
             this.permission.permissionList.forEach((item: any) => arr.push(item.id));
@@ -166,7 +164,7 @@ export default {
         },
         pickupPermission(data: any): void {
             // TODO add multiple selection
-            let arr: any[] = this.permission.permissionList;
+            const arr: any[] = this.permission.permissionList;
 
             for (let i = 0; i < arr.length; i++) {
                 if (arr[i].id == data.id) {

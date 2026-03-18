@@ -1,5 +1,5 @@
-import { XhrFetch } from '@ajaxjs/util'
-import List from '@ajaxjs/ui/dist/iView-ext/fast-iview-table/list';
+import { XhrFetch } from '@ajaxjs/util';
+import { CommonUI } from '@ajaxjs/ui';
 
 export default {
     data(): {} {
@@ -69,7 +69,7 @@ export default {
         },
 
         saveRole(): void {
-            let data: any = List.copyBeanClean(this.currentRole);
+            let data: any = CommonUI.List.copyBeanClean(this.currentRole);
             data.parentId = this.contextData.id;
 
             if (this.roleForm.isCreate) {

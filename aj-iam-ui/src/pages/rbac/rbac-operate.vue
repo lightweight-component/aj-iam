@@ -1,8 +1,8 @@
 <template>
   <span>
-    <label><input type="checkbox" name="read" v-model="allowRead" @change="crudClick" /> 访问/查询 </label> 
-    <label><input type="checkbox" name="create" v-model="allowCreate" @change="crudClick" /> 新增 </label> 
-    <label><input type="checkbox" name="update" v-model="allowUpdate" @change="crudClick" /> 修改 </label> 
+    <label><input type="checkbox" name="read" v-model="allowRead" @change="crudClick" /> 访问/查询 </label>
+    <label><input type="checkbox" name="create" v-model="allowCreate" @change="crudClick" /> 新增 </label>
+    <label><input type="checkbox" name="update" v-model="allowUpdate" @change="crudClick" /> 修改 </label>
     <label><input type="checkbox" name="delete" v-model="allowDelete" @change="crudClick" /> 删除 </label>
   </span>
 </template>
@@ -11,7 +11,7 @@
 export default {
   props: {
     resId: Number, // 资源权限值
-    setRightValue: Number, // 操作权限值，
+    setRightValue: { required: false, type: Number, default: 0 }// 操作权限值，
   },
   data() {
     return {
@@ -46,7 +46,7 @@ export default {
       if (val === true && (this.rightValue & right) !== right)
         this.rightValue += right;
     },
-    userEnableClick(e): void  {
+    userEnableClick(e: any): void {
       // 用户点击事件，不是来自数据的变化，修改立刻被保存到服务端
       let isEnable = e.target.checked;
       //   let  userGroupId = ASSIGN_RIGHT.userGroupId; // 全局变量
@@ -63,19 +63,19 @@ export default {
       // );
       //   }
     },
-    crudClick() : void {},
+    crudClick(): void { },
   },
   watch: {
-    allowRead(val: boolean): void  {
+    allowRead(val: boolean): void {
       this.toggleRight(val, 1);
     },
-    allowCreate(val: boolean): void  {
+    allowCreate(val: boolean): void {
       this.toggleRight(val, 2);
     },
-    allowUpdate(val: boolean): void  {
+    allowUpdate(val: boolean): void {
       this.toggleRight(val, 4);
     },
-    allowDelete(val: boolean): void  {
+    allowDelete(val: boolean): void {
       this.toggleRight(val, 8);
     },
   },

@@ -31,7 +31,7 @@
             <Icon type="ios-person"></Icon>
             <span>角色管理</span>
             </MenuItem>
-            <MenuItem name="2-2" to="/user/role">
+            <MenuItem name="per-per" to="/permission/permission">
             <Icon type="ios-cube-outline"></Icon>
             <span>权限管理</span>
             </MenuItem>

@@ -19,3 +19,26 @@ declare type TreeMap = {
      */
     children?: TreeMap[];
 }
+
+/**
+ * 权限
+ */
+declare type PermissionEntry = {
+    id: number;
+    name: string;
+    code?: string;
+    stat?: number;
+    content?: string;
+    createDate?: string;
+    updateDate?: string;
+};
+
+declare type Role = {
+    id: number;
+    name: string;
+    content: string;
+    stat: number;
+    createDate: string;
+    updateDate: string;
+    isInheritedParent: boolean;
+};
