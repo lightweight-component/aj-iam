@@ -25,10 +25,10 @@
 
 <script>
 import { ConfigWdiget } from '@ajaxjs/ui';
-import TreeTable from '../tree-table/tree-table.vue';
+import { CommonUI } from '@ajaxjs/ui';
 
 export default {
-  components: { ListLoader: ConfigWdiget.ListLoader, TreeTable },
+  components: { ListLoader: ConfigWdiget.ListLoader, TreeTable: CommonUI.TreeTable },
   data() {
     const api = window['config'].dsApiRoot + '/api/cms/sys_datadict';
 

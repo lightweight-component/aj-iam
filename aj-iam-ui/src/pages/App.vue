@@ -35,10 +35,6 @@
             <Icon type="ios-cube-outline"></Icon>
             <span>权限管理</span>
             </MenuItem>
-            <MenuItem name="2-3" to="/user/login_log">
-            <Icon type="md-key"></Icon>
-            <span>登录日志</span>
-            </MenuItem>
           </Submenu>
 
           <Submenu name="auth">

@@ -54,13 +54,12 @@
 <script lang="ts">
 import { UserRole_List } from './list-cfg';
 import Operate from './rbac-operate.vue';
-import TreeTable from '../tree-table/tree-table.vue';
-import TreeSelector from '../tree-table/tree-selector.vue';
+import { CommonUI } from '@ajaxjs/ui';
 
 const TEST_resources = [{ "name": "设备模块", "id": 3, "group": "充电桩系统" }, { "name": "运营商模块", "id": 4, "group": "充电桩系统" }, { "name": "厂商模块", "id": 5, "group": "充电桩系统" }, { "name": "图文系统", "id": 1, "group": "基本业务" }, { "name": "留言系统", "id": 2, "group": "基本业务" }];
 
 export default {
-    components: { Operate, TreeTable, TreeSelector },
+    components: { Operate, TreeTable: CommonUI.TreeTable, TreeSelector: CommonUI.TreeSelector },
     data() {
         try {
             TEST_resources.sort((a: any, b: any) => a.id < b.id ? -1 : 1);
