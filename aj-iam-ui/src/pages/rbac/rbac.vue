@@ -68,7 +68,7 @@ export default {
         }
 
         console.log(TEST_resources)
-        const api = window['config'].dsApiRoot + '/api/cms/user_role';
+        const api = window['config'].iamApi + '/api/cms/user_role';
 
         return {
             roleListApi: {

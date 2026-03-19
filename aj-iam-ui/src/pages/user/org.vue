@@ -30,7 +30,7 @@ import { CommonUI } from '@ajaxjs/ui';
 export default {
   components: { ListLoader: ConfigWdiget.ListLoader, TreeTable: CommonUI.TreeTable },
   data() {
-    const api = window['config'].dsApiRoot + '/api/cms/sys_datadict';
+    const api = window['config'].iamApi + '/api/cms/sys_datadict';
 
     return {
       list: [

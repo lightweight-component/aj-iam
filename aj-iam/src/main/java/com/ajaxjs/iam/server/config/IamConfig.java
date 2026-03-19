@@ -126,6 +126,8 @@ public class IamConfig implements WebMvcConfigurer {
      */
 //    @Override
 //    public void addInterceptors(InterceptorRegistry registry) {
+//                .excludePathPatterns("/iam_admin_api/user/login"); // 但排除 /api/login 登录接口
+
 //        log.info("初始化 SSO 拦截器");
 //        InterceptorRegistration interceptorRegistration = registry.addInterceptor(authInterceptor()).order(2);
 ////        registry.addInterceptor(googleCaptchaMvcInterceptor());
@@ -137,7 +139,8 @@ public class IamConfig implements WebMvcConfigurer {
 //            interceptorRegistration.excludePathPatterns(arr);
 //        }
 //    }
-//    @Bean
+
+    //    @Bean
 //    Cache<String, Object> simpleJvmCache() {
 //        return ExpiryCache.getInstance();
 //    }

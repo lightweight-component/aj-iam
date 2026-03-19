@@ -12,8 +12,13 @@ import com.ajaxjs.iam.jwt.Payload;
 import com.ajaxjs.iam.model.SimpleUser;
 import com.ajaxjs.iam.permission.PermissionConfig;
 import com.ajaxjs.iam.permission.PermissionEntity;
-import com.ajaxjs.util.*;
+import com.ajaxjs.util.CommonConstant;
+import com.ajaxjs.util.DebugTools;
+import com.ajaxjs.util.JsonUtil;
+import com.ajaxjs.util.ObjectHelper;
 import com.ajaxjs.util.httpremote.Post;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,8 +29,6 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.time.LocalDateTime;
@@ -106,7 +109,7 @@ public class UserInterceptor implements HandlerInterceptor {
                     if (tokenValidDetail.isValid()) {
                         jsonUser = getJsonUser(jwt);
 
-                        if (!permissionCheck(jwt, handler)) {
+                        if (!adminIamCheck(request, jwt) || !permissionCheck(jwt, handler)) {
                             returnErrorMsg(403, response, "模块权限不足");
                             log.warn("模块权限不足");
                             return false;
@@ -148,6 +151,24 @@ public class UserInterceptor implements HandlerInterceptor {
     @Autowired(required = false)
     private PermissionConfig permissionConfig;
 
+
+    private static final String ADMIN_PROTECTION = "admin-protection";
+
+    boolean adminIamCheck(HttpServletRequest request, JWebToken jwt) {
+        String header = request.getHeader(ADMIN_PROTECTION);
+
+        if (ObjectHelper.hasText(header) && header.equals("on")) {
+            PermissionEntity adminIam = new PermissionEntity("IAM Admin");
+            adminIam.setIndex(1);
+
+            Payload payload = jwt.getPayload();
+            Long[] mp = payload.getMp();
+
+            return adminIam.check(toPrimitive(mp));
+        } else
+            return true;
+    }
+
     /**
      * 权限检查方法
      *
@@ -177,7 +198,7 @@ public class UserInterceptor implements HandlerInterceptor {
                     return false;
             }
 
-            if(!(handler instanceof HandlerMethod)) // might be ResourceHttpRequestHandler, pass it
+            if (!(handler instanceof HandlerMethod)) // might be ResourceHttpRequestHandler, pass it
                 return true;
 
             PermissionCheck ann = ClientUtils.getAnnotationFromMethodAndClz((HandlerMethod) handler, PermissionCheck.class);
@@ -251,17 +272,13 @@ public class UserInterceptor implements HandlerInterceptor {
         return returnErrorMsg(status, response, null);
     }
 
-    private boolean returnErrorMsg(int status, HttpServletResponse response, String msg) {
+    public static boolean returnErrorMsg(int status, HttpServletResponse response, String msg) {
         switch (status) {
-            case 401:
-                returnMsg(response, HttpStatus.UNAUTHORIZED.value(), "unauthorized", msg == null ? "未认证" : msg);
-                break;
-            case 403:
-                returnMsg(response, HttpStatus.FORBIDDEN.value(), "forbidden", msg == null ? "没有权限" : msg);
-                break;
-            case 500:
-                returnMsg(response, HttpStatus.INTERNAL_SERVER_ERROR.value(), "error", msg == null ? "认证失败" : msg);
-                break;
+            case 401 ->
+                    returnMsg(response, HttpStatus.UNAUTHORIZED.value(), "unauthorized", msg == null ? "未认证" : msg);
+            case 403 -> returnMsg(response, HttpStatus.FORBIDDEN.value(), "forbidden", msg == null ? "没有权限" : msg);
+            case 500 ->
+                    returnMsg(response, HttpStatus.INTERNAL_SERVER_ERROR.value(), "error", msg == null ? "认证失败" : msg);
         }
 
         return false;
@@ -297,7 +314,7 @@ public class UserInterceptor implements HandlerInterceptor {
      * @param title       错误标题
      * @param message     错误信息
      */
-    private void returnMsg(HttpServletResponse resp, int httpErrCode, String title, String message) {
+    private static void returnMsg(HttpServletResponse resp, int httpErrCode, String title, String message) {
         returnMsg(resp, httpErrCode, String.format(ERR_JSON, httpErrCode, title, message));
     }
 

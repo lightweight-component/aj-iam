@@ -4,28 +4,7 @@
 
         <div class="main">
             <div class="left">
-                <div>
-                    <span class="btns">
-                        <Button type="primary" icon="ios-add" @click="createTopRoleNode">创建顶级角色</Button>
-                        <Button type="info" icon="ios-refresh" @click="refreshRoleList">刷新</Button>
-                    </span>
-
-                </div>
-                <h2>角色管理</h2>
-
-                <div class="tree">
-                    <Tree :data="roleTreeData" @on-select-change="onTreeNodeClk" @on-contextmenu="handleContextMenu">
-                        <template slot="contextMenu">
-                            <DropdownItem @click.native="editRole" style="color: cornflowerblue">▶ 编辑角色</DropdownItem>
-                            <DropdownItem @click.native="addSubNode" style="color: green">
-                                ➕ 添加子节点
-                            </DropdownItem>
-                            <DropdownItem @click.native="delRole" style="color: #ed4014">
-                                ✖ 删除角色
-                            </DropdownItem>
-                        </template>
-                    </Tree>
-                </div>
+                <RoleTree @select-change="onRoleSelectedFromChild" />
             </div>
 
             <div class="right">
@@ -71,48 +50,22 @@
             </div>
         </div>
 
-        <Modal v-model="isShisShowRoleEditForm" :title="'角色' + (!roleForm.isCreate ? ' #' + currentRole.id : '')"
-            @on-ok="saveRole">
-            <Form :model="currentRole" :label-width="100" style="margin-right: 10%;margin-left: 3%;">
-                <FormItem label="角色名称">
-                    <Input v-model="currentRole.name" placeholder="Enter something..."></Input>
-                </FormItem>
-                <FormItem label="角色说明">
-                    <Input type="textarea" :rows="4" v-model="currentRole.content"
-                        placeholder="Enter something..."></Input>
-                </FormItem>
-                <FormItem v-if="!roleForm.isTop">
-                    <Checkbox v-model="currentRole.isInheritedParent">继承父级权限</Checkbox>
-                </FormItem>
-                <FormItem label="角色状态">
-                    <label><input type="radio" v-model="currentRole.stat" value="0" /> 启用</label> &nbsp;
-                    <label><input type="radio" v-model="currentRole.stat" value="2" /> 禁用</label>
-                </FormItem>
-                <FormItem v-if="!roleForm.isCreate" style="color:gray;">
-                    创建于 {{ currentRole.createDate  }} 修改于 {{ currentRole.updateDate  }}
-                </FormItem>
-            </Form>
-        </Modal>
-
         <Modal v-model="isShowPermissionMgr" width="1000" title="权限管理列表">
-            <PermissionMgr :is-pickup="isPermissionMgrPickup" :on-pickup="pickupPermission" :simple-api="simpleApi" />
+            <PermissionMgr :is-pickup="isPermissionMgrPickup" :on-pickup="pickupPermission" />
         </Modal>
     </div>
 </template>
 
 <script lang="ts">
-import Role from './role';
 import PermissionMgr from './permission-list.vue';
+import RoleTree from './role-tree.vue';
 import { XhrFetch } from '@ajaxjs/util';
 
 export default {
-    mixins: [Role],
-    components: { PermissionMgr },
+    components: { RoleTree, PermissionMgr },
     data() {
         return {
-            simpleApi: 'http://localhost:8888/iam/simple_api',
-            permissionApi: 'http://localhost:8888/iam/permission',
-            isShisShowRoleEditForm: false,
+            permissionApi: `${window.config.iamApi}/permission`,
             isShowPermissionMgr: false,
             isPermissionMgrPickup: true,
             // 当前角色
@@ -126,10 +79,11 @@ export default {
             selectedPermissions: [] as number[]
         }
     },
-    mounted() {
-        this.refreshRoleList();
-    },
     methods: {
+        onRoleSelectedFromChild(selectedNodes: Role): void {
+            console.log('父组件接收到选中的节点:', selectedNodes);
+            this.currentRole = selectedNodes;
+        },
         addPermission(): void {
             this.showPermissionMgr(true);
         },
@@ -175,7 +129,6 @@ export default {
 
             this.permission.permissionList.push({ id: data.id, name: data.name });
             this.$Message.success(`添加权限[${data.name}]成功`);
-            // debugger
         },
         handlePermissionList(data: any): void {
             this.permission.inheritPermissionList = [];
@@ -204,4 +157,65 @@ export default {
 }
 </script>
 
-<style lang="less" scoped src="./permission.less"></style>
+<style lang="less" scoped>
+.main {
+    padding: 2%;
+
+    &>div {
+        padding: 0 1%;
+    }
+
+    .left {
+        float: left;
+        width: 50%;
+    }
+
+    .right {
+        float: right;
+        width: 50%;
+        padding-top: 0;
+    }
+}
+
+fieldset {
+    border-radius: 4px;
+    margin-top: 20px;
+    padding: 1%;
+
+    legend {
+        margin: 0 15px;
+    }
+}
+
+.inherited-permission {
+    color: gray;
+    min-height: 150px;
+}
+
+.permission-list {
+    select {
+        padding-left: 5px;
+        width: 55%;
+        border: 1px solid lightgray;
+        min-height: 200px;
+        max-height: 600px;
+        outline: 0;
+        float: left;
+    }
+
+    p {
+        padding: 5% 0;
+        clear: both;
+    }
+}
+
+.permission-bts {
+    float: left;
+    width: 30%;
+    margin-left: 3%;
+
+    button {
+        margin-bottom: 10px;
+    }
+}
+</style>

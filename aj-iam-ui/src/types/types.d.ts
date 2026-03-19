@@ -26,6 +26,7 @@ declare type TreeMap = {
 declare type PermissionEntry = {
     id: number;
     name: string;
+    roleName?: string;
     code?: string;
     stat?: number;
     content?: string;

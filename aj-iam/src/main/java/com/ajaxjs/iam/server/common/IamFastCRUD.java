@@ -61,10 +61,14 @@ public class IamFastCRUD extends Namespaces {
         TableModel modulePermission = new TableModel();
         modulePermission.setTableName("ds_common_api");
 
+        TableModel widgetConfigTableModel = new TableModel();
+        widgetConfigTableModel.setTableName("ds_widget_config");
+
 //        put("access_token", new AutoQuery(accessTokenTableModel, autoQueryBusiness));
         put("user", new AutoQuery(userTableModel, autoQueryBusiness));
         put("user_login_log", new AutoQuery(userLoginLogTableModel, autoQueryBusiness));
         put("module_permission", new AutoQuery(modulePermission, autoQueryBusiness));
+        put("ds_widget_config", new AutoQuery(widgetConfigTableModel, autoQueryBusiness));
     }
 
     @EventListener

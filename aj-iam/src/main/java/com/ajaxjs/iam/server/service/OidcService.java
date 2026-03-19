@@ -169,7 +169,6 @@ public class OidcService extends OAuthCommon implements OidcController {
             throw new UnsupportedOperationException("App Not found: " + client_id);
 
         Integer tenantId = app.getTenantId();
-
         User user = userLoginRegisterService.getUserLoginByPassword(username, password, tenantId);
 
         return createJWTByUser(user, app, scope);
@@ -231,9 +230,7 @@ public class OidcService extends OAuthCommon implements OidcController {
         return accessToken;
     }
 
-    public static Long[][]
-
-    getUserPermissions(Long userId) {
+    public static Long[][] getUserPermissions(Long userId) {
         String sql = "SELECT module_value, permission_value FROM per_role WHERE id IN (SELECT role_id FROM per_user_role WHERE user_id = ?)";
         List<Map<String, Object>> result = new Action(sql).query(userId).list();
 

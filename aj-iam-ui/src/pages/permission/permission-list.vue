@@ -10,7 +10,7 @@
         </div>
         <Table border :columns="columnsDef" :data="list.data" style="min-height:250px">
             <template v-slot:action="{ row }">
-                <a v-if="isPickup" style="margin-right: 5px" @click="onPickup ? (row)">选择</a>
+                <a v-if="isPickup" style="margin-right: 5px" @click="onPickup(row)">选择</a>
                 <span v-if="!isPickup">
                     <Poptip confirm title="确定删除？" @on-ok="doDelete(row.id)">
                         <a style="margin-right: 5px;color:red" icon="ios-trash">删除</a>
@@ -21,9 +21,9 @@
             </template>
         </Table>
 
-        <Page style="margin:20px auto;text-align: center;" :total="list.total" :current.sync="list.current"
-            :page-size="list.limit" @on-page-size-change="handleChangePageSize" size="small" show-total show-elevator
-            show-sizer />
+        <Page style="margin:20px auto;text-align: center;" :total="list.total" v-model:current="list.current"
+            :page-size="list.limit" @on-page-size-change="handleChangePageSize" @on-change="handlePageChange"
+            size="small" show-total show-elevator show-sizer />
 
         <Modal v-model="isShowEditWin" :title="isCreate ? '创建权限' : '编辑权限' + permissionData.id" width="600"
             @on-ok="save">
@@ -57,10 +57,11 @@ import { CommonUI } from '@ajaxjs/ui';
 export default {
     props: {
         isPickup: { type: Boolean, default: false },
-        onPickup: { type: Function }
+        onPickup: { type: Function, default() { } }
     },
     data() {
         return {
+            api: `${window['config'].iamApi}/common_api`,
             isCreate: true,
             isShowEditWin: false,
             permissionData: {} as PermissionEntry,
@@ -80,6 +81,7 @@ export default {
                 {
                     title: "操作",
                     slot: "action",
+                    key: 'action', // 添加一个唯一的 key
                     width: 120,
                 },
             ],
@@ -103,16 +105,18 @@ export default {
     mounted(): void {
         this.getData();
     },
+    computed: {
+        modalTitle(): string {  // 使用计算属性来动态生成标题，避免在模板中进行字符串拼接
+            return this.isCreate ? '创建权限' : `编辑权限 ${this.permissionData.id || ''}`;
+        }
+    },
     methods: {
         getData(): void {
-            let api: string = `${window['config'].iamApi}/permission/page`;
+            let api: string = `${this.api}/permission/page_no?pageNo=${this.list.current}&limit=${this.list.limit}`;
             if (this.isPickup)
-                api += '?q_stat=0';
+                api += '&q_stat=0';
 
-            XhrFetch.get(api, CommonUI.List.getPageList(this, this.list), {
-                limit: this.list.limit,
-                pageNo: this.list.current,
-            });
+            XhrFetch.get(api, CommonUI.List.getPageList(this, this.list));
         },
         pickup(index: number): void { },
         doSearch(): void {
@@ -124,7 +128,7 @@ export default {
             this.isCreate = true;
         },
         doDelete(id: number): void {
-            XhrFetch.del(`${this.simpleApi}/permission/${id}`, (j: ApiResponseResult) => {
+            XhrFetch.del(`${this.api}/permission/${id}`, (j: ApiResponseResult) => {
                 if (j.status) {
                     this.$Message.success('删除成功');
                     this.getData();
@@ -135,27 +139,33 @@ export default {
             this.isShowEditWin = true;
             this.isCreate = false;
 
-            XhrFetch.get(`${this.simpleApi}/permission/${id}`, (j: ApiResponseResult) => {
+            XhrFetch.get(`${this.api}/permission/${id}`, (j: ApiResponseResult) => {
                 if (j.status)
                     this.permissionData = j.data as PermissionEntry;
             });
         },
         handleChangePageSize(p: number): void {
             this.list.limit = p;
+            this.list.current = 1;// 通常改变每页大小后，需要回到第一页
+            this.getData();
+        },
+        // 新增方法来处理页码改变
+        handlePageChange(page: number): void {
+            this.list.current = page;
             this.getData();
         },
         save(): void {
             let data: any = CommonUI.List.copyBeanClean(this.permissionData);
 
             if (this.isCreate) {
-                XhrFetch.post(`${this.simpleApi}/permission`, (j: ApiResponseResult) => {
+                XhrFetch.post(`${this.api}/permission`, (j: ApiResponseResult) => {
                     if (j.status) {
                         this.$Message.success('创建成功');
                         this.getData();
                     }
                 }, data);
             } else {
-                XhrFetch.put(`${this.simpleApi}/permission/${this.permissionData.id}`, (j: ApiResponseResult) => {
+                XhrFetch.put(`${this.api}/permission/${this.permissionData.id}`, (j: ApiResponseResult) => {
                     if (j.status) {
                         this.$Message.success('修改成功');
                         this.getData();
@@ -165,14 +175,6 @@ export default {
         }
     },
     watch: {
-        /**
-         * 分页
-         * 
-         * @param v 
-         */
-        'list.current'(v: number): void {
-            this.getData();
-        },
         isPickup(v: boolean): void {
             this.getData();
 

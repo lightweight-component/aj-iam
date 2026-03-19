@@ -17,6 +17,9 @@ import com.ajaxjs.sqlman.util.SnowflakeId;
 import com.ajaxjs.sqlman.util.Utils;
 import com.ajaxjs.util.CommonConstant;
 import com.ajaxjs.util.ObjectHelper;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -25,9 +28,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
-import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
 import java.util.*;
 import java.util.function.Function;
 
@@ -82,6 +82,10 @@ public class UserLoginRegisterService implements UserLoginRegisterController, Us
             throw new UnsupportedOperationException("App Not found: " + appId);
 
         Integer tenantId = TenantService.getTenantId(false);
+
+        if (tenantId == null) // for iam admin, no tenant id means iam admin
+            tenantId = 0;
+
         User user = getUserLoginByPassword(username, password, tenantId);
 
         return DiContextUtil.getBeanNonNull(OidcService.class).createJWTByUser(user, app);
