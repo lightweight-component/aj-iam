@@ -15,6 +15,8 @@ import com.ajaxjs.iam.server.model.po.App;
 import com.ajaxjs.spring.DiContextUtil;
 import com.ajaxjs.sqlman.Action;
 import com.ajaxjs.util.JsonUtil;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,8 +24,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -159,6 +159,7 @@ public class OidcService extends OAuthCommon implements OidcController {
     LogLoginService logLoginService;
 
     @Override
+    @Deprecated
     public JwtAccessToken ropcToken(String grant_type, String username, String password, String client_id, String client_secret, String scope) {
         if (!"password".equals(grant_type))
             throw new IllegalArgumentException("参数 grant_type 只能是 password");

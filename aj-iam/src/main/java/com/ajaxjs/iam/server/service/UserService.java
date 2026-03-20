@@ -17,12 +17,12 @@ import com.ajaxjs.iam.server.model.po.App;
 import com.ajaxjs.spring.DiContextUtil;
 import com.ajaxjs.sqlman.Action;
 import com.ajaxjs.sqlman.util.Utils;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import jakarta.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.List;
@@ -36,6 +36,7 @@ public class UserService implements UserController, UserConstants {
     Function<String, String> passwordEncode;
 
     @Override
+    @Deprecated
     public User currentUserInfo() {
         Long userId = SecurityManager.getUser().getId();
 

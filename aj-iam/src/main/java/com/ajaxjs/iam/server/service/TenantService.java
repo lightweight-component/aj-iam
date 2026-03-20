@@ -1,11 +1,12 @@
 package com.ajaxjs.iam.server.service;
 
 import com.ajaxjs.iam.client.SecurityManager;
+import com.ajaxjs.iam.model.SimpleUser;
 import com.ajaxjs.spring.DiContextUtil;
 import com.ajaxjs.util.DebugTools;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.util.StringUtils;
 
-import jakarta.servlet.http.HttpServletRequest;
 import java.util.Objects;
 
 /**
@@ -61,8 +62,11 @@ public class TenantService {
                 checkUserPrivilegeOfTenant(request, tenantId);
 
             return tenantId;
-        } else
-            return SecurityManager.getUser().getTenantId();// 从用户获取，一般在后台操作时候会这样。也有可能最终找不到，为 null
+        } else {
+            SimpleUser user = SecurityManager.getUser();
+
+            return user == null ? null : user.getTenantId();// 从用户获取，一般在后台操作时候会这样。也有可能最终找不到，为 null
+        }
     }
 
     private static void checkUserPrivilegeOfTenant(HttpServletRequest request, Integer tenantId) {

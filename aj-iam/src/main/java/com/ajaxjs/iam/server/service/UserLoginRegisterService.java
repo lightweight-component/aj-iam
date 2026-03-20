@@ -83,8 +83,8 @@ public class UserLoginRegisterService implements UserLoginRegisterController, Us
 
         Integer tenantId = TenantService.getTenantId(false);
 
-        if (tenantId == null) // for iam admin, no tenant id means iam admin
-            tenantId = 0;
+        if (tenantId == null || tenantId == 0) // for iam admin, no tenant id means iam admin
+            tenantId = app.getTenantId();
 
         User user = getUserLoginByPassword(username, password, tenantId);
 

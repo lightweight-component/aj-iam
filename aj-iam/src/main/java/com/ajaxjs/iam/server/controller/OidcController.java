@@ -76,6 +76,7 @@ public interface OidcController {
      * @return 应用的 JWT AccessToken
      */
     @PostMapping("/ropc_token")
+    @Deprecated
     JwtAccessToken ropcToken(@RequestParam String grant_type, @RequestParam String username, @RequestParam String password,
                              @RequestParam String client_id, @RequestParam String client_secret,
                              @RequestParam(value = "scope", required = false) String scope);

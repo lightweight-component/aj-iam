@@ -2,7 +2,6 @@ import '@ajaxjs/ui/style.css';
 import { createRouter, createWebHashHistory, type Router } from 'vue-router';
 import { admin, system, IAM, shop, ConfigWdiget } from '@ajaxjs/ui';
 import Org from '../pages/user/org.vue';
-import Login from '../pages/user/Login.vue';
 import RBAC from '../pages/rbac/rbac.vue';
 import Permission from '../pages/permission/permission.vue';
 
@@ -18,7 +17,7 @@ const routes = [
 
     {
         path: '/login',
-        component: Login
+        component: admin.Login
     },
     {
         path: '/user/org',

@@ -23,8 +23,18 @@ public interface UserController {
      */
     @GetMapping("/info")
     @CrossOrigin
+    @Deprecated
     @BizAction("获取当前用户详情")
     User currentUserInfo();
+
+    /**
+     * 获取用户详情（根据登录用户 Session）
+     *
+     * @return 用户详情
+     */
+    @GetMapping
+    @BizAction("获取用户详情2")
+    User info();
 
     /**
      * 获取用户详情
@@ -46,14 +56,6 @@ public interface UserController {
      */
     @GetMapping("/by_client")
     User queryUserByClient(@RequestHeader("authorization") String authorization, @RequestParam String field, @RequestParam String value);
-
-    /**
-     * 获取用户详情（根据登录用户 Session）
-     *
-     * @return 用户详情
-     */
-    @GetMapping
-    User info();
 
     /**
      * 修改用户（根据登录用户 Session）
