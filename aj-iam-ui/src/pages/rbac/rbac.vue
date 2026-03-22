@@ -53,7 +53,7 @@
 
 <script lang="ts">
 import { UserRole_List } from './list-cfg';
-import Operate from './rbac-operate.vue';
+import Operate from './RbacOperate.vue';
 import { CommonUI } from '@ajaxjs/ui';
 
 const TEST_resources = [{ "name": "设备模块", "id": 3, "group": "充电桩系统" }, { "name": "运营商模块", "id": 4, "group": "充电桩系统" }, { "name": "厂商模块", "id": 5, "group": "充电桩系统" }, { "name": "图文系统", "id": 1, "group": "基本业务" }, { "name": "留言系统", "id": 2, "group": "基本业务" }];
@@ -135,9 +135,12 @@ function megeCell(columnClass: string): void {
     }
 
     [].forEach.call(document.querySelectorAll('.firtstOne'), i => {
+        // @ts-ignore 
         i.setAttribute('rowspan', i.dataset.rowSpan);
     });
+
     [].forEach.call(document.querySelectorAll('.die'), i => {
+        // @ts-ignore 
         i.parentNode.removeChild(i);
     });
 }

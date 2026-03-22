@@ -57,8 +57,8 @@
 </template>
 
 <script lang="ts">
-import PermissionMgr from './permission-list.vue';
-import RoleTree from './role-tree.vue';
+import PermissionMgr from './PermissionList.vue';
+import RoleTree from './RoleTree.vue';
 import { XhrFetch } from '@ajaxjs/util';
 
 export default {

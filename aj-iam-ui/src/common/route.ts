@@ -2,8 +2,8 @@ import '@ajaxjs/ui/style.css';
 import { createRouter, createWebHashHistory, type Router } from 'vue-router';
 import { admin, system, IAM, shop, ConfigWdiget } from '@ajaxjs/ui';
 import Org from '../pages/user/org.vue';
-import RBAC from '../pages/rbac/rbac.vue';
-import Permission from '../pages/permission/permission.vue';
+import RBAC from '../pages/rbac/Rbac.vue';
+import Permission from '../pages/permission/Permission.vue';
 
 const UserView = { template: '<div>User: {{ $route.params.id }}</div>' }
 
@@ -160,6 +160,7 @@ const routes = [
 const router: Router = createRouter({ // 使用 createRouter 工厂函数
     history: createWebHashHistory(import.meta.env.BASE_URL), // 使用 HTML5 History 模式 (推荐)
     // history: createWebHashHistory(), // 使用 Hash 模式
+    // @ts-ignore 
     routes
 });
 
