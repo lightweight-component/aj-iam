@@ -5,9 +5,10 @@
     <parent>
         <groupId>com.ajaxjs</groupId>
         <artifactId>ajaxjs-cms</artifactId>
-        <version>1.0.4</version>
+        <version>1.0.5</version>
         <relativePath/>
     </parent>
+
     <artifactId>aj-iam-client</artifactId>
     <name>aj-iam-client</name>
     <version>1.2</version>
@@ -18,7 +19,7 @@
         <dependency>
             <groupId>com.ajaxjs</groupId>
             <artifactId>ajaxjs-base</artifactId>
-            <version>1.2.8</version>
+            <version>1.2.9</version>
         </dependency>
 
         <!-- Spring 测试 -->
@@ -30,7 +31,7 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-webmvc</artifactId>
-            <version>7.0.5</version>
+            <version>7.0.6</version>
             <scope>provided</scope>
         </dependency>
 
