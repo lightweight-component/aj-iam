@@ -1,6 +1,7 @@
 package com.ajaxjs.iam.server.service;
 
 import com.ajaxjs.framework.database.EnableTransaction;
+import com.ajaxjs.iam.client.BaseOidcClientUserController;
 import com.ajaxjs.iam.client.SecurityManager;
 import com.ajaxjs.iam.jwt.JWebTokenMgr;
 import com.ajaxjs.iam.jwt.JwtAccessToken;
@@ -13,6 +14,7 @@ import com.ajaxjs.iam.server.model.UserAccount;
 import com.ajaxjs.iam.server.model.UserAccountType;
 import com.ajaxjs.iam.server.model.po.App;
 import com.ajaxjs.iam.server.model.wechat.*;
+import com.ajaxjs.spring.DiContextUtil;
 import com.ajaxjs.sqlman.Action;
 import com.ajaxjs.util.Base64Utils;
 import com.ajaxjs.util.JsonUtil;
@@ -21,6 +23,7 @@ import com.ajaxjs.util.RandomTools;
 import com.ajaxjs.util.cryptography.Constant;
 import com.ajaxjs.util.cryptography.Cryptography;
 import com.ajaxjs.util.httpremote.Get;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -44,31 +47,31 @@ public class WechatService extends OAuthCommon implements WechatController {
     @EnableTransaction
     public JwtAccessToken miniAppLogin(WechatAuthCode data) {
         Code2SessionResult session = getOpenIdByCode(data);
-        UserAccount account = new Action("SELECT * FROM user_account WHERE stat != 1 AND identifier = ? AND type = 'WECHAT_MINI'")
-                .query(session.getOpenid()).one(UserAccount.class);
-        User user;
         App app = getApp(data.getAppId());
-        Boolean isNewlyUser = account == null;
+
+        return createOrUpdateUser(session.getOpenid(), session.getSession_key(), app, app.getTenantId());
+    }
+
+    private JwtAccessToken createOrUpdateUser(String openId, String sessionKey, App app, long tenantId) {
+        UserAccount account = new Action("SELECT * FROM user_account WHERE stat != 1 AND identifier = ? AND type = 'WECHAT_MINI'").query(openId).one(UserAccount.class);
+        boolean isNewlyUser = account == null;
+        User user;
 
         if (!isNewlyUser) { // exists account
             Long userId = account.getUserId();
             user = UserService.getUserById(userId);
 
-            // saves a session key
-            UserAccount saveSessionKey = new UserAccount();
-            saveSessionKey.setId(account.getId());
-            saveSessionKey.setIdentifier2(session.getSession_key());
+            if (sessionKey != null) {
+                // saves a session key
+                UserAccount saveSessionKey = new UserAccount();
+                saveSessionKey.setId(account.getId());
+                saveSessionKey.setIdentifier2(sessionKey);
 
-            new Action(saveSessionKey).update().withId();
-
-            User updateBindState = new User(); // why does it every time?
-            updateBindState.setId(user.getId());
-            updateBindState.setBindState(user.getBindState() + UserFunction.BindState.WECHAT);
-
-            new Action(updateBindState).update();
+                new Action(saveSessionKey).update().withId();
+            }
         } else { // to create a new account
-            user = createUser(app.getTenantId().longValue(), null);
-            createUserAccount(user.getId(), session);
+            user = createUser(tenantId, null);
+            createUserAccount(user.getId(), openId, sessionKey);
         }
 
         return createToken(user, app, isNewlyUser);
@@ -89,14 +92,21 @@ public class WechatService extends OAuthCommon implements WechatController {
         return user;
     }
 
-    private void createUserAccount(Long userId, Code2SessionResult session) {
+    private boolean createUserAccount(Long userId, Code2SessionResult session) {
+        return createUserAccount(userId, session.getOpenid(), session.getSession_key());
+    }
+
+    private boolean createUserAccount(Long userId, String openId, String sessionKey) {
         UserAccount account = new UserAccount();
         account.setUserId(userId);
-        account.setIdentifier(session.getOpenid());
-        account.setIdentifier2(session.getSession_key());
+        account.setIdentifier(openId);
+
+        if (sessionKey != null)
+            account.setIdentifier2(sessionKey);
+
         account.setType(UserAccountType.WECHAT_MINI);
 
-        new Action(account).create().execute(true);
+        return new Action(account).create().execute(true).isOk();
     }
 
     private static App getApp(String appId) {
@@ -147,12 +157,7 @@ public class WechatService extends OAuthCommon implements WechatController {
 
         new Action(updateBindState).update();
 
-        UserAccount account = new UserAccount();
-        account.setUserId(currentUser.getId());
-        account.setIdentifier(session.getOpenid());
-        account.setType(UserAccountType.WECHAT_MINI);
-
-        return new Action(account).create().execute(true).isOk();
+        return createUserAccount(currentUser.getId(), session);
     }
 
     @Override
@@ -213,6 +218,64 @@ public class WechatService extends OAuthCommon implements WechatController {
         return createToken(user, getApp(dto.getAppId()), isNewlyUser);
     }
 
+    private final static String H5_LOGIN =
+            "https://api.weixin.qq.com/sns/oauth2/access_token?appid=%s&secret=%s&code=%s&grant_type=authorization_code";
+    private final static String H5_USER_INFO =
+            "https://api.weixin.qq.com/sns/userinfo?access_token=%s&openid=%s&lang=zh_CN";
+
+    @Override
+    public void H5OauthLogin(String code, String state) {
+        String appId = TenantService.getAppIdd();
+
+        if (ObjectHelper.isEmptyText(appId))
+            throw new IllegalArgumentException("请提供 AppId");
+
+        Integer tenantId = TenantService.getTenantId(false);
+
+        if (tenantId == null)
+            throw new IllegalArgumentException("请提供 tenantId");
+
+        Map<String, Object> query = new Action("SELECT app_id, app_secret FROM app_secret_mgr WHERE owner = ?").query(tenantId).one();
+
+        if (query == null)
+            throw new NullPointerException("Please provide the App Secret information.");
+
+        String url = String.format(H5_LOGIN, query.get("appId"), query.get("appSecret"), code);
+
+        WechatTokenResponse result = Get.api(url, WechatTokenResponse.class);
+        log.info("m: {}", result);
+
+        if (result.getErrCode() != null)
+            throw new UnsupportedOperationException("获取 JWT Token 失败，原因: " + result.getErrMsg());
+
+        // 获取用户信息
+        String openId = result.getOpenId();
+        String userInfoUrl = String.format(H5_USER_INFO, result.getAccessToken(), openId);
+        WechatUserInfoResponse userInfo = Get.api(userInfoUrl, WechatUserInfoResponse.class);
+        log.info("userInfo: {}", userInfo);
+
+        if (userInfo.getErrCode() != null)
+            throw new UnsupportedOperationException("获取用户信息失败，原因: " + userInfo.getErrMsg());
+
+        App app = getApp(appId);
+
+        HttpServletResponse response = DiContextUtil.getResponse();
+        JwtAccessToken accessToken = createOrUpdateUser(openId, null, app, tenantId.longValue());
+        BaseOidcClientUserController.setTokenToCookie(accessToken, response);
+
+        if (accessToken.getIsNewlyUser()) { // 更新用户相关资料
+
+        }
+
+        String redirectUri = app.getRedirectUri();
+
+        if (ObjectHelper.isEmptyText(redirectUri))
+            throw new IllegalArgumentException("未准备好跳转地址");
+
+        log.info("用户登录成功");
+        response.encodeRedirectURL(redirectUri);
+    }
+
     /**
      * 解密小程序提供的加密数据，返回包含手机号码等信息的 JSON 对象
      *
@@ -242,6 +305,7 @@ public class WechatService extends OAuthCommon implements WechatController {
      */
     static Code2SessionResult getOpenIdByCode(WechatAuthCode data) {
         Map<String, Object> query = new Action("SELECT app_id, app_secret FROM app_secret_mgr WHERE owner = ?").query(data.getAppId()).one();
+
         if (query == null)
             throw new NullPointerException("Please provide the App information.");
 

@@ -69,6 +69,15 @@ public class TenantService {
         }
     }
 
+    /**
+     * 从 HTTP 头中获取 app id
+     *
+     * @return app id
+     */
+    public static String getAppIdd() {
+        return Objects.requireNonNull(DiContextUtil.getRequest()).getHeader("auth-app-id");
+    }
+
     private static void checkUserPrivilegeOfTenant(HttpServletRequest request, Integer tenantId) {
         Integer userTenantId = SecurityManager.getUser().getTenantId();
 

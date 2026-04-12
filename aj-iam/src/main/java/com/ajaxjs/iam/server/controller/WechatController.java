@@ -1,18 +1,13 @@
 package com.ajaxjs.iam.server.controller;
 
-import com.ajaxjs.spring.annotation.BizAction;
 import com.ajaxjs.iam.annotation.AllowOpenAccess;
 import com.ajaxjs.iam.jwt.JwtAccessToken;
 import com.ajaxjs.iam.server.model.wechat.MiniAppPhoneNumber;
 import com.ajaxjs.iam.server.model.wechat.PhoneChangeDTO;
 import com.ajaxjs.iam.server.model.wechat.PhoneNumberLoginDTO;
 import com.ajaxjs.iam.server.model.wechat.WechatAuthCode;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
-import java.util.Map;
+import com.ajaxjs.spring.annotation.BizAction;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * 微信相关业务的控制器
@@ -64,4 +59,16 @@ public interface WechatController {
     @AllowOpenAccess
     @BizAction("解密小程序提供的加密数据，返回包含手机号码等信息的 JSON 对象")
     JwtAccessToken loginByMiniAppPhoneNumber(@RequestBody PhoneNumberLoginDTO dto);
+
+    /**
+     * 微信公众号/服务号 H5 登录
+     * 完成后跳转
+     *
+     * @param code  授权码
+     * @param state 状态参数 (用于防止 CSRF 攻击，可填随机字符串)
+     */
+    @GetMapping("/h5_oauth_login")
+    @AllowOpenAccess
+    @BizAction("微信公众号/服务号 H5 登录")
+    void H5OauthLogin(@RequestParam String code, @RequestParam String state);
 }
