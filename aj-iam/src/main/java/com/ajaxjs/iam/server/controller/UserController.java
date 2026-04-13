@@ -1,10 +1,9 @@
 package com.ajaxjs.iam.server.controller;
 
 import com.ajaxjs.fileupload.UploadedResult;
-import com.ajaxjs.spring.annotation.BizAction;
-import com.ajaxjs.iam.annotation.AllowOpenAccess;
 import com.ajaxjs.iam.server.model.User;
 import com.ajaxjs.iam.server.model.UserAccount;
+import com.ajaxjs.spring.annotation.BizAction;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 

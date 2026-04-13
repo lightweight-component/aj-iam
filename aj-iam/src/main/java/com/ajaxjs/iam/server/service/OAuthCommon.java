@@ -100,6 +100,15 @@ public abstract class OAuthCommon implements IamConstants {
         return app;
     }
 
+    public static App getApp(String appId) {
+        App app = new Action("SELECT * FROM app WHERE stat != 1 AND client_id = ?").query(appId).one(App.class);
+
+        if (app == null)
+            throw new UnsupportedOperationException("App Not found: " + appId);
+
+        return app;
+    }
+
     /**
      * 根据 HTTP 头的 authorization 获取 App 信息
      */

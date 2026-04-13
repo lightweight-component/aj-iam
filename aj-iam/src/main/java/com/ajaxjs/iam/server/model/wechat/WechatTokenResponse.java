@@ -6,6 +6,7 @@ import lombok.Data;
 /**
  * 微信开放平台 - 网页授权 Access Token 响应实体
  * 对应接口：通过 code 换取网页授权 access_token
+ * <a href="https://developers.weixin.qq.com/doc/oplatform/Website_App/WeChat_Login/Authorized_Interface_Calling_UnionID.html">...</a>
  */
 @Data
 public class WechatTokenResponse {

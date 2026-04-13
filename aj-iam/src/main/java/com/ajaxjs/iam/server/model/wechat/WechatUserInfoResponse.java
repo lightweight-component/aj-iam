@@ -8,6 +8,7 @@ import java.util.List;
 /**
  * 微信开放平台 - 获取用户信息响应实体
  * 对应接口：获取用户信息 (sns/userinfo)
+ * <a href="https://developers.weixin.qq.com/doc/service/api/webdev/access/api_snsuserinfo.html">...</a>
  */
 @Data
 public class WechatUserInfoResponse {
