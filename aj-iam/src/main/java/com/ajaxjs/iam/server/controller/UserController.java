@@ -36,6 +36,17 @@ public interface UserController {
     User info();
 
     /**
+     * 根据手机号码查找用户
+     * TODO 改 Token
+     *
+     * @param phone 手机号码
+     * @return 用户信息如果找不到则返回 null
+     */
+    @BizAction("根据手机号码查找用户")
+    @GetMapping("/info_by_phone/{phone}")
+    User getUserInfoByPhone(@PathVariable String phone);
+
+    /**
      * 获取用户详情
      *
      * @param id 用户 id

@@ -46,9 +46,16 @@ public class UserService implements UserController, UserConstants {
     @Override
     public User info(Long id) {
         String sql = "SELECT u.*, t.name AS tenantName FROM user u LEFT JOIN tenant t ON u.tenant_id = t.id WHERE u.stat != 1 AND u.id = ?";
-//        sql = TenantService.addTenantIdQuery(sql);
 
         return new Action(sql).query(id).one(User.class);
+    }
+
+    @Override
+    public User getUserInfoByPhone(String phone) {
+        String sql = "SELECT * FROM user WHERE stat != 1 AND phone = ?";
+        sql = TenantService.addTenantIdQuery(sql);
+
+        return new Action(sql).query(phone).one(User.class);
     }
 
     @Override

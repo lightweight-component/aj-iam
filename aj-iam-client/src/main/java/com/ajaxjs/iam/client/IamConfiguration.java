@@ -126,7 +126,8 @@ public class IamConfiguration implements WebMvcConfigurer {
         if (!ObjectHelper.isEmpty(config.getModulePermissions()))
             config.getModulePermissions().forEach(permission -> permissionCodes.add(permission.getName()));
 
-        Map<String, Object> result = Get.api(iamService + "/iam_api/permission/get_index_by_code?permissionCodes=" + String.join(",", permissionCodes) + "&type=module");
+        String url = iamService + "/iam_api/permission/get_index_by_code?permissionCodes=" + String.join(",", permissionCodes) + "&type=module";
+        Map<String, Object> result = Get.api(url);
 
         if (Response.isOk(result)) {
             Map<String, Object> data = (Map<String, Object>) result.get("data");
