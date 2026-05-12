@@ -83,7 +83,7 @@ public abstract class BaseWechatService extends OAuthCommon {
         return user;
     }
 
-    boolean createUserAccount(Long userId, Code2SessionResult session) {
+    public boolean createUserAccount(Long userId, Code2SessionResult session) {
         return createUserAccount(userId, session.getOpenid(), session.getSession_key());
     }
 

@@ -41,7 +41,7 @@ public class UserUtils {
     /**
      * 验证手机号码是否合法正确
      */
-    private final static Pattern PHONE_REG = Pattern.compile("^1[3-8]\\d{9}$");
+    private final static Pattern PHONE_REG = Pattern.compile("^1[3-9]\\d{9}$");
 
     /**
      * 是否合法的手机号码，仅限中国大陆号码

@@ -24,5 +24,7 @@ public class UserFunction {
         int IAM = 1;
 
         int WECHAT = 2;
+
+        int APP = 4;
     }
 }

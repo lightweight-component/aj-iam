@@ -9,6 +9,7 @@ import com.ajaxjs.iam.server.controller.UserLoginRegisterController;
 import com.ajaxjs.iam.server.model.User;
 import com.ajaxjs.iam.server.model.UserAccount;
 import com.ajaxjs.iam.server.model.po.App;
+import com.ajaxjs.iam.server.service.apponekeylogin.LoginOrRegister;
 import com.ajaxjs.iam.server.service.password.CheckStrength;
 import com.ajaxjs.security.iplist.IpList;
 import com.ajaxjs.spring.DiContextUtil;
@@ -242,5 +243,13 @@ public class UserLoginRegisterService implements UserLoginRegisterController, Us
         }
 
         return true;
+    }
+
+    @Autowired
+    LoginOrRegister loginOrRegister;
+
+    @Override
+    public JwtAccessToken mobileAppOneKeyLoginAli(String token) {
+        return loginOrRegister.byPhone(token);
     }
 }

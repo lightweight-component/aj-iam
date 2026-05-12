@@ -30,8 +30,8 @@ public class LogLoginService implements LogLoginController, UserConstants {
             userLoginLog.setUserName(user.getLoginId());
             saveIp(userLoginLog, req);
 
-            if (TenantService.getTenantId() != null)
-                userLoginLog.setTenantId(TenantService.getTenantId());
+            if (TenantService.getTenantId(false) != null)
+                userLoginLog.setTenantId(TenantService.getTenantId(false));
 
             CreateResult<Long> result = new Action(userLoginLog).create().execute(true, Long.class);
 
