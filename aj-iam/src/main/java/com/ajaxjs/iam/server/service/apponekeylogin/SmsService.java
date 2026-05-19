@@ -7,6 +7,8 @@ import com.ajaxjs.iam.jwt.JwtAccessToken;
 import com.ajaxjs.iam.server.common.UserUtils;
 import com.ajaxjs.iam.server.controller.SmsController;
 import com.ajaxjs.iam.server.model.AppSecretMgr;
+import com.ajaxjs.iam.server.model.User;
+import com.ajaxjs.iam.server.service.TenantService;
 import com.ajaxjs.message.sms.ali_sms.AliyunSmsEntity;
 import com.ajaxjs.sqlman.Action;
 import com.ajaxjs.util.RandomTools;
@@ -86,6 +88,13 @@ public class SmsService implements SmsController {
     public boolean updateUserPhone(String phone, String appId, String code) {
         if (!StringUtils.hasText(phone) || !UserUtils.isValidPhone(phone))
             throw new IllegalArgumentException("请提交有效的手机");
+
+        // 先判断目标手机号码是否已有用户
+        Integer tenantId = TenantService.getTenantId(false);
+        User existUser = new Action("SELECT * FROM user WHERE phone = ? AND tenant_id = ?").query(phone, tenantId).one(User.class);
+
+        if (existUser != null)
+            throw new UnsupportedOperationException("当前手机 " + phone + " 的用户已经注册。不支持修改该手机号码。");
 
         if (!StringUtils.hasText(code) || !code.matches("\\d{4}"))
             throw new IllegalArgumentException("验证码非法");
