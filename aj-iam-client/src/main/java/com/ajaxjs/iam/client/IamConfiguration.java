@@ -103,9 +103,8 @@ public class IamConfiguration implements WebMvcConfigurer {
         InterceptorRegistration interceptor = registry.addInterceptor(userInterceptor());
         interceptor.addPathPatterns("/**").excludePathPatterns("/favicon.ico"); // 拦截所有
 
-        // 不需要的拦截路径
-        if (ObjectHelper.hasText(excludes)) {
-            String[] arr = excludes.split(",|\\|");
+        if (ObjectHelper.hasText(excludes)) { // 不需要的拦截路径
+            String[] arr = excludes.split("[,|]");
             interceptor.excludePathPatterns(arr);
         }
     }

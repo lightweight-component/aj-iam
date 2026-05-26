@@ -91,7 +91,7 @@ public class SmsService implements SmsController {
 
         // 先判断目标手机号码是否已有用户
         Integer tenantId = TenantService.getTenantId(false);
-        User existUser = new Action("SELECT * FROM user WHERE phone = ? AND tenant_id = ?").query(phone, tenantId).one(User.class);
+        User existUser = new Action("SELECT * FROM user WHERE phone = ? AND tenant_id = ? AND stat != 1").query(phone, tenantId).one(User.class);
 
         if (existUser != null)
             throw new UnsupportedOperationException("当前手机 " + phone + " 的用户已经注册。不支持修改该手机号码。");

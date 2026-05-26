@@ -101,7 +101,7 @@ public class TenantService {
             if (sql.contains("1=1"))
                 sql = sql.replace("1=1", "1=1 AND tenant_id = " + tenantId);
             else
-                sql += " AND　tenant_id = " + tenantId;
+                sql += " AND tenant_id = " + tenantId;
         }
 
         return sql;
