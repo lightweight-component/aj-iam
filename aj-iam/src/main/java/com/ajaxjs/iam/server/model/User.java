@@ -6,7 +6,9 @@ import com.ajaxjs.iam.UserConstants;
 import com.ajaxjs.sqlman.annotation.Table;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+
 import java.util.Date;
+import java.util.Map;
 
 @Data
 @Table("user")
@@ -95,6 +97,11 @@ public class User extends BaseModel implements UserConstants, IBaseModel {
     private String jobTitle;
 
     private String address;
+
+    /**
+     * 扩展字段
+     */
+    private Map<String, Object> extend;
 
 //    private Long locationProvince;
 //

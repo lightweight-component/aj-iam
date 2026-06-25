@@ -1,6 +1,7 @@
 package com.ajaxjs.iam.server.controller;
 
 import com.ajaxjs.fileupload.UploadedResult;
+import com.ajaxjs.iam.annotation.AllowOpenAccess;
 import com.ajaxjs.iam.server.model.User;
 import com.ajaxjs.iam.server.model.UserAccount;
 import com.ajaxjs.spring.annotation.BizAction;
@@ -65,6 +66,7 @@ public interface UserController {
      * @return 用户详情
      */
     @GetMapping("/by_client")
+    @AllowOpenAccess // 与 Client 认证冲突
     User queryUserByClient(@RequestHeader("authorization") String authorization, @RequestParam String field, @RequestParam String value);
 
     /**
