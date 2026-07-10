@@ -147,6 +147,14 @@ public class UserService implements UserController, UserConstants {
         return new Action("SELECT id, identifier, login_type, type, create_date FROM user_account WHERE stat = 0 AND user_id = ?").query(userId).list(UserAccount.class);
     }
 
+    @Override
+    public Long getTotalUserNumberByTenant(String authorization) {
+//        Integer tenantId = TenantService.getTenantId();
+        App app = OAuthCommon.getAppByAuthHeader(authorization);
+
+        return new Action("SELECT COUNT(id) FROM user WHERE stat = 0 AND tenant_id = ?").query(app.getTenantId()).oneValue(Long.class);
+    }
+
     public static User getUserById(Long id) {
         User user = new Action("SELECT * FROM user WHERE stat != 1 AND id = ?").query(id).one(User.class);
 

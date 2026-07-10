@@ -5,6 +5,7 @@ import com.ajaxjs.framework.cache.delayqueue.ExpiryCache;
 import com.ajaxjs.iam.client.SecurityManager;
 import com.ajaxjs.iam.jwt.JwtAccessToken;
 import com.ajaxjs.iam.server.common.UserUtils;
+import com.ajaxjs.iam.server.common.langs.LanguageMapping;
 import com.ajaxjs.iam.server.controller.SmsController;
 import com.ajaxjs.iam.server.model.AppSecretMgr;
 import com.ajaxjs.iam.server.model.User;
@@ -35,13 +36,13 @@ public class SmsService implements SmsController {
 
     @Override
     public boolean sendVerificationCode(String phone, String appId) {
-        if (!StringUtils.hasText(phone) || !UserUtils.isValidPhone(phone))
-            throw new IllegalArgumentException("请提交有效的手机");
+        if (!StringUtils.hasText(phone) || !UserUtils.isValidPhone(phone)) // 请提交有效的手机
+            throw new IllegalArgumentException(LanguageMapping.getLanguageByKey("sms.phone.invalid"));
 
         AppSecretMgr appSecretMgr = new Action("SELECT app_id, app_secret FROM app_secret_mgr WHERE owner = ?").query(appId).one(AppSecretMgr.class);
 
-        if (appSecretMgr == null)
-            throw new NullPointerException("Please provide the App information.");
+        if (appSecretMgr == null) // 请提供有效的 App 信息
+            throw new NullPointerException(LanguageMapping.getLanguageByKey("sms.phone.provideAppInfo"));
 
         int randCode = RandomTools.generateNumber(4);
         String param = String.format("{\"code\":\"%s\",\"min\":\"5\"}", randCode);
@@ -69,10 +70,10 @@ public class SmsService implements SmsController {
     @Override
     public JwtAccessToken verifyCode(String phone, String appId, String code) {
         if (!StringUtils.hasText(phone) || !UserUtils.isValidPhone(phone))
-            throw new IllegalArgumentException("请提交有效的手机");
+            throw new IllegalArgumentException(LanguageMapping.getLanguageByKey("sms.phone.invalid"));
 
-        if (!StringUtils.hasText(code) || !code.matches("\\d{4}"))
-            throw new IllegalArgumentException("验证码非法");
+        if (!StringUtils.hasText(code) || !code.matches("\\d{4}"))// 验证码非法
+            throw new IllegalArgumentException(LanguageMapping.getLanguageByKey("sms.phone.invalid_verification_code"));
 
         Integer i = cache.get(phone, Integer.class);
 
@@ -81,23 +82,23 @@ public class SmsService implements SmsController {
 
             return loginOrRegister.createUserByPhone(phone);
         } else
-            throw new SecurityException("验证码错误");
+            throw new SecurityException(LanguageMapping.getLanguageByKey("sms.phone.error_verification_code"));// 验证码错误
     }
 
     @Override
     public boolean updateUserPhone(String phone, String appId, String code) {
         if (!StringUtils.hasText(phone) || !UserUtils.isValidPhone(phone))
-            throw new IllegalArgumentException("请提交有效的手机");
+            throw new IllegalArgumentException(LanguageMapping.getLanguageByKey("sms.phone.invalid"));
 
         // 先判断目标手机号码是否已有用户
         Integer tenantId = TenantService.getTenantId(false);
         User existUser = new Action("SELECT * FROM user WHERE phone = ? AND tenant_id = ? AND stat != 1").query(phone, tenantId).one(User.class);
 
-        if (existUser != null)
-            throw new UnsupportedOperationException("当前手机 " + phone + " 的用户已经注册。不支持修改该手机号码。");
+        if (existUser != null) // "当前手机 " + phone + " 的用户已经注册。不支持修改该手机号码。"
+            throw new UnsupportedOperationException(String.format(LanguageMapping.getLanguageByKey("sms.phone.phone_exist"), phone));
 
         if (!StringUtils.hasText(code) || !code.matches("\\d{4}"))
-            throw new IllegalArgumentException("验证码非法");
+            throw new IllegalArgumentException(LanguageMapping.getLanguageByKey("sms.phone.invalid_verification_code"));
 
         Integer i = cache.get(phone, Integer.class);
 
@@ -109,6 +110,6 @@ public class SmsService implements SmsController {
 
             return new Action("UPDATE user SET phone = ? WHERE id = ?").update(phone, userId).execute().isOk();
         } else
-            throw new SecurityException("验证码错误");
+            throw new SecurityException(LanguageMapping.getLanguageByKey("sms.phone.error_verification_code"));
     }
 }

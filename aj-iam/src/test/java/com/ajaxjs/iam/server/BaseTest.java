@@ -8,7 +8,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ContextConfiguration;
 
 @SpringBootTest
-@ContextConfiguration(classes = BaseConfig.class)
+//@ContextConfiguration(classes = BaseConfig.class)
 public abstract class BaseTest {
     @BeforeEach
     void initAll() {

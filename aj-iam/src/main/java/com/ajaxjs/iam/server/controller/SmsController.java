@@ -40,7 +40,7 @@ public interface SmsController {
      * 检查验证码是否匹配且未过期
      *
      * @param phone 手机号码
-     * @param appId 手机号码
+     * @param appId 应用 appId
      * @param code  验证码
      * @return 是否成功
      */
@@ -54,7 +54,7 @@ public interface SmsController {
      * 如果匹配，则更新用户手机号码
      *
      * @param phone 手机号码
-     * @param appId 手机号码
+     * @param appId 应用 appId
      * @param code  验证码
      * @return 验证码是否通过
      */

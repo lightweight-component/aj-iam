@@ -66,7 +66,8 @@ public interface UserController {
      * @return 用户详情
      */
     @GetMapping("/by_client")
-    @AllowOpenAccess // 与 Client 认证冲突
+    @AllowOpenAccess
+    // 与 Client 认证冲突
     User queryUserByClient(@RequestHeader("authorization") String authorization, @RequestParam String field, @RequestParam String value);
 
     /**
@@ -113,4 +114,14 @@ public interface UserController {
     @GetMapping("/accounts")
     @BizAction("用户多个账号信息")
     List<UserAccount> getUserAccountInfo();
+
+    /**
+     * 根据租户获取用户总数
+     *
+     * @return 用户总数
+     */
+    @GetMapping("/getTotalUserNumberByTenant")
+    @BizAction("获取用户总数")
+    @AllowOpenAccess
+    Long getTotalUserNumberByTenant(@RequestHeader("authorization") String authorization );
 }
