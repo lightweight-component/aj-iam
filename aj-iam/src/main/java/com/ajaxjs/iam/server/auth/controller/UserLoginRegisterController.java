@@ -1,0 +1,78 @@
+package com.ajaxjs.iam.server.auth.controller;
+
+//import com.ajaxjs.framework.filter.google_captcha.GoogleCaptchaCheck;
+
+import com.ajaxjs.spring.annotation.BizAction;
+import com.ajaxjs.iam.annotation.AllowOpenAccess;
+import com.ajaxjs.iam.jwt.JwtAccessToken;
+import org.springframework.web.bind.annotation.*;
+
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+import java.util.Map;
+
+/**
+ * 传统 Web 用户注册
+ */
+@RestController
+@RequestMapping("/user")
+public interface UserLoginRegisterController {
+    /**
+     * 用户登录
+     *
+     * @param username 用户名/手机号/邮箱
+     * @param password 密码
+     * @param appId    应用 id
+     * @return 应用的 JWT AccessToken
+     */
+    @PostMapping("/login")
+    @AllowOpenAccess
+//    @ImageCaptchaCheck
+    @BizAction("用户登录")
+    JwtAccessToken login(@RequestParam String username, @RequestParam String password, @RequestParam String appId);
+
+    /**
+     * 用户注册
+     * <p>
+     *
+     * @param params 用户参数
+     * @return 是否成功
+     */
+    @PostMapping("/register")
+    @AllowOpenAccess
+//    @ImageCaptchaCheck
+    @BizAction("用户注册")
+    Boolean register(@RequestBody Map<String, Object> params);
+
+    /**
+     * 检查用户某个值是否已经存在一样的值
+     *
+     * @param field 字段名，当前只能是 username/email/phone 中的任意一种
+     * @param value 字段值，要校验的值
+     * @return true=存在
+     */
+    @GetMapping("/checkRepeat")
+    @BizAction("查用户某个值是否已经存在一样的值")
+    Boolean checkRepeat(@RequestParam String field, @RequestParam String value);
+
+    /**
+     * 用户登出
+     */
+    @PostMapping("/logout")
+    @BizAction("用户登出")
+    @AllowOpenAccess
+    boolean logout(@RequestParam(required = false) String returnUrl, HttpServletResponse resp, HttpSession session);
+
+    /**
+     * APP 登录一键登录，使用阿里云的
+     * 自动获取手机号码。单屏手机号码登录
+     * TODO 考虑安全性
+     *
+     * @param token 登录 token
+     * @return 登录结果
+     */
+    @GetMapping("/mobile_app_onekey_login_ali/{token}")
+    @BizAction("APP 登录一键登录")
+    @AllowOpenAccess
+    JwtAccessToken mobileAppOneKeyLoginAli(@PathVariable String token);
+}

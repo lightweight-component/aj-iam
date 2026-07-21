@@ -1,12 +1,13 @@
 package com.ajaxjs.iam.client;
 
+import com.ajaxjs.iam.oauth.ClientCredential;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
-public class ClientCredentialsTest {
+public class ClientCredentialTest {
     @Test
     public void encodeClient_ShouldCorrectlyEncodeCredentials() {
         // Arrange
@@ -16,7 +17,7 @@ public class ClientCredentialsTest {
         String expectedEncoded = "dGVzdENsaWVudElkOnRlc3RDbGllbnRTZWNyZXQ="; // This is the Base64 encoding of "testClientId:testClientSecret"
 
         // Act
-        String actualEncoded = ClientCredentials.encodeClient(clientId, clientSecret);
+        String actualEncoded = ClientCredential.encodeClient(clientId, clientSecret);
 
         // Assert
         assertTrue(actualEncoded.startsWith(expectedPrefix), "The returned string should start with 'Basic '");
@@ -32,7 +33,7 @@ public class ClientCredentialsTest {
         String expectedEncoded = "BasicOiJ0ZXN0Q2xpZW50U2VjcmV0"; // This is the Base64 encoding of ":testClientSecret"
 
         // Act
-        String actualEncoded = ClientCredentials.encodeClient(clientId, clientSecret);
+        String actualEncoded = ClientCredential.encodeClient(clientId, clientSecret);
 
         // Assert
         assertTrue(actualEncoded.startsWith("Basic "), "The returned string should start with 'Basic '");
@@ -48,7 +49,7 @@ public class ClientCredentialsTest {
         String expectedEncoded = "Basic dGVzdENsaWVudElkOg=="; // This is the Base64 encoding of "testClientId:"
 
         // Act
-        String actualEncoded = ClientCredentials.encodeClient(clientId, clientSecret);
+        String actualEncoded = ClientCredential.encodeClient(clientId, clientSecret);
 
         // Assert
         assertTrue(actualEncoded.startsWith("Basic "), "The returned string should start with 'Basic '");
@@ -65,7 +66,7 @@ public class ClientCredentialsTest {
         String expectedEncoded = "BasicOiJ0ZXN0Q2xpZW50U2VjcmV0"; // This is the Base64 encoding of ":testClientSecret"
 
         // Act
-        String actualEncoded = ClientCredentials.encodeClient(clientId, clientSecret);
+        String actualEncoded = ClientCredential.encodeClient(clientId, clientSecret);
 
         // Assert
         assertTrue(actualEncoded.startsWith("Basic "), "The returned string should start with 'Basic '");
@@ -82,7 +83,7 @@ public class ClientCredentialsTest {
         String expectedEncoded = "Basic dGVzdENsaWVudElkOg=="; // This is the Base64 encoding of "testClientId:"
 
         // Act
-        String actualEncoded = ClientCredentials.encodeClient(clientId, clientSecret);
+        String actualEncoded = ClientCredential.encodeClient(clientId, clientSecret);
 
         // Assert
         assertTrue(actualEncoded.startsWith("Basic "), "The returned string should start with 'Basic '");

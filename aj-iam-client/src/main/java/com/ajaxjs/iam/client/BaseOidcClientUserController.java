@@ -2,6 +2,7 @@ package com.ajaxjs.iam.client;
 
 import com.ajaxjs.iam.UserConstants;
 import com.ajaxjs.iam.jwt.JwtAccessToken;
+import com.ajaxjs.iam.oauth.ClientCredential;
 import com.ajaxjs.util.*;
 import com.ajaxjs.util.httpremote.Post;
 import lombok.Data;
@@ -82,7 +83,7 @@ public abstract class BaseOidcClientUserController {
         String tokenApi = getIamService() + "/iam_api/oidc/token";
 
         Map<String, String> params = ObjectHelper.mapOf("grant_type", "authorization_code", "code", code, "state", state);
-        Map<String, Object> result = Post.api(tokenApi, params, conn -> conn.setRequestProperty("Authorization", ClientCredentials.encodeClient(clientId, clientSecret)));
+        Map<String, Object> result = Post.api(tokenApi, params, conn -> conn.setRequestProperty("Authorization", ClientCredential.encodeClient(clientId, clientSecret)));
 
         if (result != null) {// 处理授权成功的逻辑，例如解析并保存访问令牌和刷新令牌等
             if ((int) result.get("status") == 1) {

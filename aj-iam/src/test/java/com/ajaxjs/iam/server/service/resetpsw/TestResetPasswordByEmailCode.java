@@ -2,6 +2,8 @@ package com.ajaxjs.iam.server.service.resetpsw;
 
 import com.ajaxjs.iam.server.BaseTest;
 import com.ajaxjs.iam.server.model.User;
+import com.ajaxjs.iam.server.user_info.resetpsw.BaseResetPasswordService;
+import com.ajaxjs.iam.server.user_info.resetpsw.ResetPasswordByEmailCode;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.context.request.RequestContextHolder;

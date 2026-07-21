@@ -114,8 +114,8 @@ public class UserUtils {
 
         try {
             resp.getWriter().write(html);
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (IOException ignored) {
+
         }
     }
 }

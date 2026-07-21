@@ -2,6 +2,7 @@ package com.ajaxjs.iam.server.service;
 
 import com.ajaxjs.iam.server.BaseTest;
 import com.ajaxjs.iam.jwt.JWebTokenMgr;
+import com.ajaxjs.iam.server.auth.OidcService;
 import com.ajaxjs.iam.server.common.IamConstants;
 import com.ajaxjs.iam.jwt.JwtAccessToken;
 import com.ajaxjs.iam.server.model.User;

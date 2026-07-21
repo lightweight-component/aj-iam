@@ -60,7 +60,7 @@ public class CheckStrength {
     private static int countLetter(String passwd, int type) {
         int count = 0;
 
-        if (null != passwd && passwd.length() > 0) {
+        if (null != passwd && !passwd.isEmpty()) {
             for (char c : passwd.toCharArray()) {
                 if (checkCharacterType(c) == type)
                     count++;

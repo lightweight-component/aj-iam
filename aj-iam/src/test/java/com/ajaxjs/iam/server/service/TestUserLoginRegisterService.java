@@ -1,6 +1,7 @@
 package com.ajaxjs.iam.server.service;
 
 import com.ajaxjs.iam.server.BaseTest;
+import com.ajaxjs.iam.server.auth.UserLoginRegisterService;
 import com.ajaxjs.iam.server.model.User;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

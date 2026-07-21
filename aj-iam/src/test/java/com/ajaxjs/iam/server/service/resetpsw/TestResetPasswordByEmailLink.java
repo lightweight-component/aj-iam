@@ -2,13 +2,14 @@ package com.ajaxjs.iam.server.service.resetpsw;
 
 import com.ajaxjs.framework.spring.SimpleTemplate;
 import com.ajaxjs.iam.server.BaseTest;
+import com.ajaxjs.iam.server.user_info.resetpsw.ResetPasswordByEmailLink;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.ajaxjs.iam.server.service.resetpsw.ResetPasswordByEmailLink.BY_LINK_HTML;
+import static com.ajaxjs.iam.server.user_info.resetpsw.ResetPasswordByEmailLink.BY_LINK_HTML;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class TestResetPasswordByEmailLink extends BaseTest {
