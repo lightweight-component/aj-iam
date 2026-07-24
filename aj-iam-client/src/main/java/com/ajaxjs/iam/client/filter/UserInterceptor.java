@@ -5,12 +5,13 @@ import com.ajaxjs.iam.annotation.AllowOpenAccess;
 import com.ajaxjs.iam.annotation.ClientAuthentication;
 import com.ajaxjs.iam.annotation.PermissionCheck;
 import com.ajaxjs.iam.client.ClientUtils;
+import com.ajaxjs.iam.client.IOAuthService;
 import com.ajaxjs.iam.client.model.TokenValidDetail;
 import com.ajaxjs.iam.jwt.JWebToken;
 import com.ajaxjs.iam.jwt.JWebTokenMgr;
 import com.ajaxjs.iam.jwt.Payload;
 import com.ajaxjs.iam.model.SimpleUser;
-import com.ajaxjs.iam.oauth.ClientCredential;
+import com.ajaxjs.iam.oauth.OAuthTools;
 import com.ajaxjs.iam.permission.PermissionConfig;
 import com.ajaxjs.iam.permission.PermissionEntity;
 import com.ajaxjs.util.CommonConstant;
@@ -70,21 +71,27 @@ public class UserInterceptor implements HandlerInterceptor {
     @Autowired(required = false)
     JWebTokenMgr jWebTokenMgr;
 
+    @Autowired(required = false)
+    IOAuthService iOAuthService;
+
     private final static Pattern GET_TENANT_ID_REP = Pattern.compile("tenantId=(\\d+)");
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
         if (handler instanceof HandlerMethod) {
             HandlerMethod handlerMethod = (HandlerMethod) handler;
-
             // allows open access without any authentication
             if (ClientUtils.getAnnotationFromMethod(handlerMethod, AllowOpenAccess.class) != null)
                 return true;
 
             ClientAuthentication anno = ClientUtils.getAnnotationFromMethod(handlerMethod, ClientAuthentication.class);
 
-            if (anno != null)
-                return new ClientCredential().check(request);
+            if (anno != null) {
+                if (iOAuthService == null)
+                    throw new NullPointerException("OAuthService is not ready.");
+
+                return iOAuthService.clientCredentialCheck(request);
+            }
         }
 
         if (DebugTools.isDebug && "1".equals(request.getParameter("allow"))) // 方便开发
@@ -444,7 +451,7 @@ public class UserInterceptor implements HandlerInterceptor {
         String tokenApi = iamService + "/iam_api/oidc/refresh_token";
 
         Map<String, String> params = ObjectHelper.mapOf("grant_type", "refresh_token", "refresh_token", refreshToken);
-        Map<String, Object> result = Post.form(tokenApi, params, conn -> conn.setRequestProperty("Authorization", ClientCredential.encodeClient(clientId, clientSecret)));
+        Map<String, Object> result = Post.form(tokenApi, params, conn -> conn.setRequestProperty("Authorization", OAuthTools.encodeClient(clientId, clientSecret)));
 
         if (result == null)
             throw new IllegalAccessError("通讯失败");

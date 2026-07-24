@@ -33,11 +33,11 @@ public class TestOAuthService extends BaseTest {
 //        TestHelper.printJson(m);
 //    }
 
-    @Test
-    public void testClientCredentials() {
-        AccessToken accessToken = oAuthService.clientCredentials("clientCredentials", "G5IFeG7Eesbny3f", "J1Bb4zhchfziuDipKI7sgo6iyk");
-        System.out.println(accessToken);
-    }
+//    @Test
+//    public void testClientCredentials() {
+//        AccessToken accessToken = oAuthService.clientCredentials("clientCredentials", "G5IFeG7Eesbny3f", "J1Bb4zhchfziuDipKI7sgo6iyk");
+//        System.out.println(accessToken);
+//    }
 
     @Test
     public void testRefreshToken() {

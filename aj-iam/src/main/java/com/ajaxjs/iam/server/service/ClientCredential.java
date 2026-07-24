@@ -1,23 +1,28 @@
-package com.ajaxjs.iam.oauth;
+package com.ajaxjs.iam.server.service;
 
+import com.ajaxjs.framework.database.DataBaseConnection;
 import com.ajaxjs.iam.UserConstants;
+import com.ajaxjs.iam.client.IOAuthService;
 import com.ajaxjs.iam.model.App;
+import com.ajaxjs.iam.oauth.OAuthTools;
+import com.ajaxjs.spring.DiContextUtil;
 import com.ajaxjs.sqlman.Action;
 import com.ajaxjs.util.Base64Utils;
 import com.ajaxjs.util.CommonConstant;
 import com.ajaxjs.util.ObjectHelper;
 import com.ajaxjs.util.RandomTools;
 import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.http.*;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
+import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
-import org.springframework.web.client.RestTemplate;
+
+import java.sql.Connection;
+import java.sql.SQLException;
 
 /**
  * OAuth 2.0 中的客户端凭证（Client Credentials）授权模式请求
  */
-public class ClientCredential {
+@Service
+public class ClientCredential implements IOAuthService {
     public Boolean clientRegister(App app) {
         if (!StringUtils.hasText(app.getName()))
             throw new IllegalArgumentException("客户端的名称和回调地址不能为空");
@@ -38,15 +43,40 @@ public class ClientCredential {
         return new Action(app, "app").create().execute(true).isOk();
     }
 
-    public boolean check(HttpServletRequest request) {
+    @Override
+    public boolean clientCredentialCheck(HttpServletRequest request) {
         String authorization = request.getHeader(UserConstants.AUTHORIZATION);
 
         if (ObjectHelper.isEmptyText(authorization))
-            throw new IllegalArgumentException("Illegal arguments of authorization");
+            throw new IllegalArgumentException("Illegal arguments of client authorization");
 
-        getAppByAuthHeader(authorization);
+        try (Connection ignored = DataBaseConnection.initDb()) {
+            App app = getAppByAuthHeader(authorization);
+            request.setAttribute(CLIENT_ID, app.getClientId());
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
 
         return true;
+    }
+
+    public static final String CLIENT_ID = "CLIENT_ID";
+
+    /**
+     * 在 Request 上下文中获取应用 ID
+     *
+     * @return 应用 ID
+     */
+    public static String getAppId() {
+        if (DiContextUtil.getRequest() == null)
+            return "";
+
+        Object obj = DiContextUtil.getRequest().getAttribute(CLIENT_ID);
+
+        if (obj == null)
+            throw new NullPointerException("CLIENT_ID is null, not initialized");
+
+        return (String) obj;
     }
 
     /**
@@ -54,7 +84,13 @@ public class ClientCredential {
      */
     public static App getAppByAuthHeader(String authorization) {
         authorization = authorization.replaceAll("Basic ", CommonConstant.EMPTY_STRING);
-        String base64Str = new Base64Utils(authorization).decodeAsString();
+        String base64Str;
+
+        try {
+            base64Str = new Base64Utils(authorization).decodeAsString();
+        } catch (Exception e) {
+            throw new IllegalArgumentException("非法 Token");
+        }
 
         if (!base64Str.contains(":"))
             throw new IllegalArgumentException("非法 Token");
@@ -77,7 +113,7 @@ public class ClientCredential {
         App app = new Action("SELECT * FROM app WHERE stat = 0 AND client_id = ? AND client_secret = ?").query(clientId, clientSecret).one(App.class);
 
         if (app == null)
-            throw new IllegalStateException("应用不存在或非法密钥"); // 如果查询结果为空，表示没有找到对应的应用或密钥不正确，抛出业务异常
+            throw new IllegalStateException("App Not found or Illegal clientSecret"); // 如果查询结果为空，表示没有找到对应的应用或密钥不正确，抛出业务异常
 
         return app;
     }
@@ -91,8 +127,6 @@ public class ClientCredential {
         return app;
     }
 
-    private RestTemplate restTemplate;
-
     /**
      * 对客户端ID和密钥进行基础认证编码。
      * <p>
@@ -104,32 +138,6 @@ public class ClientCredential {
      * @return 返回编码后的字符串，格式为"Basic base64 编码的客户端ID:客户端密钥"
      */
     public static String encodeClient(String clientId, String clientSecret) {
-        if (ObjectHelper.isEmptyText(clientId) || ObjectHelper.isEmptyText(clientSecret))
-            throw new IllegalArgumentException("Missing the arguments: clientId/clientSecret");
-
-        String clientAndSecret = clientId + ":" + clientSecret;
-
-        return "Basic " + new Base64Utils(clientAndSecret).encodeAsString();
-    }
-
-    /**
-     * 使用基础认证方式请求 Token
-     *
-     * @param clientId
-     * @param clientSecret
-     */
-    public void requestWithBasic(String tokenEndPoint, String clientId, String clientSecret) {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-        headers.set("Authorization", encodeClient(clientId, clientSecret)); // 请求头
-
-        MultiValueMap<String, Object> bodyParams = new LinkedMultiValueMap<>();
-        bodyParams.add("grant_type", "client_credentials");
-
-        ResponseEntity<String> responseEntity = restTemplate.exchange(tokenEndPoint, HttpMethod.POST, new HttpEntity<>(bodyParams, headers), String.class);
-
-        if (responseEntity.getStatusCode().is2xxSuccessful()) {
-
-        }
+        return OAuthTools.encodeClient(clientId, clientSecret);
     }
 }

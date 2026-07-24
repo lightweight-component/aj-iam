@@ -62,17 +62,4 @@ public interface UserLoginRegisterController {
     @BizAction("用户登出")
     @AllowOpenAccess
     boolean logout(@RequestParam(required = false) String returnUrl, HttpServletResponse resp, HttpSession session);
-
-    /**
-     * APP 登录一键登录，使用阿里云的
-     * 自动获取手机号码。单屏手机号码登录
-     * TODO 考虑安全性
-     *
-     * @param token 登录 token
-     * @return 登录结果
-     */
-    @GetMapping("/mobile_app_onekey_login_ali/{token}")
-    @BizAction("APP 登录一键登录")
-    @AllowOpenAccess
-    JwtAccessToken mobileAppOneKeyLoginAli(@PathVariable String token);
 }

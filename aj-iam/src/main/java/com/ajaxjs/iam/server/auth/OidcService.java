@@ -7,14 +7,14 @@ import com.ajaxjs.iam.client.BaseOidcClientUserController;
 import com.ajaxjs.iam.jwt.JWebTokenMgr;
 import com.ajaxjs.iam.jwt.JwtAccessToken;
 import com.ajaxjs.iam.jwt.JwtUtils;
-import com.ajaxjs.iam.oauth.ClientCredential;
+import com.ajaxjs.iam.model.App;
 import com.ajaxjs.iam.server.auth.controller.OidcController;
 import com.ajaxjs.iam.server.common.session.UserSession;
-import com.ajaxjs.iam.server.model.User;
 import com.ajaxjs.iam.server.model.AccessTokenPo;
-import com.ajaxjs.iam.model.App;
+import com.ajaxjs.iam.server.model.User;
+import com.ajaxjs.iam.server.service.ClientCredential;
 import com.ajaxjs.iam.server.service.LogLoginService;
-import com.ajaxjs.iam.server.user_info.UserService;
+import com.ajaxjs.iam.server.user_info.UserInfoService;
 import com.ajaxjs.spring.DiContextUtil;
 import com.ajaxjs.sqlman.Action;
 import com.ajaxjs.util.JsonUtil;
@@ -112,7 +112,7 @@ public class OidcService extends OAuthCommon implements OidcController {
         if (accessTokenPO == null)
             throw new BusinessException("找不到 RefreshToken " + refreshToken);
 
-        User user = UserService.getUserById(accessTokenPO.getUserId());
+        User user = UserInfoService.getUserByIdSimple(accessTokenPO.getUserId());
 
         // 生成 Access Token
         JwtAccessToken accessToken = new JwtAccessToken();
@@ -160,18 +160,6 @@ public class OidcService extends OAuthCommon implements OidcController {
 
     @Autowired
     LogLoginService logLoginService;
-
-    @Override
-    public JwtAccessToken ropcToken(String grantType, String username, String password, String clientId, String clientSecret, String scope) {
-        if (!"password".equals(grantType))
-            throw new IllegalArgumentException("参数 grant_type 只能是 password");
-
-        App app = ClientCredential.getApp(clientId, clientSecret);
-        Integer tenantId = app.getTenantId();
-        User user = userLoginRegisterService.getUserLoginByPassword(username, password, tenantId);
-
-        return createJWTByUser(user, app, scope);
-    }
 
     public JwtAccessToken createJWTByUser(User user, App app) {
         return createJWTByUser(user, app, DEFAULT_SCOPE);

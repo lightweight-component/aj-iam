@@ -3,7 +3,7 @@ package com.ajaxjs.iam.server.service;
 import com.ajaxjs.iam.server.BaseTest;
 import com.ajaxjs.iam.UserConstants;
 import com.ajaxjs.iam.server.model.User;
-import com.ajaxjs.iam.server.user_info.UserService;
+import com.ajaxjs.iam.server.user_info.UserInfoService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TestUserService extends BaseTest {
     @Autowired
-    UserService userService;
+    UserInfoService userService;
 
     @Test
     public void testInfo() {

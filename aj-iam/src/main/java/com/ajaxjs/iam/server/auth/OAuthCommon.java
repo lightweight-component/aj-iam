@@ -14,6 +14,7 @@ import com.ajaxjs.iam.model.App;
 import com.ajaxjs.iam.server.service.TenantService;
 import com.ajaxjs.sqlman.Action;
 import com.ajaxjs.util.*;
+import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.util.StringUtils;
@@ -23,6 +24,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.util.Calendar;
 import java.util.Date;
 
+@Data
 public abstract class OAuthCommon implements IamConstants {
     static final String NOT_LOGIN_TEXT = "<meta charset=\"UTF-8\" /><meta http-equiv=\"refresh\" content=\"1;url=%s\" /> " +
             "User Not login, wait 1 seconds to redirect the login page...<br />" +

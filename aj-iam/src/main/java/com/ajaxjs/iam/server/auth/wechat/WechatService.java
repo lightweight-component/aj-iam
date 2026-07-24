@@ -4,7 +4,7 @@ import com.ajaxjs.framework.database.EnableTransaction;
 import com.ajaxjs.iam.client.SecurityManager;
 import com.ajaxjs.iam.jwt.JwtAccessToken;
 import com.ajaxjs.iam.model.SimpleUser;
-import com.ajaxjs.iam.oauth.ClientCredential;
+import com.ajaxjs.iam.server.service.ClientCredential;
 import com.ajaxjs.iam.server.auth.controller.WechatController;
 import com.ajaxjs.iam.server.model.User;
 import com.ajaxjs.iam.server.model.UserAccount;
@@ -12,7 +12,7 @@ import com.ajaxjs.iam.model.App;
 import com.ajaxjs.iam.server.model.wechat.*;
 import com.ajaxjs.iam.server.service.TenantService;
 import com.ajaxjs.iam.server.model.UserFunction;
-import com.ajaxjs.iam.server.user_info.UserService;
+import com.ajaxjs.iam.server.user_info.UserInfoService;
 import com.ajaxjs.sqlman.Action;
 import com.ajaxjs.util.Base64Utils;
 import com.ajaxjs.util.JsonUtil;
@@ -57,7 +57,7 @@ public class WechatService extends BaseWechatService implements WechatController
         if (new Action("SELECT * FROM user_account WHERE user_id = ? AND type = 'WECHAT_MINI'").query(currentUser.getId()).one() != null)
             throw new IllegalStateException("该用户 " + currentUser.getName() + " 已绑定微信账号");
 
-        User user = UserService.getUserById(currentUser.getId());
+        User user = UserInfoService.getUserByIdSimple(currentUser.getId());
         User updateBindState = new User();
         updateBindState.setId(user.getId());
         updateBindState.setBindState(user.getBindState() + UserFunction.BindState.WECHAT);

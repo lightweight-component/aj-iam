@@ -66,26 +66,6 @@ public interface OidcController {
                                 @RequestParam("refresh_token") String refreshToken);
 
     /**
-     * Resource Owner Password Credentials(ROPC) 密码模式获取 Token。
-     * 客户端可能不可信，存在密码泄露风险，一般情况下尽量避免使用。
-     *
-     * @param grantType    必填，且固定是 password
-     * @param username     用户账号
-     * @param password     密码
-     * @param clientId     客户机应用 id
-     * @param clientSecret 应用客户端密钥
-     * @param scope        权限范围
-     * @return 应用的 JWT AccessToken
-     */
-    @PostMapping("/ropc_token")
-    @Deprecated
-    JwtAccessToken ropcToken(@RequestParam("grant_type") String grantType,
-                             @RequestParam String username, @RequestParam String password,
-                             @RequestParam("client_id") String clientId,
-                             @RequestParam("client_secret") String clientSecret,
-                             @RequestParam(required = false) String scope);
-
-    /**
      * 客户端凭证获取 Token
      * 这是通过头传输 client_id/client_secret
      *

@@ -1,16 +1,15 @@
-package com.ajaxjs.iam.server.service;
+package com.ajaxjs.iam.server.auth;
 
 import com.ajaxjs.iam.server.BaseTest;
-import com.ajaxjs.iam.server.auth.EmailCodeService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class TestEmailCodeService extends BaseTest {
     @Autowired
-    private EmailCodeService emailCodeService;
+    EmailCodeService emailCodeService;
 
     @Test
-    void testSendEmailCode() {
-//        emailCodeService.sendEmailCode();
+    void testSendEmail() {
+        emailCodeService.sendVerificationCode("sp42@qq.com");
     }
 }

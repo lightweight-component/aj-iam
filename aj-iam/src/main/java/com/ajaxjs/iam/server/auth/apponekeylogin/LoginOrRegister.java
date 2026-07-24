@@ -4,70 +4,72 @@ import com.ajaxjs.iam.jwt.JWebTokenMgr;
 import com.ajaxjs.iam.jwt.JwtAccessToken;
 import com.ajaxjs.iam.jwt.JwtUtils;
 import com.ajaxjs.iam.model.App;
-import com.ajaxjs.iam.oauth.ClientCredential;
+import com.ajaxjs.iam.server.auth.OAuthCommon;
+import com.ajaxjs.iam.server.auth.OidcService;
 import com.ajaxjs.iam.server.common.IamConstants;
 import com.ajaxjs.iam.server.model.User;
 import com.ajaxjs.iam.server.model.UserAccount;
 import com.ajaxjs.iam.server.model.UserAccountType;
-import com.ajaxjs.iam.server.auth.OAuthCommon;
-import com.ajaxjs.iam.server.auth.OidcService;
-import com.ajaxjs.iam.server.service.TenantService;
 import com.ajaxjs.iam.server.model.UserFunction;
+import com.ajaxjs.iam.server.service.ClientCredential;
+import com.ajaxjs.iam.server.service.TenantService;
 import com.ajaxjs.sqlman.Action;
 import com.ajaxjs.util.ObjectHelper;
 import com.ajaxjs.util.RandomTools;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
+import lombok.RequiredArgsConstructor;
 
-@Slf4j
-@Service
+@RequiredArgsConstructor
 public class LoginOrRegister extends OAuthCommon {
-    @Autowired
-    AliyunOpenApi aliyunOpenApi;
+    private final UserAccountType userAccountType;
 
-    public JwtAccessToken byPhone(String token) {
-        String phone = aliyunOpenApi.getPhoneByToken(token);
-        log.info("已获取手机号码 {}", phone);
-
-        return createUserByPhone(phone);
-    }
-
-    public JwtAccessToken createUserByPhone(String phone) {
+    public JwtAccessToken createUser(String value, String appId) {
         Integer tenantId = TenantService.getTenantId(false);
 
         if (tenantId == null)
             throw new IllegalArgumentException("请选择租户");
 
+        String type = switch (userAccountType) {
+            case PHONE -> "phone";
+            case EMAIL -> "email";
+            default -> "";
+        };
+
         User user;
-        User existUser = new Action("SELECT * FROM user WHERE stat = 0 AND phone = ? AND tenant_id = ?").query(phone, tenantId).one(User.class);
+        User existUser = new Action("SELECT * FROM user WHERE stat = 0 AND " + type + " = ? AND tenant_id = ?").query(value, tenantId).one(User.class);
         boolean isNewlyUser = existUser == null;
 
         if (isNewlyUser) { // to create a new user
-            user = createUser(tenantId.longValue(), phone);
+            user = createUser(tenantId.longValue(), value);
             createUserAccount(user.getId());
         } else {
             user = existUser;
-            UserAccount existAccount = new Action("SELECT * FROM user_account WHERE user_id = ? AND type = 'PHONE' AND stat= 0")
+            UserAccount existAccount = new Action("SELECT * FROM user_account WHERE user_id = ? AND stat= 0")
                     .query(existUser.getId()).one(UserAccount.class);
 
             if (existAccount == null)
                 createUserAccount(existUser.getId());
         }
 
-        // TODO 暂时写死 app id
-        return createToken(user, ClientCredential.getApp("r3fgO43ft5H"), isNewlyUser);
+
+        return createToken(user, ClientCredential.getApp(appId), isNewlyUser);
     }
 
-    private static User createUser(Long tenantId, String phoneNumber) {
+    private User createUser(Long tenantId, String value) {
         User user = new User();
         user.setLoginId("User_" + RandomTools.generateRandomString(5));
         user.setTenantId(tenantId);
         user.setBindState(UserFunction.BindState.APP);
 
-        if (ObjectHelper.hasText(phoneNumber))
-            user.setPhone(phoneNumber);
+        if (ObjectHelper.hasText(value)) {
+            switch (userAccountType) {
+                case PHONE:
+                    user.setPhone(value);
+                    break;
+                case EMAIL:
+                    user.setEmail(value);
+                    break;
+            }
+        }
 
         Long newlyId = new Action(user).create().execute(true, Long.class).getNewlyId();
         user.setId(newlyId);
@@ -75,21 +77,19 @@ public class LoginOrRegister extends OAuthCommon {
         return user;
     }
 
-    private static boolean createUserAccount(Long userId) {
+    private boolean createUserAccount(Long userId) {
         UserAccount account = new UserAccount();
         account.setUserId(userId);
-        account.setType(UserAccountType.PHONE);
+        account.setType(userAccountType);
 
         return new Action(account).create().execute(true).isOk();
     }
 
-    @Autowired
-    JWebTokenMgr jWebTokenMgr;
+    private final JWebTokenMgr jWebTokenMgr;
 
-    @Value("${User.oidc.jwtExpireHours:74}")
-    int jwtExpireHours;
+    private final int jwtExpireHours;
 
-    JwtAccessToken createToken(User user, App app, Boolean isNewlyUser) {
+    private JwtAccessToken createToken(User user, App app, Boolean isNewlyUser) {
         // 生成 JWT Token
         JwtAccessToken accessToken = new JwtAccessToken();
         accessToken.setIsNewlyUser(isNewlyUser);

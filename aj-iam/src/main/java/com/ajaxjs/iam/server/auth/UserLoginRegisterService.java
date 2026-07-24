@@ -4,14 +4,13 @@ import com.ajaxjs.framework.database.EnableTransaction;
 import com.ajaxjs.framework.model.BusinessException;
 import com.ajaxjs.iam.UserConstants;
 import com.ajaxjs.iam.jwt.JwtAccessToken;
-import com.ajaxjs.iam.oauth.ClientCredential;
+import com.ajaxjs.iam.server.service.ClientCredential;
 import com.ajaxjs.iam.server.common.UserUtils;
 import com.ajaxjs.iam.server.auth.controller.UserLoginRegisterController;
 import com.ajaxjs.iam.server.model.User;
 import com.ajaxjs.iam.server.model.UserAccount;
 import com.ajaxjs.iam.model.App;
 import com.ajaxjs.iam.server.model.UserFunction;
-import com.ajaxjs.iam.server.auth.apponekeylogin.LoginOrRegister;
 import com.ajaxjs.iam.server.service.TenantService;
 import com.ajaxjs.iam.server.service.password.CheckStrength;
 import com.ajaxjs.security.iplist.IpList;
@@ -158,7 +157,6 @@ public class UserLoginRegisterService implements UserLoginRegisterController, Us
         if (!ObjectUtils.isEmpty(extract))
             params.put("extend", extract);
 
-
         // 有些字段不要
         String psw = params.get("password").toString();
         params.remove("password");
@@ -242,13 +240,5 @@ public class UserLoginRegisterService implements UserLoginRegisterController, Us
         }
 
         return true;
-    }
-
-    @Autowired
-    LoginOrRegister loginOrRegister;
-
-    @Override
-    public JwtAccessToken mobileAppOneKeyLoginAli(String token) {
-        return loginOrRegister.byPhone(token);
     }
 }

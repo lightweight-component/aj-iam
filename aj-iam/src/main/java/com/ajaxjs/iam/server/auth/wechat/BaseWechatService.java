@@ -12,7 +12,7 @@ import com.ajaxjs.iam.server.model.wechat.Code2SessionResult;
 import com.ajaxjs.iam.server.auth.OAuthCommon;
 import com.ajaxjs.iam.server.auth.OidcService;
 import com.ajaxjs.iam.server.model.UserFunction;
-import com.ajaxjs.iam.server.user_info.UserService;
+import com.ajaxjs.iam.server.user_info.UserInfoService;
 import com.ajaxjs.sqlman.Action;
 import com.ajaxjs.util.ObjectHelper;
 import com.ajaxjs.util.RandomTools;
@@ -30,7 +30,7 @@ public abstract class BaseWechatService extends OAuthCommon {
 
         if (!isNewlyUser) { // exists account
             Long userId = account.getUserId();
-            user = UserService.getUserById(userId);
+            user = UserInfoService.getUserByIdSimple(userId);
 
             if (sessionKey != null) {
                 // saves a session key

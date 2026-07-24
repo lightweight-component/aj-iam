@@ -3,7 +3,7 @@ package com.ajaxjs.iam.server.auth;
 import com.ajaxjs.framework.cache.Cache;
 import com.ajaxjs.framework.database.EnableTransaction;
 import com.ajaxjs.framework.model.BusinessException;
-import com.ajaxjs.iam.oauth.ClientCredential;
+import com.ajaxjs.iam.server.service.ClientCredential;
 import com.ajaxjs.iam.server.auth.controller.OAuthController;
 import com.ajaxjs.iam.model.AccessToken;
 import com.ajaxjs.iam.server.model.AccessTokenPo;

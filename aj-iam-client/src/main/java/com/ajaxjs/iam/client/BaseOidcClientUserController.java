@@ -2,7 +2,7 @@ package com.ajaxjs.iam.client;
 
 import com.ajaxjs.iam.UserConstants;
 import com.ajaxjs.iam.jwt.JwtAccessToken;
-import com.ajaxjs.iam.oauth.ClientCredential;
+import com.ajaxjs.iam.oauth.OAuthTools;
 import com.ajaxjs.util.*;
 import com.ajaxjs.util.httpremote.Post;
 import lombok.Data;
@@ -73,7 +73,7 @@ public abstract class BaseOidcClientUserController {
 
         if (!state.equals(savedState)) { // 检查返回的 state 值是否与之前保存的值匹配
             ClientUtils.returnForbidden(resp);
-            log.warn("State code error, in session: " + savedState);
+            log.warn("State code error, in session: {}", savedState);
 
             return null;
         } else
@@ -83,7 +83,7 @@ public abstract class BaseOidcClientUserController {
         String tokenApi = getIamService() + "/iam_api/oidc/token";
 
         Map<String, String> params = ObjectHelper.mapOf("grant_type", "authorization_code", "code", code, "state", state);
-        Map<String, Object> result = Post.api(tokenApi, params, conn -> conn.setRequestProperty("Authorization", ClientCredential.encodeClient(clientId, clientSecret)));
+        Map<String, Object> result = Post.api(tokenApi, params, conn -> conn.setRequestProperty("Authorization", OAuthTools.encodeClient(clientId, clientSecret)));
 
         if (result != null) {// 处理授权成功的逻辑，例如解析并保存访问令牌和刷新令牌等
             if ((int) result.get("status") == 1) {

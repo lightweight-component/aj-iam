@@ -4,7 +4,7 @@ import com.ajaxjs.framework.model.BusinessException;
 import com.ajaxjs.iam.UserConstants;
 import com.ajaxjs.iam.client.BaseOidcClientUserController;
 import com.ajaxjs.iam.jwt.JwtAccessToken;
-import com.ajaxjs.iam.oauth.ClientCredential;
+import com.ajaxjs.iam.server.service.ClientCredential;
 import com.ajaxjs.iam.model.App;
 import com.ajaxjs.iam.server.model.wechat.WechatTokenResponse;
 import com.ajaxjs.iam.server.model.wechat.WechatUserInfoResponse;
