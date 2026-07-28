@@ -8,7 +8,7 @@ import com.ajaxjs.iam.server.common.IamConstants;
 import com.ajaxjs.iam.server.model.User;
 import com.ajaxjs.iam.server.service.TenantService;
 import com.ajaxjs.iam.server.service.token.model.AccessTokenPo;
-import com.ajaxjs.iam.server.service.token.model.JwtToken;
+import com.ajaxjs.iam.jwt.JwtToken;
 import com.ajaxjs.iam.server.user_info.UserInfoService;
 import com.ajaxjs.sqlman.Action;
 import com.ajaxjs.util.ObjectHelper;

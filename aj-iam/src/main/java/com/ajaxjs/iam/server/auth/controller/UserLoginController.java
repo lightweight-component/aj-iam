@@ -2,7 +2,7 @@ package com.ajaxjs.iam.server.auth.controller;
 
 import com.ajaxjs.iam.annotation.AllowOpenAccess;
 import com.ajaxjs.iam.annotation.ClientAuthentication;
-import com.ajaxjs.iam.server.service.token.model.JwtToken;
+import com.ajaxjs.iam.jwt.JwtToken;
 import com.ajaxjs.security.captcha.image.ImageCaptchaCheck;
 import com.ajaxjs.spring.annotation.BizAction;
 import jakarta.servlet.http.HttpServletRequest;

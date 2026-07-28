@@ -8,7 +8,7 @@ import com.ajaxjs.iam.server.model.UserAccountType;
 import com.ajaxjs.iam.server.model.UserFunction;
 import com.ajaxjs.iam.server.model.wechat.Code2SessionResult;
 import com.ajaxjs.iam.server.service.token.JwtTokenService;
-import com.ajaxjs.iam.server.service.token.model.JwtToken;
+import com.ajaxjs.iam.jwt.JwtToken;
 import com.ajaxjs.iam.server.user_info.UserInfoService;
 import com.ajaxjs.sqlman.Action;
 import com.ajaxjs.util.ObjectHelper;

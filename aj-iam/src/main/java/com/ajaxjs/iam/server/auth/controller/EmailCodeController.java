@@ -1,7 +1,7 @@
 package com.ajaxjs.iam.server.auth.controller;
 
 import com.ajaxjs.iam.annotation.ClientAuthentication;
-import com.ajaxjs.iam.server.service.token.model.JwtToken;
+import com.ajaxjs.iam.jwt.JwtToken;
 import com.ajaxjs.spring.annotation.BizAction;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;

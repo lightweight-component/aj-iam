@@ -15,7 +15,7 @@ import com.ajaxjs.iam.server.model.User;
 import com.ajaxjs.iam.server.model.UserAccountType;
 import com.ajaxjs.iam.server.service.ClientCredential;
 import com.ajaxjs.iam.server.service.TenantService;
-import com.ajaxjs.iam.server.service.token.model.JwtToken;
+import com.ajaxjs.iam.jwt.JwtToken;
 import com.ajaxjs.message.sms.ali_sms.AliyunSmsEntity;
 import com.ajaxjs.sqlman.Action;
 import com.ajaxjs.util.RandomTools;

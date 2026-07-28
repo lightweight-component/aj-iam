@@ -4,7 +4,7 @@ import com.ajaxjs.iam.UserConstants;
 import com.ajaxjs.iam.client.BaseOidcClientUserController;
 import com.ajaxjs.iam.client.ClientUtils;
 import com.ajaxjs.iam.client.model.TokenValidDetail;
-import com.ajaxjs.iam.jwt.JwtAccessToken;
+import com.ajaxjs.iam.jwt.JwtToken;
 import com.ajaxjs.util.JsonUtil;
 import com.ajaxjs.util.ObjectHelper;
 import lombok.AllArgsConstructor;
@@ -57,7 +57,7 @@ public class RefreshJWT {
 
         if ((int) result.get("status") == 1) {
             // 将返回数据转换为 JwtAccessToken 对象并设置到 Cookie 中
-            JwtAccessToken token = JsonUtil.map2pojo((Map<String, Object>) result.get("data"), JwtAccessToken.class);
+            JwtToken token = JsonUtil.map2pojo((Map<String, Object>) result.get("data"), JwtToken.class);
             BaseOidcClientUserController.setTokenToCookie(token, response);
         } else
             System.err.println("刷新失败:" + result.get("message"));

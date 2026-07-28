@@ -6,6 +6,7 @@ import com.ajaxjs.framework.model.BusinessException;
 import com.ajaxjs.iam.UserConstants;
 import com.ajaxjs.iam.client.BaseOidcClientUserController;
 import com.ajaxjs.iam.jwt.JWebTokenMgr;
+import com.ajaxjs.iam.jwt.JwtToken;
 import com.ajaxjs.iam.model.App;
 import com.ajaxjs.iam.server.auth.controller.UserLoginController;
 import com.ajaxjs.iam.server.authorizatio.OAuthService;
@@ -17,7 +18,7 @@ import com.ajaxjs.iam.server.service.ClientCredential;
 import com.ajaxjs.iam.server.service.LogLoginService;
 import com.ajaxjs.iam.server.service.TenantService;
 import com.ajaxjs.iam.server.service.token.JwtTokenService;
-import com.ajaxjs.iam.server.service.token.model.JwtToken;
+
 import com.ajaxjs.spring.DiContextUtil;
 import com.ajaxjs.sqlman.Action;
 import com.ajaxjs.util.CommonConstant;
@@ -76,11 +77,8 @@ public class UserLoginService implements UserLoginController, IamConstants {
         JwtToken token = tokenService.create();
         tokenService.createSave(token);
 
-        // 保存 token 在缓存
         saveTokenToCache(user, token);
-
-        // 删除缓存
-        cache.remove(code + ":user");
+        cache.remove(code + ":user");  // 删除缓存
 
         return token;
     }
@@ -134,11 +132,11 @@ public class UserLoginService implements UserLoginController, IamConstants {
 
         User user = getUserLoginByPassword(username, password, tenantId);
 
-        JwtTokenService jwtTokenService = new JwtTokenService(app, user);
-        jwtTokenService.setjWebTokenMgr(jWebTokenMgr);
-        jwtTokenService.setTokenExpires(tokenExpires);
-        JwtToken token = jwtTokenService.create();
-        jwtTokenService.createSave(token);
+        JwtTokenService tokenService = new JwtTokenService(app, user);
+        tokenService.setjWebTokenMgr(jWebTokenMgr);
+        tokenService.setTokenExpires(tokenExpires);
+        JwtToken token = tokenService.create();
+        tokenService.createSave(token);
 
         saveTokenToCache(user, token);
 

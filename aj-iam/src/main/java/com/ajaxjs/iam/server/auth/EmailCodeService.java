@@ -10,7 +10,7 @@ import com.ajaxjs.iam.server.common.langs.LanguageMapping;
 import com.ajaxjs.iam.server.model.AppSecretMgr;
 import com.ajaxjs.iam.server.model.UserAccountType;
 import com.ajaxjs.iam.server.service.ClientCredential;
-import com.ajaxjs.iam.server.service.token.model.JwtToken;
+import com.ajaxjs.iam.jwt.JwtToken;
 import com.ajaxjs.message.email.Email;
 import com.ajaxjs.message.email.resend.Resend;
 import com.ajaxjs.sqlman.Action;

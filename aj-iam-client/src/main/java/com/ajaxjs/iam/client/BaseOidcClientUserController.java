@@ -1,10 +1,11 @@
 package com.ajaxjs.iam.client;
 
 import com.ajaxjs.iam.UserConstants;
-import com.ajaxjs.iam.jwt.JwtAccessToken;
+import com.ajaxjs.iam.jwt.JwtToken;
 import com.ajaxjs.iam.oauth.OAuthTools;
 import com.ajaxjs.util.*;
 import com.ajaxjs.util.httpremote.Post;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -14,7 +15,6 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.view.RedirectView;
 
-import jakarta.servlet.http.HttpServletResponse;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -64,7 +64,7 @@ public abstract class BaseOidcClientUserController {
     /**
      * 用 AccessToken 可用的时候
      */
-    public abstract JwtAccessToken onAccessTokenGot(JwtAccessToken token, HttpServletResponse resp);
+    public abstract JwtToken onAccessTokenGot(JwtToken token, HttpServletResponse resp);
 
     public ModelAndView callbackToken(String clientId, String clientSecret, String code, String state, String webUrl, HttpServletResponse resp) {
         // 从会话中获取之前保存的 state 值
@@ -87,7 +87,7 @@ public abstract class BaseOidcClientUserController {
 
         if (result != null) {// 处理授权成功的逻辑，例如解析并保存访问令牌和刷新令牌等
             if ((int) result.get("status") == 1) {
-                JwtAccessToken jwt = JsonUtil.map2pojo((Map<String, Object>) result.get("data"), JwtAccessToken.class);
+                JwtToken jwt = JsonUtil.map2pojo((Map<String, Object>) result.get("data"), JwtToken.class);
                 onAccessTokenGot(jwt, resp);
 
                 if (StringUtils.hasText(webUrl)) {
@@ -104,7 +104,7 @@ public abstract class BaseOidcClientUserController {
             throw new SecurityException("获取 JWT Token 失败");
     }
 
-    public JwtAccessToken ropcLogin(String username, String password) {
+    public JwtToken ropcLogin(String username, String password) {
         Map<String, Object> bodyParams = new HashMap<>();
         bodyParams.put("grant_type", "password");
         bodyParams.put("username", username);
@@ -121,9 +121,8 @@ public abstract class BaseOidcClientUserController {
                 throw new RuntimeException(result.get("message").toString());
             else {
                 Map<String, Object> map = (Map<String, Object>) result.get("data");
-                JwtAccessToken token = JsonUtil.map2pojo(map, JwtAccessToken.class);
 
-                return token;
+                return JsonUtil.map2pojo(map, JwtToken.class);
             }
         }
     }
@@ -150,9 +149,9 @@ public abstract class BaseOidcClientUserController {
         resp.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
     }
 
-    public static void setTokenToCookie(JwtAccessToken token, HttpServletResponse resp) {
+    public static void setTokenToCookie(JwtToken token, HttpServletResponse resp) {
         // 设置 Token 到 Cookie
-        ResponseCookie cookie = ResponseCookie.from(UserConstants.ACCESS_TOKEN_KEY, token.getId_token())
+        ResponseCookie cookie = ResponseCookie.from(UserConstants.ACCESS_TOKEN_KEY, token.getToken())
                 .httpOnly(true)
                 .secure(false) // TODO for prod
                 .path("/")
@@ -162,7 +161,7 @@ public abstract class BaseOidcClientUserController {
 
         resp.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
 
-        ResponseCookie refreshCookie = ResponseCookie.from(UserConstants.REFRESH_TOKEN_KEY, token.getRefresh_token())
+        ResponseCookie refreshCookie = ResponseCookie.from(UserConstants.REFRESH_TOKEN_KEY, token.getRefreshToken())
                 .httpOnly(true)
                 .secure(false) // TODO for prod
                 .path("/")

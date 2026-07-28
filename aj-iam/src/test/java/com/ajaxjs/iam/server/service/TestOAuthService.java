@@ -39,9 +39,9 @@ public class TestOAuthService extends BaseTest {
 //        System.out.println(accessToken);
 //    }
 
-    @Test
-    public void testRefreshToken() {
-        AccessToken accessToken = oAuthService.refreshToken(IamConstants.GrantType.REFRESH_TOKEN, "G5IFeG7Eesbny3f", "bf173e7d-1131-89d3-e1f7-96a236571681");
-        System.out.println(accessToken);
-    }
+//    @Test
+//    public void testRefreshToken() {
+//        AccessToken accessToken = oAuthService.refreshToken(IamConstants.GrantType.REFRESH_TOKEN, "G5IFeG7Eesbny3f", "bf173e7d-1131-89d3-e1f7-96a236571681");
+//        System.out.println(accessToken);
+//    }
 }

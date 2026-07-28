@@ -8,7 +8,7 @@ import com.ajaxjs.iam.server.model.wechat.WechatTokenResponse;
 import com.ajaxjs.iam.server.model.wechat.WechatUserInfoResponse;
 import com.ajaxjs.iam.server.service.ClientCredential;
 import com.ajaxjs.iam.server.service.TenantService;
-import com.ajaxjs.iam.server.service.token.model.JwtToken;
+import com.ajaxjs.iam.jwt.JwtToken;
 import com.ajaxjs.spring.DiContextUtil;
 import com.ajaxjs.sqlman.Action;
 import com.ajaxjs.util.ObjectHelper;

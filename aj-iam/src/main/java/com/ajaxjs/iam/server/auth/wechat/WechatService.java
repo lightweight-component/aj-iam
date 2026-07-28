@@ -11,7 +11,7 @@ import com.ajaxjs.iam.server.model.UserFunction;
 import com.ajaxjs.iam.server.model.wechat.*;
 import com.ajaxjs.iam.server.service.ClientCredential;
 import com.ajaxjs.iam.server.service.TenantService;
-import com.ajaxjs.iam.server.service.token.model.JwtToken;
+import com.ajaxjs.iam.jwt.JwtToken;
 import com.ajaxjs.iam.server.user_info.UserInfoService;
 import com.ajaxjs.sqlman.Action;
 import com.ajaxjs.util.Base64Utils;

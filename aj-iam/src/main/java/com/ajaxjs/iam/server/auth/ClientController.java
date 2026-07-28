@@ -3,7 +3,7 @@ package com.ajaxjs.iam.server.auth;
 import com.ajaxjs.iam.UserConstants;
 import com.ajaxjs.iam.client.BaseOidcClientUserController;
 import com.ajaxjs.iam.client.CacheProvider;
-import com.ajaxjs.iam.jwt.JwtAccessToken;
+import com.ajaxjs.iam.jwt.JwtToken;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
@@ -30,8 +30,8 @@ public class ClientController extends BaseOidcClientUserController {
     }
 
     @Override
-    public JwtAccessToken onAccessTokenGot(JwtAccessToken token, HttpServletResponse resp) {
-        String tokenStr = token.getId_token();
+    public JwtToken onAccessTokenGot(JwtToken token, HttpServletResponse resp) {
+        String tokenStr = token.getToken();
         // 设置 Token 到 Cookie
         ResponseCookie cookie = ResponseCookie.from(UserConstants.ACCESS_TOKEN_KEY, tokenStr)
                 .httpOnly(true)
