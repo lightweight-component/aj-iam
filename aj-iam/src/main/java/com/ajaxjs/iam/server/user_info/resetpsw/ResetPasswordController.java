@@ -1,8 +1,7 @@
-package com.ajaxjs.iam.server.user_info;
+package com.ajaxjs.iam.server.user_info.resetpsw;
 
 import com.ajaxjs.iam.annotation.AllowOpenAccess;
 import com.ajaxjs.iam.client.SecurityManager;
-import com.ajaxjs.iam.server.user_info.resetpsw.*;
 import com.ajaxjs.security.captcha.image.ImageCaptchaCheck;
 import com.ajaxjs.spring.annotation.BizAction;
 import com.ajaxjs.sqlman.Action;

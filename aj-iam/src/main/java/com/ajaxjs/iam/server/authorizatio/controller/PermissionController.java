@@ -1,4 +1,4 @@
-package com.ajaxjs.iam.server.authorizatio;
+package com.ajaxjs.iam.server.authorizatio.controller;
 
 import com.ajaxjs.spring.annotation.BizAction;
 import com.ajaxjs.iam.annotation.AllowOpenAccess;

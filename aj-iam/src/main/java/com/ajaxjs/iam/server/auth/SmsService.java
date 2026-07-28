@@ -4,7 +4,6 @@ import com.ajaxjs.framework.cache.Cache;
 import com.ajaxjs.framework.cache.delayqueue.ExpiryCache;
 import com.ajaxjs.iam.client.SecurityManager;
 import com.ajaxjs.iam.jwt.JWebTokenMgr;
-import com.ajaxjs.iam.jwt.JwtAccessToken;
 import com.ajaxjs.iam.server.auth.apponekeylogin.AliyunOpenApi;
 import com.ajaxjs.iam.server.auth.apponekeylogin.LoginOrRegister;
 import com.ajaxjs.iam.server.auth.apponekeylogin.SendAliyunSms;
@@ -16,6 +15,7 @@ import com.ajaxjs.iam.server.model.User;
 import com.ajaxjs.iam.server.model.UserAccountType;
 import com.ajaxjs.iam.server.service.ClientCredential;
 import com.ajaxjs.iam.server.service.TenantService;
+import com.ajaxjs.iam.server.service.token.model.JwtToken;
 import com.ajaxjs.message.sms.ali_sms.AliyunSmsEntity;
 import com.ajaxjs.sqlman.Action;
 import com.ajaxjs.util.RandomTools;
@@ -26,7 +26,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 /**
- *
+ * SMS
  */
 @Slf4j
 @Service
@@ -37,25 +37,19 @@ public class SmsService implements SmsController {
     @Autowired
     JWebTokenMgr jWebTokenMgr;
 
-    @Value("${User.oidc.jwtExpireHours:74}")
-    int jwtExpireHours;
-
     /**
-     * Token 的有效期，单位：分钟  默认两天
+     * Token 的有效期，单位：分钟  默认一天
      */
-    @Value("${oauth.token.client_expires: 60}")
-    private Integer clientExpires;
+    @Value("${oauth.token.client_expires: 3600}")
+    private Integer tokenExpires;
 
     @Override
-    public JwtAccessToken mobileAppOneKeyLoginAli(String token) {
+    public JwtToken mobileAppOneKeyLoginAli(String token) {
         String appId = ClientCredential.getAppId();
         String phone = aliyunOpenApi.getPhoneByToken(token);
         log.info("已获取手机号码 {}", phone);
 
-        LoginOrRegister loginOrRegister = new LoginOrRegister(UserAccountType.PHONE, jWebTokenMgr, jwtExpireHours);
-        loginOrRegister.setClientExpires(clientExpires);
-
-        return loginOrRegister.createUser(phone, appId);
+        return new LoginOrRegister(UserAccountType.PHONE, jWebTokenMgr, tokenExpires).createUser(phone, appId);
     }
 
     private final Cache<String, Object> cache = ExpiryCache.getInstance();
@@ -96,7 +90,7 @@ public class SmsService implements SmsController {
     }
 
     @Override
-    public JwtAccessToken verifyCode(String phone, String code) {
+    public JwtToken verifyCode(String phone, String code) {
         String appId = ClientCredential.getAppId();
 
         if (!StringUtils.hasText(phone) || !UserUtils.isValidPhone(phone))
@@ -110,10 +104,7 @@ public class SmsService implements SmsController {
         if (i != null && i.equals(Integer.parseInt(code))) {
             cache.remove(phone);
 
-            LoginOrRegister loginOrRegister = new LoginOrRegister(UserAccountType.PHONE, jWebTokenMgr, jwtExpireHours);
-            loginOrRegister.setClientExpires(clientExpires);
-
-            return loginOrRegister.createUser(phone, appId);
+            return new LoginOrRegister(UserAccountType.PHONE, jWebTokenMgr, tokenExpires).createUser(phone, appId);
         } else
             throw new SecurityException(LanguageMapping.getLanguageByKey("sms.phone.error_verification_code"));// 验证码错误
     }
@@ -137,9 +128,7 @@ public class SmsService implements SmsController {
 
         if (i != null && i.equals(Integer.parseInt(code))) {
             cache.remove(phone);
-
-            // update user info
-            Long userId = SecurityManager.getUser().getId();
+            Long userId = SecurityManager.getUser().getId();// update user info
 
             return new Action("UPDATE user SET phone = ? WHERE id = ?").update(phone, userId).execute().isOk();
         } else

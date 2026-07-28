@@ -1,11 +1,11 @@
 package com.ajaxjs.iam.server.auth.controller;
 
 import com.ajaxjs.iam.annotation.AllowOpenAccess;
-import com.ajaxjs.iam.jwt.JwtAccessToken;
 import com.ajaxjs.iam.server.model.wechat.MiniAppPhoneNumber;
 import com.ajaxjs.iam.server.model.wechat.PhoneChangeDTO;
 import com.ajaxjs.iam.server.model.wechat.PhoneNumberLoginDTO;
 import com.ajaxjs.iam.server.model.wechat.WechatAuthCode;
+import com.ajaxjs.iam.server.service.token.model.JwtToken;
 import com.ajaxjs.spring.annotation.BizAction;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,7 +24,7 @@ public interface WechatController {
     @PostMapping("/mini_app_login")
     @BizAction("微信小程序登录")
     @AllowOpenAccess
-    JwtAccessToken miniAppLogin(@RequestBody WechatAuthCode data);
+    JwtToken miniAppLogin(@RequestBody WechatAuthCode data);
 
     /**
      * 绑定微信账号到现有的账号
@@ -58,7 +58,7 @@ public interface WechatController {
     @PostMapping("/phone_number_login")
     @AllowOpenAccess
     @BizAction("解密小程序提供的加密数据，返回包含手机号码等信息的 JSON 对象")
-    JwtAccessToken loginByMiniAppPhoneNumber(@RequestBody PhoneNumberLoginDTO dto);
+    JwtToken loginByMiniAppPhoneNumber(@RequestBody PhoneNumberLoginDTO dto);
 
     /**
      * 微信公众号/服务号 H5 登录

@@ -5,6 +5,7 @@ import com.ajaxjs.framework.model.BusinessException;
 import com.ajaxjs.iam.model.App;
 import com.ajaxjs.iam.server.model.User;
 import com.ajaxjs.iam.server.service.ClientCredential;
+import com.ajaxjs.iam.server.user_info.controller.UserInfoController;
 import com.ajaxjs.sqlman.Action;
 import com.ajaxjs.sqlman.util.Utils;
 import org.springframework.stereotype.Service;

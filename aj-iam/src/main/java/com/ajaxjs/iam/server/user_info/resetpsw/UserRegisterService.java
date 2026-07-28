@@ -1,28 +1,18 @@
-package com.ajaxjs.iam.server.auth;
+package com.ajaxjs.iam.server.user_info.resetpsw;
 
 import com.ajaxjs.framework.database.EnableTransaction;
-import com.ajaxjs.framework.model.BusinessException;
 import com.ajaxjs.iam.UserConstants;
-import com.ajaxjs.iam.jwt.JwtAccessToken;
-import com.ajaxjs.iam.server.service.ClientCredential;
-import com.ajaxjs.iam.server.common.UserUtils;
-import com.ajaxjs.iam.server.auth.controller.UserLoginRegisterController;
-import com.ajaxjs.iam.server.model.User;
 import com.ajaxjs.iam.server.model.UserAccount;
-import com.ajaxjs.iam.model.App;
 import com.ajaxjs.iam.server.model.UserFunction;
 import com.ajaxjs.iam.server.service.TenantService;
 import com.ajaxjs.iam.server.service.password.CheckStrength;
+import com.ajaxjs.iam.server.user_info.controller.UserRegisterController;
 import com.ajaxjs.security.iplist.IpList;
 import com.ajaxjs.spring.DiContextUtil;
 import com.ajaxjs.sqlman.Action;
 import com.ajaxjs.sqlman.util.SnowflakeId;
 import com.ajaxjs.sqlman.util.Utils;
-import com.ajaxjs.util.CommonConstant;
 import com.ajaxjs.util.ObjectHelper;
-import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -36,63 +26,33 @@ import java.util.function.Function;
 
 @Service
 @Slf4j
-public class UserLoginRegisterService implements UserLoginRegisterController, UserConstants {
-    @Value("${user.loginIdType:1}")
-    int loginIdType;
+public class UserRegisterService implements UserRegisterController {
+    @Override
+    @EnableTransaction
+    public boolean registerWeb(Map<String, Object> params) {
+        return _register(params);
+    }
+
+    @Override
+    @EnableTransaction
+    public boolean register(Map<String, Object> params) {
+        return _register(params);
+    }
+
+
+    @Override
+    public boolean checkRepeat(String field, String value) {
+        return isRepeat(field, value, TenantService.getTenantId());
+    }
 
     @Autowired
     @Qualifier("passwordEncode")
     Function<String, String> passwordEncode;
 
-    /**
-     * 密码支持帐号、邮件、手机作为身份凭证
-     */
-    public User getUserLoginByPassword(String loginId, String password, Integer tenantId) {
-        loginId = loginId.trim();
-        password = password.trim();
-
-        String sql = "SELECT u.* FROM user u INNER JOIN user_account a ON a.user_id = u.id WHERE u.stat != 1 AND u.%s = ? AND a.password = ? AND u.tenant_id = ?";
-
-        if (UserUtils.testBCD(LoginIdType.PSW_LOGIN_EMAIL, loginIdType) && UserUtils.isValidEmail(loginId))
-            sql = String.format(sql, "email");
-        else if (UserUtils.testBCD(LoginIdType.PSW_LOGIN_PHONE, loginIdType) && UserUtils.isValidPhone(loginId))
-            sql = String.format(sql, "phone");
-        else
-            sql = String.format(sql, "login_id");
-
-        String encodePsw = passwordEncode.apply(password);
-        User user = new Action(sql).query(loginId, encodePsw, tenantId).one(User.class);
-
-        if (user == null)
-            throw new BusinessException("用户 " + loginId + " 登录失败，用户不存在或密码错误");
-
-        log.info(user.getName() + " 登录成功！");
-
-        return user;
-    }
-
     @Value("${auth.user.CheckStrength:true}")
     boolean isCheckPasswordStrength;
 
-//    @Autowired
-//    OidcService oidcService;
-
-    @Override
-    public JwtAccessToken login(String username, String password, String appId) {
-        App app = ClientCredential.getApp(appId);
-        Integer tenantId = TenantService.getTenantId(false);
-
-        if (tenantId == null || tenantId == 0) // for iam admin, no tenant id means iam admin
-            tenantId = app.getTenantId();
-
-        User user = getUserLoginByPassword(username, password, tenantId);
-
-        return DiContextUtil.getBeanNonNull(OidcService.class).createJWTByUser(user, app);
-    }
-
-    @Override
-    @EnableTransaction
-    public Boolean register(Map<String, Object> params) {
+    public boolean _register(Map<String, Object> params) {
         // 所有字符串 trim 一下
         for (String key : params.keySet()) {
             Object obj = params.get(key);
@@ -180,10 +140,14 @@ public class UserLoginRegisterService implements UserLoginRegisterController, Us
         UserAccount auth = new UserAccount();
         auth.setUserId(userId);
         auth.setPassword(passwordEncode.apply(psw));
-        auth.setRegisterType(LoginType.PASSWORD);
+        auth.setRegisterType(UserConstants.LoginType.PASSWORD);
         auth.setRegisterIp(IpList.getClientIp(Objects.requireNonNull(DiContextUtil.getRequest())));
 
         return new Action(auth, "user_account").create().execute(true, Long.class).isOk();
+    }
+
+    private static boolean isNull(Map<String, Object> params, String key) {
+        return !params.containsKey(key) || !StringUtils.hasText(params.get(key).toString());
     }
 
     /**
@@ -201,15 +165,6 @@ public class UserLoginRegisterService implements UserLoginRegisterController, Us
             log.warn("保存用户角色失败！");
     }
 
-    private static boolean isNull(Map<String, Object> params, String key) {
-        return !params.containsKey(key) || !StringUtils.hasText(params.get(key).toString());
-    }
-
-    @Override
-    public Boolean checkRepeat(String field, String value) {
-        return isRepeat(field, value, TenantService.getTenantId());
-    }
-
     /**
      * 检查某个值是否已经存在一样的值
      *
@@ -222,23 +177,5 @@ public class UserLoginRegisterService implements UserLoginRegisterController, Us
         sql = String.format(sql, field.trim());
 
         return new Action(sql).query(value.trim(), tenantId).oneValue(Long.class) != null; // 有这个数据表示重复
-    }
-
-    @Override
-    public boolean logout(String returnUrl, HttpServletResponse resp, HttpSession session) {
-        session.invalidate(); // 销毁会话
-        // 清除 HttpOnly Cookie
-        Cookie cookie = new Cookie(UserConstants.ACCESS_TOKEN_KEY, CommonConstant.EMPTY_STRING);
-        cookie.setHttpOnly(true);
-        cookie.setSecure(false);
-        cookie.setPath("/");
-        cookie.setMaxAge(0);
-        resp.addCookie(cookie);
-
-        if (ObjectHelper.hasText(returnUrl)) {
-            // TODO
-        }
-
-        return true;
     }
 }

@@ -1,6 +1,9 @@
-package com.ajaxjs.iam.server.auth.controller;
+package com.ajaxjs.iam.server.authorizatio.controller;
 
+import com.ajaxjs.iam.annotation.AllowOpenAccess;
+import com.ajaxjs.iam.annotation.ClientAuthentication;
 import com.ajaxjs.iam.model.AccessToken;
+import com.ajaxjs.spring.annotation.BizAction;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -24,7 +27,9 @@ public interface OAuthController {
      * @param resp         响应对象
      */
     @GetMapping("/authorization")
-    void authorization(@RequestParam("response_type") String responseType, @RequestParam("client_id") String clientId, @RequestParam("redirect_uri") String redirectUri, @RequestParam(required = false) String scope, @RequestParam String state, HttpServletRequest req, HttpServletResponse resp);
+    @AllowOpenAccess
+    @BizAction("获取授权码")
+    void authorizationCode(@RequestParam("response_type") String responseType, @RequestParam("client_id") String clientId, @RequestParam("redirect_uri") String redirectUri, @RequestParam(required = false) String scope, @RequestParam String state, HttpServletRequest req, HttpServletResponse resp);
 
     /**
      * 获取 Token
@@ -36,30 +41,22 @@ public interface OAuthController {
      * @return 令牌 Token
      */
     @PostMapping("/token")
+    @AllowOpenAccess
+    @BizAction("获取 Token")
     AccessToken token(@RequestHeader String authorization, @RequestParam("grant_type") String grantType, @RequestParam String code, @RequestParam String state);
 
     /**
      * 通过 Refresh Token 刷新 Access Token
      * 这是通过头传输 client_id/client_secret
      *
-     * @param grantType     必选，固定为 refresh_token
-     * @param authorization 包含  client_id/client_secret 的头，用 Base64 编码
-     * @param refreshToken  必选，Refresh Token
+     * @param grantType    必选，固定为 refresh_token
+     * @param refreshToken 必选，Refresh Token
      * @return Token
      */
     @PostMapping("/refresh_token")
-    AccessToken refreshToken(@RequestParam("grant_type") String grantType, @RequestHeader("Authorization") String authorization, @RequestParam("refresh_token") String refreshToken);
-
-    /**
-     * 客户端凭证获取 Token
-     * 这是通过头传输 client_id/client_secret
-     *
-     * @param grantType     必填，且固定是 client_credentials
-     * @param authorization 包含  client_id/client_secret 的头，用 Base64 编码
-     * @return 应用的 AccessToken
-     */
-    @PostMapping("/client_credentials_basic")
-    AccessToken clientCredential(@RequestParam("grant_type") String grantType, @RequestHeader("Authorization") String authorization);
+    @ClientAuthentication
+    @BizAction("通过 Refresh Token 刷新 Access Token")
+    AccessToken refreshToken(@RequestParam("grant_type") String grantType, @RequestParam("refresh_token") String refreshToken);
 
     /**
      * 验证访问令牌

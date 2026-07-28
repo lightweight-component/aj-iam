@@ -1,17 +1,14 @@
 package com.ajaxjs.iam.server.auth.wechat;
 
 import com.ajaxjs.iam.jwt.JWebTokenMgr;
-import com.ajaxjs.iam.jwt.JwtAccessToken;
-import com.ajaxjs.iam.jwt.JwtUtils;
-import com.ajaxjs.iam.server.common.IamConstants;
+import com.ajaxjs.iam.model.App;
 import com.ajaxjs.iam.server.model.User;
 import com.ajaxjs.iam.server.model.UserAccount;
 import com.ajaxjs.iam.server.model.UserAccountType;
-import com.ajaxjs.iam.model.App;
-import com.ajaxjs.iam.server.model.wechat.Code2SessionResult;
-import com.ajaxjs.iam.server.auth.OAuthCommon;
-import com.ajaxjs.iam.server.auth.OidcService;
 import com.ajaxjs.iam.server.model.UserFunction;
+import com.ajaxjs.iam.server.model.wechat.Code2SessionResult;
+import com.ajaxjs.iam.server.service.token.JwtTokenService;
+import com.ajaxjs.iam.server.service.token.model.JwtToken;
 import com.ajaxjs.iam.server.user_info.UserInfoService;
 import com.ajaxjs.sqlman.Action;
 import com.ajaxjs.util.ObjectHelper;
@@ -19,11 +16,11 @@ import com.ajaxjs.util.RandomTools;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
-public abstract class BaseWechatService extends OAuthCommon {
+public abstract class BaseWechatService {
     @Autowired
     JWebTokenMgr jWebTokenMgr;
 
-    JwtAccessToken createOrUpdateUser(String openId, String sessionKey, App app, long tenantId) {
+    JwtToken createOrUpdateUser(String openId, String sessionKey, App app, long tenantId) {
         UserAccount account = new Action("SELECT * FROM user_account WHERE stat != 1 AND identifier = ? AND type = 'WECHAT_MINI'").query(openId).one(UserAccount.class);
         boolean isNewlyUser = account == null;
         User user;
@@ -48,24 +45,21 @@ public abstract class BaseWechatService extends OAuthCommon {
         return createToken(user, app, isNewlyUser);
     }
 
-    @Value("${User.oidc.jwtExpireHours:74}")
-    int jwtExpireHours;
+    /**
+     * Token 的有效期，单位：分钟  默认一天
+     */
+    @Value("${oauth.token.client_expires: 3600}")
+    private Integer tokenExpires;
 
-    JwtAccessToken createToken(User user, App app, Boolean isNewlyUser) {
-        // 生成 JWT Token
-        JwtAccessToken accessToken = new JwtAccessToken();
-        accessToken.setIsNewlyUser(isNewlyUser);
+    JwtToken createToken(User user, App app, Boolean isNewlyUser) {
+        JwtTokenService tokenService = new JwtTokenService(app, user);
+        tokenService.setjWebTokenMgr(jWebTokenMgr);
+        tokenService.setTokenExpires(tokenExpires);
+        JwtToken token = tokenService.create();
+        token.setIsNewlyUser(isNewlyUser);
+        tokenService.createSave(token);
 
-        // TODO user.getName() 中文名会乱码
-        Long[][] userPermissions = OidcService.getUserPermissions(user.getId());
-        String jWebToken = jWebTokenMgr.tokenFactory(
-                String.valueOf(user.getId()), user.getLoginId(), "", JwtUtils.setExpire(jwtExpireHours),
-                user.getTenantId().intValue(), userPermissions[0], userPermissions[1]
-        ).toString();
-        accessToken.setId_token(jWebToken);
-        createToken(accessToken, app, IamConstants.GrantType.OIDC, user);
-
-        return accessToken;
+        return token;
     }
 
     static User createUser(Long tenantId, String phoneNumber) {

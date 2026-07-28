@@ -1,4 +1,4 @@
-package com.ajaxjs.iam.server.model;
+package com.ajaxjs.iam.server.service.token.model;
 
 import com.ajaxjs.sqlman.annotation.Id;
 import com.ajaxjs.sqlman.annotation.Table;

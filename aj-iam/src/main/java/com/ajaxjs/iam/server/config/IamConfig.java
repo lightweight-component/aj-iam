@@ -4,9 +4,9 @@ import com.ajaxjs.framework.cache.Cache;
 import com.ajaxjs.framework.cache.delayqueue.ExpiryCache;
 import com.ajaxjs.framework.cache.lru.LRUCache;
 import com.ajaxjs.iam.client.CacheProvider;
+import com.ajaxjs.iam.server.auth.UserLoginService;
 import com.ajaxjs.iam.server.common.session.ServletUserSession;
 import com.ajaxjs.iam.server.common.session.UserSession;
-import com.ajaxjs.iam.server.auth.OidcService;
 import com.ajaxjs.message.email.ISendEmail;
 import com.ajaxjs.message.email.resend.Resend;
 import com.ajaxjs.security.captcha.image.ImageCaptchaConfig;
@@ -39,7 +39,7 @@ public class IamConfig implements WebMvcConfigurer {
         return token -> {
             Cache<String, Object> cache = ExpiryCache.getInstance();
             String key = JWT_TOKEN_USER_KEY + "-" + token;
-            OidcService.TokenUser tokenUser = cache.get(key, OidcService.TokenUser.class);
+            UserLoginService.TokenUser tokenUser = cache.get(key, UserLoginService.TokenUser.class);
 
             if (tokenUser == null)
                 throw new SecurityException("找不到用户信息");

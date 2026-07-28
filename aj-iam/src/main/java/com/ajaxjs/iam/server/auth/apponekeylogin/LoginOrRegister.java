@@ -1,28 +1,28 @@
 package com.ajaxjs.iam.server.auth.apponekeylogin;
 
 import com.ajaxjs.iam.jwt.JWebTokenMgr;
-import com.ajaxjs.iam.jwt.JwtAccessToken;
-import com.ajaxjs.iam.jwt.JwtUtils;
-import com.ajaxjs.iam.model.App;
-import com.ajaxjs.iam.server.auth.OAuthCommon;
-import com.ajaxjs.iam.server.auth.OidcService;
-import com.ajaxjs.iam.server.common.IamConstants;
 import com.ajaxjs.iam.server.model.User;
 import com.ajaxjs.iam.server.model.UserAccount;
 import com.ajaxjs.iam.server.model.UserAccountType;
 import com.ajaxjs.iam.server.model.UserFunction;
 import com.ajaxjs.iam.server.service.ClientCredential;
 import com.ajaxjs.iam.server.service.TenantService;
+import com.ajaxjs.iam.server.service.token.JwtTokenService;
+import com.ajaxjs.iam.server.service.token.model.JwtToken;
 import com.ajaxjs.sqlman.Action;
 import com.ajaxjs.util.ObjectHelper;
 import com.ajaxjs.util.RandomTools;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-public class LoginOrRegister extends OAuthCommon {
+public class LoginOrRegister {
     private final UserAccountType userAccountType;
 
-    public JwtAccessToken createUser(String value, String appId) {
+    private final JWebTokenMgr jWebTokenMgr;
+
+    private final Integer tokenExpires;
+
+    public JwtToken createUser(String value, String appId) {
         Integer tenantId = TenantService.getTenantId(false);
 
         if (tenantId == null)
@@ -50,8 +50,14 @@ public class LoginOrRegister extends OAuthCommon {
                 createUserAccount(existUser.getId());
         }
 
+        JwtTokenService tokenService = new JwtTokenService(ClientCredential.getApp(appId), user);
+        tokenService.setjWebTokenMgr(jWebTokenMgr);
+        tokenService.setTokenExpires(tokenExpires);
+        JwtToken token = tokenService.create();
+        token.setIsNewlyUser(isNewlyUser);
+        tokenService.createSave(token);
 
-        return createToken(user, ClientCredential.getApp(appId), isNewlyUser);
+        return token;
     }
 
     private User createUser(Long tenantId, String value) {
@@ -83,26 +89,5 @@ public class LoginOrRegister extends OAuthCommon {
         account.setType(userAccountType);
 
         return new Action(account).create().execute(true).isOk();
-    }
-
-    private final JWebTokenMgr jWebTokenMgr;
-
-    private final int jwtExpireHours;
-
-    private JwtAccessToken createToken(User user, App app, Boolean isNewlyUser) {
-        // 生成 JWT Token
-        JwtAccessToken accessToken = new JwtAccessToken();
-        accessToken.setIsNewlyUser(isNewlyUser);
-
-        // TODO user.getName() 中文名会乱码
-        Long[][] userPermissions = OidcService.getUserPermissions(user.getId());
-        String jWebToken = jWebTokenMgr.tokenFactory(
-                String.valueOf(user.getId()), user.getLoginId(), "", JwtUtils.setExpire(jwtExpireHours),
-                user.getTenantId().intValue(), userPermissions[0], userPermissions[1]
-        ).toString();
-        accessToken.setId_token(jWebToken);
-        createToken(accessToken, app, IamConstants.GrantType.OIDC, user);
-
-        return accessToken;
     }
 }

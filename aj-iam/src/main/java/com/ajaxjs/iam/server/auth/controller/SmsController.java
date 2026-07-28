@@ -1,7 +1,7 @@
 package com.ajaxjs.iam.server.auth.controller;
 
 import com.ajaxjs.iam.annotation.ClientAuthentication;
-import com.ajaxjs.iam.jwt.JwtAccessToken;
+import com.ajaxjs.iam.server.service.token.model.JwtToken;
 import com.ajaxjs.spring.annotation.BizAction;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,7 +21,7 @@ public interface SmsController {
     @GetMapping("/mobile_app_onekey_login_ali/{token}")
     @BizAction("APP 登录一键登录")
     @ClientAuthentication
-    JwtAccessToken mobileAppOneKeyLoginAli(@PathVariable String token);
+    JwtToken mobileAppOneKeyLoginAli(@PathVariable String token);
 
     /**
      * 根据手机号码发送短信
@@ -44,7 +44,7 @@ public interface SmsController {
     @PostMapping("/verify_code")
     @BizAction("检查验证码是否匹配且未过期")
     @ClientAuthentication
-    JwtAccessToken verifyCode(@RequestParam String phone,  @RequestParam String code);
+    JwtToken verifyCode(@RequestParam String phone,  @RequestParam String code);
 
     /**
      * 检查验证码是否匹配且未过期

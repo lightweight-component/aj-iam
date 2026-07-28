@@ -3,12 +3,12 @@ package com.ajaxjs.iam.server.auth.wechat;
 import com.ajaxjs.framework.model.BusinessException;
 import com.ajaxjs.iam.UserConstants;
 import com.ajaxjs.iam.client.BaseOidcClientUserController;
-import com.ajaxjs.iam.jwt.JwtAccessToken;
-import com.ajaxjs.iam.server.service.ClientCredential;
 import com.ajaxjs.iam.model.App;
 import com.ajaxjs.iam.server.model.wechat.WechatTokenResponse;
 import com.ajaxjs.iam.server.model.wechat.WechatUserInfoResponse;
+import com.ajaxjs.iam.server.service.ClientCredential;
 import com.ajaxjs.iam.server.service.TenantService;
+import com.ajaxjs.iam.server.service.token.model.JwtToken;
 import com.ajaxjs.spring.DiContextUtil;
 import com.ajaxjs.sqlman.Action;
 import com.ajaxjs.util.ObjectHelper;
@@ -71,7 +71,7 @@ public class OpenAccount extends BaseWechatService {
 
         App app = ClientCredential.getApp(appId);
         HttpServletResponse response = DiContextUtil.getResponse();
-        JwtAccessToken accessToken = createOrUpdateUser(openId, null, app, tenantId.longValue());
+        JwtToken accessToken = createOrUpdateUser(openId, null, app, tenantId.longValue());
         BaseOidcClientUserController.setTokenToCookie(accessToken, response);
 
         if (accessToken.getIsNewlyUser())

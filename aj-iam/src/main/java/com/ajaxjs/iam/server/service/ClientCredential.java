@@ -23,7 +23,7 @@ import java.sql.SQLException;
  */
 @Service
 public class ClientCredential implements IOAuthService {
-    public Boolean clientRegister(App app) {
+    public boolean clientRegister(App app) {
         if (!StringUtils.hasText(app.getName()))
             throw new IllegalArgumentException("客户端的名称和回调地址不能为空");
 

@@ -4,6 +4,7 @@ import com.ajaxjs.iam.UserConstants;
 import com.ajaxjs.iam.client.BaseOidcClientUserController;
 import com.ajaxjs.iam.client.CacheProvider;
 import com.ajaxjs.iam.jwt.JwtAccessToken;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
@@ -13,8 +14,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.view.RedirectView;
-
-import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * IAM 作为 OIDC 客户端的相关业务

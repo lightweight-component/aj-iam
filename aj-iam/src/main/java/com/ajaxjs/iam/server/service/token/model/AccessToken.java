@@ -1,31 +1,31 @@
-package com.ajaxjs.iam.model;
+package com.ajaxjs.iam.server.service.token.model;
 
 import lombok.Data;
 
 /**
- * 访问令牌
+ * 普通 Access Token
  */
 @Data
 public class AccessToken {
     /**
-     * 普通 Access Token，UUID 生成，如果用了 JWT 这个就没什么用了。但保留吧
+     * 普通 Access Token
      */
-    private String access_token;
+    private String accessToken;
 
     /**
      * 刷新 Token
      */
-    private String refresh_token;
+    private String refreshToken;
 
     /**
      * 有效期，以秒为单位
      */
-    private Integer expires_in;
+    private Integer expiresIn;
 
     /**
      * RefreshToken 有效期，以秒为单位
      */
-    private Integer refresh_expires_in;
+    private Integer refreshExpiresIn;
 
     /**
      * 权限范围

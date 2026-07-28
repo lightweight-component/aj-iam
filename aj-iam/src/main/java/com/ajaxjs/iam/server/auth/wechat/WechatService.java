@@ -2,16 +2,16 @@ package com.ajaxjs.iam.server.auth.wechat;
 
 import com.ajaxjs.framework.database.EnableTransaction;
 import com.ajaxjs.iam.client.SecurityManager;
-import com.ajaxjs.iam.jwt.JwtAccessToken;
+import com.ajaxjs.iam.model.App;
 import com.ajaxjs.iam.model.SimpleUser;
-import com.ajaxjs.iam.server.service.ClientCredential;
 import com.ajaxjs.iam.server.auth.controller.WechatController;
 import com.ajaxjs.iam.server.model.User;
 import com.ajaxjs.iam.server.model.UserAccount;
-import com.ajaxjs.iam.model.App;
-import com.ajaxjs.iam.server.model.wechat.*;
-import com.ajaxjs.iam.server.service.TenantService;
 import com.ajaxjs.iam.server.model.UserFunction;
+import com.ajaxjs.iam.server.model.wechat.*;
+import com.ajaxjs.iam.server.service.ClientCredential;
+import com.ajaxjs.iam.server.service.TenantService;
+import com.ajaxjs.iam.server.service.token.model.JwtToken;
 import com.ajaxjs.iam.server.user_info.UserInfoService;
 import com.ajaxjs.sqlman.Action;
 import com.ajaxjs.util.Base64Utils;
@@ -35,7 +35,7 @@ import java.util.Map;
 public class WechatService extends BaseWechatService implements WechatController {
     @Override
     @EnableTransaction
-    public JwtAccessToken miniAppLogin(WechatAuthCode data) {
+    public JwtToken miniAppLogin(WechatAuthCode data) {
         Code2SessionResult session = getOpenIdByCode(data);
         App app = ClientCredential.getApp(data.getAppId());
 
@@ -86,7 +86,7 @@ public class WechatService extends BaseWechatService implements WechatController
 
     @Override
     @EnableTransaction
-    public JwtAccessToken loginByMiniAppPhoneNumber(PhoneNumberLoginDTO dto) {
+    public JwtToken loginByMiniAppPhoneNumber(PhoneNumberLoginDTO dto) {
         WechatAuthCode wechatAuthCode = new WechatAuthCode();
         wechatAuthCode.setAppId(dto.getAppId());
         wechatAuthCode.setCode(dto.getCode());
@@ -100,7 +100,7 @@ public class WechatService extends BaseWechatService implements WechatController
 
         MiniAppPhoneNumber phoneNumber = JsonUtil.fromJson(json, MiniAppPhoneNumber.class);
         String phone = phoneNumber.getPhoneNumber();
-        log.info("phone:" + phone);
+        log.info("phone:{}", phone);
         String openId = openIdByCode.getOpenid();
         Integer tenantId = TenantService.getTenantId(false);
 

@@ -1,7 +1,7 @@
 package com.ajaxjs.iam.server.service;
 
 import com.ajaxjs.iam.server.BaseTest;
-import com.ajaxjs.iam.server.auth.UserLoginRegisterService;
+import com.ajaxjs.iam.server.auth.UserLoginService;
 import com.ajaxjs.iam.server.model.User;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class TestUserLoginRegisterService extends BaseTest {
     @Autowired
-    UserLoginRegisterService userLoginRegisterService;
+    UserLoginService userLoginService;
 
     HttpServletRequest request = mock(HttpServletRequest.class);
 
@@ -38,7 +38,7 @@ public class TestUserLoginRegisterService extends BaseTest {
 
     @Test
     public void testGetUserLoginByPassword() {
-        User admin = userLoginRegisterService.getUserLoginByPassword("admin", "123123", 0);
+        User admin = userLoginService.getUserLoginByPassword("admin", "123123", 0);
         assertNotNull(admin);
 
         HttpSession s = mock(HttpSession.class);

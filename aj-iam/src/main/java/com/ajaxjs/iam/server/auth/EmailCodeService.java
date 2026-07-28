@@ -3,7 +3,6 @@ package com.ajaxjs.iam.server.auth;
 import com.ajaxjs.framework.cache.Cache;
 import com.ajaxjs.framework.cache.delayqueue.ExpiryCache;
 import com.ajaxjs.iam.jwt.JWebTokenMgr;
-import com.ajaxjs.iam.jwt.JwtAccessToken;
 import com.ajaxjs.iam.server.auth.apponekeylogin.LoginOrRegister;
 import com.ajaxjs.iam.server.auth.controller.EmailCodeController;
 import com.ajaxjs.iam.server.common.UserUtils;
@@ -11,6 +10,7 @@ import com.ajaxjs.iam.server.common.langs.LanguageMapping;
 import com.ajaxjs.iam.server.model.AppSecretMgr;
 import com.ajaxjs.iam.server.model.UserAccountType;
 import com.ajaxjs.iam.server.service.ClientCredential;
+import com.ajaxjs.iam.server.service.token.model.JwtToken;
 import com.ajaxjs.message.email.Email;
 import com.ajaxjs.message.email.resend.Resend;
 import com.ajaxjs.sqlman.Action;
@@ -76,17 +76,14 @@ public class EmailCodeService implements EmailCodeController {
     @Autowired
     private JWebTokenMgr jWebTokenMgr;
 
-    @Value("${User.oidc.jwtExpireHours:74}")
-    private int jwtExpireHours;
-
     /**
-     * Token 的有效期，单位：分钟  默认两天
+     * Token 的有效期，单位：分钟  默认一天
      */
-    @Value("${oauth.token.client_expires: 60}")
-    private Integer clientExpires;
+    @Value("${oauth.token.client_expires: 3600}")
+    private Integer tokenExpires;
 
     @Override
-    public JwtAccessToken verifyCode(String email, String code) {
+    public JwtToken verifyCode(String email, String code) {
         String appId = ClientCredential.getAppId();
 
         if (!StringUtils.hasText(email) || !UserUtils.isValidEmail(email)) // 请提交有效的邮箱
@@ -100,10 +97,7 @@ public class EmailCodeService implements EmailCodeController {
         if (i != null && i.equals(Integer.parseInt(code))) {
             cache.remove(email);
 
-            LoginOrRegister loginOrRegister = new LoginOrRegister(UserAccountType.EMAIL, jWebTokenMgr, jwtExpireHours);
-            loginOrRegister.setClientExpires(clientExpires);
-
-            return loginOrRegister.createUser(email, appId);
+            return new LoginOrRegister(UserAccountType.EMAIL, jWebTokenMgr, tokenExpires).createUser(email, appId);
         } else
             throw new SecurityException(LanguageMapping.getLanguageByKey("sms.phone.error_verification_code"));// 验证码错误
     }

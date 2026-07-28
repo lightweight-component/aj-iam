@@ -1,9 +1,12 @@
 package com.ajaxjs.iam.server.auth.controller;
 
 import com.ajaxjs.iam.annotation.ClientAuthentication;
-import com.ajaxjs.iam.jwt.JwtAccessToken;
+import com.ajaxjs.iam.server.service.token.model.JwtToken;
 import com.ajaxjs.spring.annotation.BizAction;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * 通过邮箱验证码登录
@@ -32,7 +35,7 @@ public interface EmailCodeController {
     @PostMapping("/verify_code")
     @BizAction("检查验证码是否匹配且未过期")
     @ClientAuthentication
-    JwtAccessToken verifyCode(@RequestParam String email, @RequestParam String code);
+    JwtToken verifyCode(@RequestParam String email, @RequestParam String code);
 
     /**
      * 检查验证码是否匹配且未过期

@@ -1,6 +1,5 @@
-package com.ajaxjs.iam.server.user_info;
+package com.ajaxjs.iam.server.user_info.controller;
 
-import com.ajaxjs.iam.annotation.AllowOpenAccess;
 import com.ajaxjs.iam.annotation.ClientAuthentication;
 import com.ajaxjs.iam.server.model.User;
 import com.ajaxjs.spring.annotation.BizAction;

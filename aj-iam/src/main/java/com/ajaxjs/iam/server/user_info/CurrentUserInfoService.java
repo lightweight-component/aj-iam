@@ -12,6 +12,7 @@ import com.ajaxjs.iam.client.SecurityManager;
 import com.ajaxjs.iam.model.SimpleUser;
 import com.ajaxjs.iam.server.model.User;
 import com.ajaxjs.iam.server.model.UserAccount;
+import com.ajaxjs.iam.server.user_info.controller.CurrentUserInfoController;
 import com.ajaxjs.spring.DiContextUtil;
 import com.ajaxjs.sqlman.Action;
 import jakarta.servlet.http.HttpServletRequest;

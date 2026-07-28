@@ -20,6 +20,12 @@ public interface IamConstants {
         String OAUTH = "authorization_code_oauth";
     }
 
+    String DEFAULT_SCOPE = "DEFAULT_SCOPE";
+
+    String NOT_LOGIN_TEXT = "<meta charset=\"UTF-8\" /><meta http-equiv=\"refresh\" content=\"1;url=%s\" /> " +
+            "User Not login, wait 1 seconds to redirect the login page...<br />" +
+            "用户尚未登录，现在跳转到登录页面……";
+
     /**
      * accessToken的有效期为30天
      */

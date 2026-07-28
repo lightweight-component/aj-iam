@@ -1,4 +1,4 @@
-package com.ajaxjs.iam.server.user_info;
+package com.ajaxjs.iam.server.user_info.controller;
 
 import com.ajaxjs.fileupload.UploadedResult;
 import com.ajaxjs.iam.server.model.User;
