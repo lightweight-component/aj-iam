@@ -18,10 +18,6 @@ import lombok.RequiredArgsConstructor;
 public class LoginOrRegister {
     private final UserAccountType userAccountType;
 
-    private final JWebTokenMgr jWebTokenMgr;
-
-    private final Integer tokenExpires;
-
     public JwtToken createUser(String value, String appId) {
         Integer tenantId = TenantService.getTenantId(false);
 
@@ -51,8 +47,6 @@ public class LoginOrRegister {
         }
 
         JwtTokenService tokenService = new JwtTokenService(ClientCredential.getApp(appId), user);
-        tokenService.setjWebTokenMgr(jWebTokenMgr);
-        tokenService.setTokenExpires(tokenExpires);
         JwtToken token = tokenService.create();
         token.setIsNewlyUser(isNewlyUser);
         tokenService.createSave(token);

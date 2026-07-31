@@ -67,8 +67,7 @@ public class ClassicAccessToken extends BaseTokenService {
             save.setUserName(user.getLoginId());
         }
 
-//        return new Action(save).create().execute(true).isOk();
-        return true;
+        return new Action(save).create().execute(true).isOk();
     }
 
     public AccessToken refreshToken(String refreshToken) {
@@ -87,8 +86,7 @@ public class ClassicAccessToken extends BaseTokenService {
         updated.setRefreshToken(accessToken.getRefresh_token());
         updated.setExpiresDate(calculateExpirationDate(accessToken.getExpires_in()));
         updated.setRefreshExpires(calculateExpirationDate(accessToken.getRefresh_expires_in()));
-
-//        new Action(updated).update().withId();
+        new Action(updated).update().withId();
 
         return accessToken;
     }

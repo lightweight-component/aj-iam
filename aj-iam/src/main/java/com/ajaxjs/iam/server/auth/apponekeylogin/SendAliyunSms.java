@@ -1,37 +1,24 @@
 package com.ajaxjs.iam.server.auth.apponekeylogin;
 
 import com.ajaxjs.message.sms.ali_sms.AliyunSmsEntity;
-import com.ajaxjs.util.HashHelper;
 import com.ajaxjs.util.JsonUtil;
 import com.ajaxjs.util.RandomTools;
+import com.ajaxjs.util.date.DateTools;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.net.URI;
-import java.net.URLEncoder;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.nio.charset.StandardCharsets;
-import java.time.Instant;
-import java.time.ZoneOffset;
-import java.time.format.DateTimeFormatter;
 import java.util.Map;
 import java.util.TreeMap;
-
-import static com.ajaxjs.util.HashHelper.HMAC_SHA1;
 
 /**
  * 阿里云发送短信
  */
 @Slf4j
-public class SendAliyunSms {
-    private static final String ENDPOINT = "https://dypnsapi.aliyuncs.com";
-
-    private static final String SIGNATURE_METHOD = "HMAC-SHA1";
-
-    private static final String SIGNATURE_VERSION = "1.0";
-
+public class SendAliyunSms extends BaseAliOpenApi {
     public static String send(AliyunSmsEntity entity) {
         // 1. 构造公共请求参数
         Map<String, String> commonParams = new TreeMap<>();
@@ -39,7 +26,7 @@ public class SendAliyunSms {
         commonParams.put("Version", "2017-05-25");
         commonParams.put("Format", "JSON"); // 可选
         commonParams.put("AccessKeyId", entity.getAccessKeyId());
-        commonParams.put("Timestamp", generateTimestamp());
+        commonParams.put("Timestamp", DateTools.newISO8601Date());
         commonParams.put("SignatureMethod", SIGNATURE_METHOD);
         commonParams.put("SignatureVersion", SIGNATURE_VERSION);
         commonParams.put("SignatureNonce", RandomTools.generateRandomString(10));
@@ -95,73 +82,5 @@ public class SendAliyunSms {
 
             return msg;
         }
-    }
-
-    /**
-     * 生成 ISO8601 格式的 UTC 时间戳
-     */
-    private static String generateTimestamp() {
-        return Instant.now().atOffset(ZoneOffset.UTC)
-                .format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'"));
-    }
-
-    /**
-     * 计算阿里云 OpenAPI 签名
-     */
-    private static String calculateSignature(Map<String, String> params, String accessKeySecret) {
-        StringBuilder canonicalizedQueryString = new StringBuilder();
-        for (Map.Entry<String, String> entry : params.entrySet()) {
-            // 注意：签名计算时，Signature 参数本身不参与
-            if ("Signature".equals(entry.getKey())) continue;
-
-            canonicalizedQueryString.append("&")
-                    .append(percentEncode(entry.getKey())).append("=")
-                    .append(percentEncode(entry.getValue()));
-        }
-
-        // 移除第一个 &
-        if (!canonicalizedQueryString.isEmpty())
-            canonicalizedQueryString.deleteCharAt(0);
-
-        String stringToSign = "POST&" + percentEncode("/") + "&" + percentEncode(canonicalizedQueryString.toString());
-        String key = accessKeySecret + "&"; // 阿里云要求在Secret后面加 '&'
-
-        return new HashHelper(HMAC_SHA1, stringToSign).setKey(key).hashAsBase64(false);
-    }
-
-    /**
-     * URL 编码函数，遵循阿里云规范 (使用 %2F 而非 %20)
-     */
-    public static String percentEncode(String value) {
-        if (value == null)
-            return "";
-
-        try {
-            return URLEncoder.encode(value, StandardCharsets.UTF_8)
-                    .replace("+", "%20")
-                    .replace("*", "%2A")
-                    .replace("%7E", "~");
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    /**
-     * 构建 application/x-www-form-urlencoded 格式的请求体
-     */
-    public static String buildFormData(Map<String, String> params) {
-        StringBuilder formData = new StringBuilder();
-
-        for (Map.Entry<String, String> entry : params.entrySet()) {
-            formData.append("&")
-                    .append(percentEncode(entry.getKey()))
-                    .append("=")
-                    .append(percentEncode(entry.getValue()));
-        }
-
-        if (!formData.isEmpty())
-            formData.deleteCharAt(0); // Remove leading &
-
-        return formData.toString();
     }
 }

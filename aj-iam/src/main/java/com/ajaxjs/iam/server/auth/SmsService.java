@@ -3,7 +3,7 @@ package com.ajaxjs.iam.server.auth;
 import com.ajaxjs.framework.cache.Cache;
 import com.ajaxjs.framework.cache.delayqueue.ExpiryCache;
 import com.ajaxjs.iam.client.SecurityManager;
-import com.ajaxjs.iam.jwt.JWebTokenMgr;
+import com.ajaxjs.iam.jwt.JwtToken;
 import com.ajaxjs.iam.server.auth.apponekeylogin.AliyunOpenApi;
 import com.ajaxjs.iam.server.auth.apponekeylogin.LoginOrRegister;
 import com.ajaxjs.iam.server.auth.apponekeylogin.SendAliyunSms;
@@ -15,13 +15,11 @@ import com.ajaxjs.iam.server.model.User;
 import com.ajaxjs.iam.server.model.UserAccountType;
 import com.ajaxjs.iam.server.service.ClientCredential;
 import com.ajaxjs.iam.server.service.TenantService;
-import com.ajaxjs.iam.jwt.JwtToken;
 import com.ajaxjs.message.sms.ali_sms.AliyunSmsEntity;
 import com.ajaxjs.sqlman.Action;
 import com.ajaxjs.util.RandomTools;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -34,22 +32,13 @@ public class SmsService implements SmsController {
     @Autowired
     AliyunOpenApi aliyunOpenApi;
 
-    @Autowired
-    JWebTokenMgr jWebTokenMgr;
-
-    /**
-     * Token 的有效期，单位：分钟  默认一天
-     */
-    @Value("${oauth.token.client_expires: 3600}")
-    private Integer tokenExpires;
-
     @Override
     public JwtToken mobileAppOneKeyLoginAli(String token) {
         String appId = ClientCredential.getAppId();
         String phone = aliyunOpenApi.getPhoneByToken(token);
         log.info("已获取手机号码 {}", phone);
 
-        return new LoginOrRegister(UserAccountType.PHONE, jWebTokenMgr, tokenExpires).createUser(phone, appId);
+        return new LoginOrRegister(UserAccountType.PHONE).createUser(phone, appId);
     }
 
     private final Cache<String, Object> cache = ExpiryCache.getInstance();
@@ -104,7 +93,7 @@ public class SmsService implements SmsController {
         if (i != null && i.equals(Integer.parseInt(code))) {
             cache.remove(phone);
 
-            return new LoginOrRegister(UserAccountType.PHONE, jWebTokenMgr, tokenExpires).createUser(phone, appId);
+            return new LoginOrRegister(UserAccountType.PHONE).createUser(phone, appId);
         } else
             throw new SecurityException(LanguageMapping.getLanguageByKey("sms.phone.error_verification_code"));// 验证码错误
     }

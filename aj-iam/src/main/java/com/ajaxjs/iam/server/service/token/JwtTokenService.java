@@ -1,6 +1,7 @@
 package com.ajaxjs.iam.server.service.token;
 
 import com.ajaxjs.framework.model.BusinessException;
+import com.ajaxjs.iam.jwt.JWebToken;
 import com.ajaxjs.iam.jwt.JWebTokenMgr;
 import com.ajaxjs.iam.jwt.JwtUtils;
 import com.ajaxjs.iam.model.App;
@@ -10,6 +11,7 @@ import com.ajaxjs.iam.server.service.TenantService;
 import com.ajaxjs.iam.server.service.token.model.AccessTokenPo;
 import com.ajaxjs.iam.jwt.JwtToken;
 import com.ajaxjs.iam.server.user_info.UserInfoService;
+import com.ajaxjs.spring.DiContextUtil;
 import com.ajaxjs.sqlman.Action;
 import com.ajaxjs.util.ObjectHelper;
 import com.ajaxjs.util.RandomTools;
@@ -20,10 +22,6 @@ import java.util.List;
 import java.util.Map;
 
 public class JwtTokenService extends BaseTokenService {
-    public JwtTokenService(App app, String grantType, User user) {
-        super(app, grantType, user);
-    }
-
     public JwtTokenService(App app, User user) {
         super(app, IamConstants.GrantType.OIDC, user);
     }
@@ -44,6 +42,16 @@ public class JwtTokenService extends BaseTokenService {
         this.jWebTokenMgr = jWebTokenMgr;
     }
 
+    public JWebTokenMgr getjWebTokenMgr() {
+        if (jWebTokenMgr == null)
+            jWebTokenMgr = DiContextUtil.getBean(JWebTokenMgr.class);
+
+        if (jWebTokenMgr == null)
+            throw new NullPointerException("Please set jWebTokenMgr first.");
+
+        return jWebTokenMgr;
+    }
+
     /**
      * 生成 JWT Token
      *
@@ -62,16 +70,15 @@ public class JwtTokenService extends BaseTokenService {
         jwtAccessToken.setExpiresIn(tokenExpInSecs);
         jwtAccessToken.setRefreshExpiresIn(refreshTokenExpInSecs);
 
-        if (jWebTokenMgr == null)
-            throw new NullPointerException("Please set jWebTokenMgr first.");
 
         // TODO user.getName() 中文名会乱码
         Long[][] userPermissions = getUserPermissions(user.getId());
-        String jWebToken = jWebTokenMgr.tokenFactory(
+        JWebToken jWebToken = getjWebTokenMgr().tokenFactory(
                 String.valueOf(user.getId()), user.getLoginId(), DEFAULT_SCOPE, JwtUtils.setExpire(tokenExpInSecs / 3600),
                 user.getTenantId().intValue(), userPermissions[0], userPermissions[1]
-        ).toString();
-        jwtAccessToken.setToken(jWebToken);
+        );
+        jwtAccessToken.setToken(jWebToken.toString());
+        jwtAccessToken.setTokenJson(jWebToken.getPayloadJson());
         jwtAccessToken.setRefreshToken(RandomTools.uuidStr());
 
         return jwtAccessToken;
@@ -82,12 +89,14 @@ public class JwtTokenService extends BaseTokenService {
         AccessTokenPo save = new AccessTokenPo();
         save.setAccessToken(token.getToken());
         save.setRefreshToken(token.getRefreshToken());
-//        save.setJwtToken();
+        save.setJwtToken(token.getTokenJson());
         save.setExpiresDate(calculateExpirationDate(token.getExpiresIn()));
         save.setRefreshExpires(calculateExpirationDate(token.getRefreshExpiresIn()));
         save.setGrantType(getGrantType());
         save.setClientId(getApp().getClientId());
         save.setCreateDate(new Date());
+
+        token.setTokenJson(null); // 避免把 json 输出到前端
 
         if (TenantService.getTenantId(false) != null)
             save.setTenantId(TenantService.getTenantId(false));
@@ -100,7 +109,6 @@ public class JwtTokenService extends BaseTokenService {
         }
 
         return new Action(save).create().execute(true).isOk();
-//        return true;
     }
 
     public JwtToken refreshToken(String refreshToken) {
@@ -123,7 +131,7 @@ public class JwtTokenService extends BaseTokenService {
         updated.setExpiresDate(calculateExpirationDate(token.getExpiresIn()));
         updated.setRefreshExpires(calculateExpirationDate(token.getRefreshExpiresIn()));
 
-//        new Action(updated).update().withId();
+        new Action(updated).update().withId();
 
         return token;
     }

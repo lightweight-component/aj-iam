@@ -49,7 +49,7 @@ public abstract class BaseOidcClientUserController {
         String state = RandomTools.generateRandomString(5);
         getCacheProvider().save(ClientUtils.OAUTH_STATE, state, STATE_EXPIRE);
 
-        log.info("set state code:" + state);
+        log.info("set state code:{}", state);
 
         String url = getAuthCodeUrl + "?response_type=code&client_id=" + clientId;
         url += "&redirect_uri=" + new UrlEncode(clientCallbackUrl).encodeQuery();
@@ -96,7 +96,7 @@ public abstract class BaseOidcClientUserController {
                 } else
                     return new ModelAndView("redirect:/");
             } else {
-                log.info("error:" + result);
+                log.info("error:{}", result);
                 throw new SecurityException("获取 JWT Token 失败，原因: " + result.get("message"));
             }
         } else

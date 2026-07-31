@@ -2,7 +2,7 @@ package com.ajaxjs.iam.server.auth;
 
 import com.ajaxjs.framework.cache.Cache;
 import com.ajaxjs.framework.cache.delayqueue.ExpiryCache;
-import com.ajaxjs.iam.jwt.JWebTokenMgr;
+import com.ajaxjs.iam.jwt.JwtToken;
 import com.ajaxjs.iam.server.auth.apponekeylogin.LoginOrRegister;
 import com.ajaxjs.iam.server.auth.controller.EmailCodeController;
 import com.ajaxjs.iam.server.common.UserUtils;
@@ -10,7 +10,6 @@ import com.ajaxjs.iam.server.common.langs.LanguageMapping;
 import com.ajaxjs.iam.server.model.AppSecretMgr;
 import com.ajaxjs.iam.server.model.UserAccountType;
 import com.ajaxjs.iam.server.service.ClientCredential;
-import com.ajaxjs.iam.jwt.JwtToken;
 import com.ajaxjs.message.email.Email;
 import com.ajaxjs.message.email.resend.Resend;
 import com.ajaxjs.sqlman.Action;
@@ -19,7 +18,6 @@ import com.ajaxjs.util.RandomTools;
 import com.ajaxjs.util.StrUtil;
 import com.ajaxjs.util.date.DateTools;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -73,13 +71,10 @@ public class EmailCodeService implements EmailCodeController {
 //        return new Resend().setApiKey(resendKey).sendEmail(emailEntity);
 //    }
 
-    @Autowired
-    private JWebTokenMgr jWebTokenMgr;
-
     /**
      * Token 的有效期，单位：分钟  默认一天
      */
-    @Value("${oauth.token.client_expires: 3600}")
+    @Value("${auth.token.expires: 3600}")
     private Integer tokenExpires;
 
     @Override
@@ -97,7 +92,7 @@ public class EmailCodeService implements EmailCodeController {
         if (i != null && i.equals(Integer.parseInt(code))) {
             cache.remove(email);
 
-            return new LoginOrRegister(UserAccountType.EMAIL, jWebTokenMgr, tokenExpires).createUser(email, appId);
+            return new LoginOrRegister(UserAccountType.EMAIL).createUser(email, appId);
         } else
             throw new SecurityException(LanguageMapping.getLanguageByKey("sms.phone.error_verification_code"));// 验证码错误
     }

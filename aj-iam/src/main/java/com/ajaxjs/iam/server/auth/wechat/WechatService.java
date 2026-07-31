@@ -165,10 +165,9 @@ public class WechatService extends BaseWechatService implements WechatController
         if (query == null)
             throw new NullPointerException("Please provide the App information.");
 
-        log.info(":::" + query);
         String url = String.format(LOGIN_API, query.get("appId"), query.get("appSecret"), data.getCode());
         Code2SessionResult session = Get.api(url, Code2SessionResult.class);
-        log.info("session: " + session);
+        log.info("session: {}", session);
 
         if (session == null || session.getErrcode() != null && session.getErrcode() != 0)
             throw new IllegalStateException(session == null ? "微信登录失败" : "微信登录失败: " + session.getErrmsg());

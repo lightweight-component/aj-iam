@@ -77,9 +77,9 @@ public class IamConfiguration implements WebMvcConfigurer {
         if (ObjectHelper.hasText(iamService)) {
             CompletableFuture.runAsync(() -> {        // 异步执行任务
                 try {
-                    Map<String, Object> api = Get.api(iamService + "/iam_api/");
+                    String helloWorld = Get.text(iamService + "/iam_api/");
 
-                    if (api == null || !api.containsKey("status") || (int) api.get("status") != 1)
+                    if (ObjectHelper.isEmptyText(helloWorld))
                         log.warn("IAM 服务连接失败或异常。你的认证服务或不可用。");
                     else
                         log.info("IAM 服务连接成功");

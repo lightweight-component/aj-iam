@@ -2,6 +2,8 @@ package com.ajaxjs.iam.server.service.token;
 
 import com.ajaxjs.iam.model.App;
 import com.ajaxjs.iam.server.model.User;
+import com.ajaxjs.spring.DiContextUtil;
+import com.ajaxjs.util.ObjectHelper;
 import lombok.Data;
 
 import java.util.Calendar;
@@ -21,12 +23,18 @@ public abstract class BaseTokenService {
     /**
      * Token 的有效期，单位：分钟，默认两天
      */
-    private Integer tokenExpires = 3600 * 2;
+    private Integer tokenExpires = 60 * 24 * 2;
 
     /**
      * Refresh Token 的有效期，单位：分钟，默认7天
      */
-    private Integer refreshTokenExpires = 3600 * 7;
+    private Integer refreshTokenExpires = 60 * 24 * 7;
+
+    public Integer getTokenExpires() {
+        String s = DiContextUtil.getConfigFromYml("auth.token.expires");
+
+        return ObjectHelper.hasText(s) ? Integer.parseInt(s) : this.tokenExpires;
+    }
 
     /**
      * 创建 BaseTokenService
@@ -54,9 +62,9 @@ public abstract class BaseTokenService {
     /**
      * 将到期的分钟数转换为到期的时间
      */
-    static Date calculateExpirationDate(int minutesToExpiration) {
+    static Date calculateExpirationDate(int secondsToExpiration) {
         Calendar calendar = Calendar.getInstance();
-        calendar.add(Calendar.MINUTE, minutesToExpiration);
+        calendar.add(Calendar.SECOND, secondsToExpiration);
 
         return calendar.getTime();
     }

@@ -5,7 +5,6 @@ import com.ajaxjs.framework.database.EnableTransaction;
 import com.ajaxjs.framework.model.BusinessException;
 import com.ajaxjs.iam.UserConstants;
 import com.ajaxjs.iam.client.BaseOidcClientUserController;
-import com.ajaxjs.iam.jwt.JWebTokenMgr;
 import com.ajaxjs.iam.jwt.JwtToken;
 import com.ajaxjs.iam.model.App;
 import com.ajaxjs.iam.server.auth.controller.UserLoginController;
@@ -45,19 +44,10 @@ public class UserLoginService implements UserLoginController, IamConstants {
     @Autowired(required = false)
     Cache<String, Object> cache;
 
-    @Autowired
-    JWebTokenMgr jWebTokenMgr;
-
     @Override
     public void authorizationCode(String responseType, String clientId, String redirectUri, String scope, String state, String webUrl, HttpServletRequest req, HttpServletResponse resp) {
         OAuthService.sendAuthCode(userSession, responseType, clientId, redirectUri, scope, state, webUrl, req, resp, cache);
     }
-
-    /**
-     * Token 的有效期，单位：分钟  默认一天
-     */
-    @Value("${oauth.token.client_expires: 3600}")
-    private Integer tokenExpires;
 
     @Override
     public JwtToken token(String authorization, String grantType, String code, String state, String webUrl) {
@@ -72,8 +62,6 @@ public class UserLoginService implements UserLoginController, IamConstants {
 
         App app = ClientCredential.getAppByAuthHeader(authorization);
         JwtTokenService tokenService = new JwtTokenService(app, user);
-        tokenService.setjWebTokenMgr(jWebTokenMgr);
-        tokenService.setTokenExpires(tokenExpires);
         JwtToken token = tokenService.create();
         tokenService.createSave(token);
 
@@ -112,19 +100,18 @@ public class UserLoginService implements UserLoginController, IamConstants {
         String appId = ClientCredential.getAppId();
         App app = ClientCredential.getApp(appId);
 
-        JwtTokenService jwtTokenService = new JwtTokenService(app);
-        jwtTokenService.setjWebTokenMgr(jWebTokenMgr);
-        jwtTokenService.setTokenExpires(tokenExpires);
-
-        return jwtTokenService.refreshToken(refreshToken);
+        return new JwtTokenService(app).refreshToken(refreshToken);
     }
 
     @Autowired
     LogLoginService logLoginService;
 
     @Override
-    public JwtToken login(String username, String password, String appId) {
-        App app = ClientCredential.getApp(appId);
+    public JwtToken loginWeb(String username, String password, String appId) {
+        return login(username, password, ClientCredential.getApp(appId));
+    }
+
+    private JwtToken login(String username, String password, App app) {
         Integer tenantId = TenantService.getTenantId(false);
 
         if (tenantId == null || tenantId == 0) // for iam admin, no tenant id means iam admin
@@ -133,8 +120,6 @@ public class UserLoginService implements UserLoginController, IamConstants {
         User user = getUserLoginByPassword(username, password, tenantId);
 
         JwtTokenService tokenService = new JwtTokenService(app, user);
-        tokenService.setjWebTokenMgr(jWebTokenMgr);
-        tokenService.setTokenExpires(tokenExpires);
         JwtToken token = tokenService.create();
         tokenService.createSave(token);
 
@@ -144,6 +129,13 @@ public class UserLoginService implements UserLoginController, IamConstants {
         logLoginService.saveLoginLog(user, DiContextUtil.getRequest());
 
         return token;
+    }
+
+    @Override
+    public JwtToken login(String username, String password) {
+        App app = ClientCredential.getApp(ClientCredential.getAppId());
+
+        return login(username, password, app);
     }
 
     @Value("${user.loginIdType:1}")
@@ -190,8 +182,6 @@ public class UserLoginService implements UserLoginController, IamConstants {
         User user = getUserLoginByPassword(username, password, tenantId);
 
         JwtTokenService tokenService = new JwtTokenService(app, user);
-        tokenService.setjWebTokenMgr(jWebTokenMgr);
-        tokenService.setTokenExpires(tokenExpires);
         JwtToken token = tokenService.create();
         tokenService.createSave(token);
 

@@ -103,12 +103,6 @@ public class OAuthService implements OAuthController, IamConstants {
         AccessToken accessToken;
     }
 
-    /**
-     * Token 的有效期，单位：分钟  默认一天
-     */
-    @Value("${oauth.token.client_expires: 3600}")
-    private Integer tokenExpires;
-
     @Override
     public AccessToken token(String authorization, String grantType, String code, String state) {
         if (!"authorization_code".equals(grantType))
@@ -124,7 +118,6 @@ public class OAuthService implements OAuthController, IamConstants {
         App app = ClientCredential.getAppByAuthHeader(authorization);
 
         ClassicAccessToken tokenService = new ClassicAccessToken(app, GrantType.OAUTH, user);
-        tokenService.setTokenExpires(tokenExpires);
         AccessToken accessToken = tokenService.create();
         tokenService.createSave(accessToken);
 
@@ -148,10 +141,8 @@ public class OAuthService implements OAuthController, IamConstants {
 
         String appId = ClientCredential.getAppId();
         App app = ClientCredential.getApp(appId);
-        ClassicAccessToken tokenService = new ClassicAccessToken(app, GrantType.OAUTH);
-        tokenService.setTokenExpires(tokenExpires);
 
-        return tokenService.refreshToken(refreshToken);
+        return new ClassicAccessToken(app, GrantType.OAUTH).refreshToken(refreshToken);
     }
 
     @Override

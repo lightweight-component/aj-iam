@@ -77,13 +77,25 @@ public interface UserLoginController {
      * @param username 用户名/手机号/邮箱
      * @param password 密码
      * @param appId    应用 id
-     * @return 应用的 JWT AccessToken
+     * @return 用户的 JWT Token
      */
-    @PostMapping("/login")
+    @PostMapping("/web")
     @AllowOpenAccess
     @ImageCaptchaCheck
     @BizAction("用户登录")
-    JwtToken login(@RequestParam String username, @RequestParam String password, @RequestParam String appId);
+    JwtToken loginWeb(@RequestParam String username, @RequestParam String password, @RequestParam String appId);
+
+    /**
+     * 通过客户端认证的用户登录
+     *
+     * @param username 用户名/手机号/邮箱
+     * @param password 密码
+     * @return 用户的 JWT Token
+     */
+    @PostMapping
+    @ClientAuthentication
+    @BizAction("用户登录")
+    JwtToken login(@RequestParam String username, @RequestParam String password);
 
     /**
      * 用户登录
