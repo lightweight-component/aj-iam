@@ -1,6 +1,6 @@
 package com.ajaxjs.iam.server.auth.apponekeylogin;
 
-import com.ajaxjs.iam.jwt.JWebTokenMgr;
+import com.ajaxjs.iam.jwt.JwtToken;
 import com.ajaxjs.iam.server.model.User;
 import com.ajaxjs.iam.server.model.UserAccount;
 import com.ajaxjs.iam.server.model.UserAccountType;
@@ -8,7 +8,6 @@ import com.ajaxjs.iam.server.model.UserFunction;
 import com.ajaxjs.iam.server.service.ClientCredential;
 import com.ajaxjs.iam.server.service.TenantService;
 import com.ajaxjs.iam.server.service.token.JwtTokenService;
-import com.ajaxjs.iam.jwt.JwtToken;
 import com.ajaxjs.sqlman.Action;
 import com.ajaxjs.util.ObjectHelper;
 import com.ajaxjs.util.RandomTools;

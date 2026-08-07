@@ -13,6 +13,7 @@ import com.ajaxjs.iam.server.model.User;
 import com.ajaxjs.iam.server.service.ClientCredential;
 import com.ajaxjs.iam.server.service.TenantService;
 import com.ajaxjs.iam.server.service.token.ClassicAccessToken;
+import com.ajaxjs.spring.DiContextUtil;
 import com.ajaxjs.sqlman.Action;
 import com.ajaxjs.util.HashHelper;
 import com.ajaxjs.util.ObjectHelper;
@@ -55,18 +56,22 @@ public class OAuthService implements OAuthController, IamConstants {
 
         User user = userSession.getUserFromSession();
 
+        log.info("session " + DiContextUtil.getSession().getId());
+        log.info("session " + DiContextUtil.getSession().getAttribute(UserSession.SESSION_KEY));
+
+
         if (user == null) { // 未登录
             // 返回一段 HTML
             String qs = req.getQueryString();
             String loginPage;
 
-            // 根据 appId 获取登录地址
-//            loginPage = Sql.newInstance().input("SELECT login_page FROM app WHERE stat = 0 AND client_id = ?", clientId).queryOne(String.class);
             // 根据 租户 获取登录地址
-            if (TenantService.getTenantId() == null) // 没租户 id，超级管理员登录
+            Integer tenantId = TenantService.getTenantId(false);
+
+            if (tenantId == null) // 没租户 id，超级管理员登录
                 loginPage = "../../iam/login";
-            else
-                loginPage = new Action("SELECT login_page FROM tenant WHERE stat = 0 AND id = ?").query(TenantService.getTenantId()).one(String.class);
+            else// 根据 appId 获取登录地址
+                loginPage = new Action("SELECT login_page FROM tenant WHERE stat = 0 AND id = ?").query(tenantId).one(String.class);
 
             if (ObjectHelper.isEmptyText(loginPage))
                 throw new BusinessException("应用或登录地址不存在");

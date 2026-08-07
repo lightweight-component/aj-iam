@@ -1,7 +1,9 @@
 package com.ajaxjs.iam.server.auth.controller;
 
+import com.ajaxjs.iam.annotation.AllowOpenAccess;
 import com.ajaxjs.iam.annotation.ClientAuthentication;
 import com.ajaxjs.iam.jwt.JwtToken;
+import com.ajaxjs.security.captcha.image.ImageCaptchaCheck;
 import com.ajaxjs.spring.annotation.BizAction;
 import org.springframework.web.bind.annotation.*;
 
@@ -35,6 +37,34 @@ public interface SmsController {
     boolean sendVerificationCode(@RequestParam String phone);
 
     /**
+     * 根据手机号码发送短信
+     *
+     * @param phone       手机号码
+     * @param smsClientId 登记发送短信的客户端
+     * @return 是否成功
+     */
+    @PostMapping("/send_verification_code_web")
+    @BizAction("根据手机号码发送短信")
+    @ImageCaptchaCheck
+    @AllowOpenAccess
+    boolean sendVerificationCodeWeb(@RequestParam String phone, @RequestParam String smsClientId);
+
+    /**
+     * 用户登录
+     * <p>
+     * 如果登录成功，前端应该跳转到 OIDC 获取 code 的流程
+     *
+     * @param phone 手机号码
+     * @param code  验证码
+     * @return 是否成功
+     */
+    @PostMapping("/sms_login")
+    @BizAction("用户登录 loginBySms")
+    @ImageCaptchaCheck
+    @AllowOpenAccess
+    boolean loginBySms(@RequestParam String phone, @RequestParam String code);
+
+    /**
      * 检查验证码是否匹配且未过期
      *
      * @param phone 手机号码
@@ -44,7 +74,7 @@ public interface SmsController {
     @PostMapping("/verify_code")
     @BizAction("检查验证码是否匹配且未过期")
     @ClientAuthentication
-    JwtToken verifyCode(@RequestParam String phone,  @RequestParam String code);
+    JwtToken verifyCode(@RequestParam String phone, @RequestParam String code);
 
     /**
      * 检查验证码是否匹配且未过期
@@ -58,4 +88,8 @@ public interface SmsController {
     @PostMapping("/verify_code_update_phone")
     @BizAction("检查验证码是否匹配且未过期")
     boolean updateUserPhone(@RequestParam String phone, @RequestParam String appId, @RequestParam String code);
+
+    @GetMapping("/test")
+    @AllowOpenAccess
+    boolean test();
 }

@@ -79,7 +79,12 @@ public class TenantService {
     }
 
     private static void checkUserPrivilegeOfTenant(HttpServletRequest request, Integer tenantId) {
-        Integer userTenantId = SecurityManager.getUser().getTenantId();
+        SimpleUser user = SecurityManager.getUser();
+
+        if (user == null)
+            throw new NullPointerException("User not found.");
+
+        Integer userTenantId = user.getTenantId();
 
         if (userTenantId == null || userTenantId == 0) // 没设租户 id，则是管理员，可访问所有租户
             return;
