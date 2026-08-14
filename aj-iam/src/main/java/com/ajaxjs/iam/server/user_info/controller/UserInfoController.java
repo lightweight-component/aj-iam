@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
  * 必须通过客户端认证调用该接口
  */
 @RestController
-@RequestMapping("/user_info")
+@RequestMapping("")
 public interface UserInfoController {
     /**
      * 获取用户详情

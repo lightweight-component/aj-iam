@@ -71,6 +71,11 @@ public class UserLoginService implements UserLoginController, IamConstants {
         return token;
     }
 
+    @Override
+    public boolean isLogined() {
+        return userSession.getUserFromSession() != null;
+    }
+
     @Data
     public static class TokenUser {
         Long userId;
@@ -103,6 +108,11 @@ public class UserLoginService implements UserLoginController, IamConstants {
         return new JwtTokenService(app).refreshToken(refreshToken);
     }
 
+    @Override
+    public boolean login(String username, String password, String appId) {
+        return false;
+    }
+
     @Autowired
     LogLoginService logLoginService;
 
@@ -132,7 +142,7 @@ public class UserLoginService implements UserLoginController, IamConstants {
     }
 
     @Override
-    public JwtToken login(String username, String password) {
+    public JwtToken loginByClient(String username, String password) {
         App app = ClientCredential.getApp(ClientCredential.getAppId());
 
         return login(username, password, app);

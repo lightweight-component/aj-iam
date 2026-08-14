@@ -1,6 +1,7 @@
 package com.ajaxjs.iam.server.user_info.controller;
 
 import com.ajaxjs.fileupload.UploadedResult;
+import com.ajaxjs.framework.mvc.unifiedreturn.PureOutput;
 import com.ajaxjs.iam.server.model.User;
 import com.ajaxjs.iam.server.model.UserAccount;
 import com.ajaxjs.spring.annotation.BizAction;
@@ -25,6 +26,16 @@ public interface CurrentUserInfoController {
     User currentUserInfo();
 
     /**
+     * 获取当前用户详情（JSONP）
+     *
+     * @return 用户详情
+     */
+    @BizAction("获取当前用户详情（JSONP）")
+    @GetMapping(value = "/jsonp", produces = "application/javascript;charset=UTF-8")
+    @PureOutput
+    String currentUserInfoJSONP(@RequestParam String callback);
+
+    /**
      * 修改用户
      *
      * @param user 用户详情
@@ -35,6 +46,7 @@ public interface CurrentUserInfoController {
 
     /**
      * 注销用户账号
+     *
      * @return 是否成功
      */
     @DeleteMapping

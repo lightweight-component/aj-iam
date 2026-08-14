@@ -15,6 +15,7 @@ import com.ajaxjs.iam.server.model.UserAccount;
 import com.ajaxjs.iam.server.user_info.controller.CurrentUserInfoController;
 import com.ajaxjs.spring.DiContextUtil;
 import com.ajaxjs.sqlman.Action;
+import com.ajaxjs.util.JsonUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -32,6 +33,14 @@ public class CurrentUserInfoService implements CurrentUserInfoController {
 
         return UserInfoService.getUserInfoById(userId);
 
+    }
+
+    @Override
+    public String currentUserInfoJSONP(String callback) {
+        User user = currentUserInfo();
+        String json = JsonUtil.toJson(user);
+
+        return callback + "(" + json + ");";
     }
 
     @Override

@@ -59,6 +59,18 @@ public interface UserLoginController {
                    @RequestParam(value = "web_url", required = false) String webUrl);
 
     /**
+     * 检查用户是否已经登录
+     * 这是通过 Servlet Session 监测的，所以不走 token 鉴权
+     * 主要是有 Cookie 即可。
+     *
+     * @return true = 已登录
+     */
+    @GetMapping("/check_login")
+    @BizAction("检查用户是否已经登录")
+    @AllowOpenAccess
+    boolean isLogined();
+
+    /**
      * 通过 Refresh Token 刷新 Access Token
      * 这是通过头传输 client_id/client_secret
      *
@@ -72,7 +84,23 @@ public interface UserLoginController {
     JwtToken refreshToken(@RequestParam("grant_type") String grantType, @RequestParam("refresh_token") String refreshToken);
 
     /**
+     * 用户登录
+     * 用于 OIDC 登录
+     *
+     * @param username 用户名/手机号/邮箱
+     * @param password 密码
+     * @param appId    应用 id
+     * @return 是否登录成功
+     */
+    @PostMapping
+    @AllowOpenAccess
+    @ImageCaptchaCheck
+    @BizAction("用户登录")
+    boolean login(@RequestParam String username, @RequestParam String password, @RequestParam String appId);
+
+    /**
      * 传统 Web 用户登录
+     * 这个直接返回 token，一般情况下尽量避免使用。
      *
      * @param username 用户名/手机号/邮箱
      * @param password 密码
@@ -83,10 +111,12 @@ public interface UserLoginController {
     @AllowOpenAccess
     @ImageCaptchaCheck
     @BizAction("用户登录")
+    @Deprecated
     JwtToken loginWeb(@RequestParam String username, @RequestParam String password, @RequestParam String appId);
 
     /**
      * 通过客户端认证的用户登录
+     * 这个直接返回 token，一般情况下尽量避免使用。
      *
      * @param username 用户名/手机号/邮箱
      * @param password 密码
@@ -95,7 +125,8 @@ public interface UserLoginController {
     @PostMapping
     @ClientAuthentication
     @BizAction("用户登录")
-    JwtToken login(@RequestParam String username, @RequestParam String password);
+    @Deprecated
+    JwtToken loginByClient(@RequestParam String username, @RequestParam String password);
 
     /**
      * 用户登录
@@ -121,7 +152,7 @@ public interface UserLoginController {
     /**
      * 用户登出
      */
-    @PostMapping("/logout")
+    @GetMapping("/logout")
     @BizAction("用户登出")
     @AllowOpenAccess
     boolean logout(@RequestParam(required = false) String returnUrl, HttpServletResponse resp, HttpSession session);
