@@ -88,6 +88,23 @@ public class CurrentUserInfoService implements CurrentUserInfoController {
     }
 
     @Override
+    public boolean setPasswordAtFirstTime(String password) {
+        Long userId = SecurityManager.getUser().getId();
+
+        String checkIfNotSetPsw = "SELECT password FROM user_account WHERE user_id = ? AND type = 'PASSWORD' AND stat = 0";
+        String psw = new Action(checkIfNotSetPsw).query(userId).oneValue(String.class);
+
+        if (psw != null)
+            throw new BusinessException("用户已设置密码");
+
+        // TODO
+        String sql = "UPDATE user_account SET password = ? WHERE user_id = ? AND type = 'PASSWORD' AND stat = 0";
+        new Action(sql).update(password, userId).execute();
+
+        return true;
+    }
+
+    @Override
     public List<UserAccount> getUserAccountInfo() {
         Long userId = SecurityManager.getUser().getId();
 

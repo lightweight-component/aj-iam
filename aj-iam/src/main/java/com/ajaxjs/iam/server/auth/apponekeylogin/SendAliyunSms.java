@@ -1,6 +1,5 @@
 package com.ajaxjs.iam.server.auth.apponekeylogin;
 
-import com.ajaxjs.message.sms.ali_sms.AliyunSmsEntity;
 import com.ajaxjs.util.JsonUtil;
 import com.ajaxjs.util.RandomTools;
 import com.ajaxjs.util.date.DateTools;

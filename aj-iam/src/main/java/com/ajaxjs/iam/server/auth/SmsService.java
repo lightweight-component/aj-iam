@@ -5,6 +5,7 @@ import com.ajaxjs.framework.cache.delayqueue.ExpiryCache;
 import com.ajaxjs.iam.client.SecurityManager;
 import com.ajaxjs.iam.jwt.JwtToken;
 import com.ajaxjs.iam.server.auth.apponekeylogin.AliyunOpenApi;
+import com.ajaxjs.iam.server.auth.apponekeylogin.AliyunSmsEntity;
 import com.ajaxjs.iam.server.auth.apponekeylogin.LoginOrRegister;
 import com.ajaxjs.iam.server.auth.apponekeylogin.SendAliyunSms;
 import com.ajaxjs.iam.server.auth.controller.SmsController;
@@ -16,7 +17,7 @@ import com.ajaxjs.iam.server.model.User;
 import com.ajaxjs.iam.server.model.UserAccountType;
 import com.ajaxjs.iam.server.service.ClientCredential;
 import com.ajaxjs.iam.server.service.TenantService;
-import com.ajaxjs.message.sms.ali_sms.AliyunSmsEntity;
+
 import com.ajaxjs.spring.DiContextUtil;
 import com.ajaxjs.sqlman.Action;
 import com.ajaxjs.util.RandomTools;

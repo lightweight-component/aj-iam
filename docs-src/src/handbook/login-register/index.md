@@ -29,3 +29,10 @@ GET \user\logout
 ```
 
 即使单点登出用户后，IAM 仍保留用户的登录状态，此时 Client 再登录的话即可立即”无感知“登录，不用输入账号密码。
+
+
+Popup Authentication Flow
+
+现代浏览器对第三方 Cookie、Storage、跨站上下文等限制越来越严格，iframe 中的登录状态可能出现问题。
+
+OIDC Authorization Code Flow with Popup UI

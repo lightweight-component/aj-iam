@@ -17,7 +17,6 @@ import com.ajaxjs.iam.server.service.ClientCredential;
 import com.ajaxjs.iam.server.service.LogLoginService;
 import com.ajaxjs.iam.server.service.TenantService;
 import com.ajaxjs.iam.server.service.token.JwtTokenService;
-
 import com.ajaxjs.spring.DiContextUtil;
 import com.ajaxjs.sqlman.Action;
 import com.ajaxjs.util.CommonConstant;
@@ -122,10 +121,10 @@ public class UserLoginService implements UserLoginController, IamConstants {
     }
 
     private JwtToken login(String username, String password, App app) {
-        Integer tenantId = TenantService.getTenantId(false);
+        Integer tenantId = app.getTenantId();
 
-        if (tenantId == null || tenantId == 0) // for iam admin, no tenant id means iam admin
-            tenantId = app.getTenantId();
+        if (tenantId == null)
+            tenantId = TenantService.getTenantId(false);
 
         User user = getUserLoginByPassword(username, password, tenantId);
 
@@ -143,12 +142,12 @@ public class UserLoginService implements UserLoginController, IamConstants {
 
     @Override
     public JwtToken loginByClient(String username, String password) {
-        App app = ClientCredential.getApp(ClientCredential.getAppId());
+        App app = ClientCredential.getApp(ClientCredential.getAppId());// TODO just clientId?
 
         return login(username, password, app);
     }
 
-    @Value("${user.loginIdType:1}")
+    @Value("${user.loginIdType:3}")
     int loginIdType;
 
     @Autowired
@@ -162,7 +161,10 @@ public class UserLoginService implements UserLoginController, IamConstants {
         loginId = loginId.trim();
         password = password.trim();
 
-        String sql = "SELECT u.* FROM user u INNER JOIN user_account a ON a.user_id = u.id WHERE u.stat != 1 AND u.%s = ? AND a.password = ? AND u.tenant_id = ?";
+        String sql = "SELECT u.* FROM user u INNER JOIN user_account a ON a.user_id = u.id " +
+                "WHERE a.type = 'PASSWORD' AND u.stat != 1 AND u.%s = ? AND a.password = ? AND u.tenant_id = ?";
+
+        log.info("loginType:{}, isPass: {}", loginIdType, UserUtils.testBCD(UserConstants.LoginIdType.PSW_LOGIN_EMAIL, loginIdType));
 
         if (UserUtils.testBCD(UserConstants.LoginIdType.PSW_LOGIN_EMAIL, loginIdType) && UserUtils.isValidEmail(loginId))
             sql = String.format(sql, "email");

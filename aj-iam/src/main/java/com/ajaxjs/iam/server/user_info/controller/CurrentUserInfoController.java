@@ -62,6 +62,16 @@ public interface CurrentUserInfoController {
     UploadedResult avatar(@RequestParam("file") MultipartFile file);
 
     /**
+     * 设置用户密码（首次设置，未有密码时）
+     *
+     * @param password 用户设置的密码
+     * @return 是否成功
+     */
+    @PostMapping("/set_psw_first_time")
+    @BizAction("设置用户密码（首次设置，未有密码时）")
+    boolean setPasswordAtFirstTime(@RequestParam String password);
+
+    /**
      * 获取用户多个账号信息（微信、支付宝……）
      *
      * @return 用户多个账号信息

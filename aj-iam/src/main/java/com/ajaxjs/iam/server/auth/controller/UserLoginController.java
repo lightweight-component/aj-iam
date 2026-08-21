@@ -84,7 +84,7 @@ public interface UserLoginController {
     JwtToken refreshToken(@RequestParam("grant_type") String grantType, @RequestParam("refresh_token") String refreshToken);
 
     /**
-     * 用户登录
+     * 通过密码进行用户登录
      * 用于 OIDC 登录
      *
      * @param username 用户名/手机号/邮箱
@@ -99,7 +99,7 @@ public interface UserLoginController {
     boolean login(@RequestParam String username, @RequestParam String password, @RequestParam String appId);
 
     /**
-     * 传统 Web 用户登录
+     * 通过密码进行用户登录，用于 Web 登录
      * 这个直接返回 token，一般情况下尽量避免使用。
      *
      * @param username 用户名/手机号/邮箱
@@ -115,17 +115,16 @@ public interface UserLoginController {
     JwtToken loginWeb(@RequestParam String username, @RequestParam String password, @RequestParam String appId);
 
     /**
-     * 通过客户端认证的用户登录
-     * 这个直接返回 token，一般情况下尽量避免使用。
+     * 通过密码进行用户登录
+     * 要求客户端认证，一般适合 App 登录
      *
      * @param username 用户名/手机号/邮箱
      * @param password 密码
      * @return 用户的 JWT Token
      */
-    @PostMapping
+    @PostMapping("/client")
     @ClientAuthentication
     @BizAction("用户登录")
-    @Deprecated
     JwtToken loginByClient(@RequestParam String username, @RequestParam String password);
 
     /**
