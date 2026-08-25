@@ -10,5 +10,6 @@
     <modules>
         <module>aj-iam-client</module>
         <module>aj-iam</module>
+        <module>aj-oauth</module>
     </modules>
 </project>

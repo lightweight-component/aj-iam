@@ -2,8 +2,10 @@ package com.ajaxjs.iam.server.user_info.resetpsw;
 
 import com.ajaxjs.framework.database.EnableTransaction;
 import com.ajaxjs.iam.UserConstants;
+import com.ajaxjs.iam.model.App;
 import com.ajaxjs.iam.server.model.UserAccount;
 import com.ajaxjs.iam.server.model.UserFunction;
+import com.ajaxjs.iam.server.service.ClientCredential;
 import com.ajaxjs.iam.server.service.TenantService;
 import com.ajaxjs.iam.server.service.password.CheckStrength;
 import com.ajaxjs.iam.server.user_info.controller.UserRegisterController;
@@ -13,6 +15,7 @@ import com.ajaxjs.sqlman.Action;
 import com.ajaxjs.sqlman.util.SnowflakeId;
 import com.ajaxjs.sqlman.util.Utils;
 import com.ajaxjs.util.ObjectHelper;
+import com.ajaxjs.util.RandomTools;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -62,24 +65,14 @@ public class UserRegisterService implements UserRegisterController {
         }
 
         // 校验
-        int tenantId;
-
-        if (!isNull(params, "tenantId"))
-            tenantId = Integer.parseInt(params.get("tenantId").toString());
-        else {
-            tenantId = TenantService.getTenantId() == null ? 0 : TenantService.getTenantId();
-            params.put("tenantId", tenantId);
-        }
-
-        if (tenantId == 0)
-            throw new IllegalArgumentException("租户 id 不能为空");
-
         if (isNull(params, "password"))
             throw new IllegalArgumentException("注册密码不能为空");
 
         boolean hasNoUsername = isNull(params, "loginId"), hasNoEmail = isNull(params, "email"), hasNoPhone = isNull(params, "phone");
         if (hasNoUsername && hasNoEmail && hasNoPhone)
             throw new IllegalArgumentException("没有用户标识， loginId/email/phone 至少填一种");
+
+        int tenantId = getTenantId(params);
 
         // 是否重复
         if (!hasNoUsername && isRepeat("login_id", params.get("loginId").toString(), tenantId))
@@ -129,6 +122,9 @@ public class UserRegisterService implements UserRegisterController {
                 throw new UnsupportedOperationException("密码强度太低");
         }
 
+        if (!params.containsKey("loginId"))
+            params.put("loginId", createDefaultUserLoginId());
+
         params.put("uid", SnowflakeId.get());
         params.put("bindState", UserFunction.BindState.IAM);
         params = Utils.changeFieldToColumnName(params);
@@ -144,6 +140,39 @@ public class UserRegisterService implements UserRegisterController {
         auth.setRegisterIp(IpList.getClientIp(Objects.requireNonNull(DiContextUtil.getRequest())));
 
         return new Action(auth, "user_account").create().execute(true, Long.class).isOk();
+    }
+
+    /**
+     * Get the id of tenant for any cases.
+     *
+     * @param params The request data
+     * @return The tenant id
+     */
+    int getTenantId(Map<String, Object> params) {
+        String clientId;
+        int tenantId;
+
+        try {
+            clientId = ClientCredential.getAppId();
+        } catch (NullPointerException ignored) {
+            clientId = null;
+        }
+
+        if (clientId != null) {
+            App app = ClientCredential.getApp(clientId);
+            tenantId = app.getTenantId();
+        } else {
+            Integer _c = TenantService.getTenantId(false);
+            tenantId = _c == null ? 0 : _c;
+        }
+
+        if (tenantId == 0)
+            throw new IllegalArgumentException("租户 id 不能为空");
+        else {
+            params.put("tenantId", tenantId);
+
+            return tenantId;
+        }
     }
 
     private static boolean isNull(Map<String, Object> params, String key) {
@@ -177,5 +206,14 @@ public class UserRegisterService implements UserRegisterController {
         sql = String.format(sql, field.trim());
 
         return new Action(sql).query(value.trim(), tenantId).oneValue(Long.class) != null; // 有这个数据表示重复
+    }
+
+    /**
+     * Give a user loginId if not provided
+     *
+     * @return Random loginId
+     */
+    public static String createDefaultUserLoginId() {
+        return "User_" + RandomTools.generateRandomString(5);
     }
 }

@@ -27,8 +27,7 @@ public interface UserRegisterController {
     boolean registerWeb(@RequestBody Map<String, Object> params);
 
     /**
-     * 用户注册
-     * 通过客户端认证
+     * 用户注册（通过客户端认证）
      *
      * @param params 用户参数
      * @return 是否成功

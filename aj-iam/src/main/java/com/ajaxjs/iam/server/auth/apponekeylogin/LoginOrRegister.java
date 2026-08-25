@@ -8,6 +8,7 @@ import com.ajaxjs.iam.server.model.UserFunction;
 import com.ajaxjs.iam.server.service.ClientCredential;
 import com.ajaxjs.iam.server.service.TenantService;
 import com.ajaxjs.iam.server.service.token.JwtTokenService;
+import com.ajaxjs.iam.server.user_info.resetpsw.UserRegisterService;
 import com.ajaxjs.sqlman.Action;
 import com.ajaxjs.util.ObjectHelper;
 import com.ajaxjs.util.RandomTools;
@@ -55,7 +56,7 @@ public class LoginOrRegister {
 
     private User createUser(Long tenantId, String value) {
         User user = new User();
-        user.setLoginId("User_" + RandomTools.generateRandomString(5));
+        user.setLoginId(UserRegisterService.createDefaultUserLoginId());
         user.setTenantId(tenantId);
         user.setBindState(UserFunction.BindState.APP);
 
