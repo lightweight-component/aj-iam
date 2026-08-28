@@ -92,6 +92,7 @@ public class UserInterceptor implements HandlerInterceptor {
 
                 return iOAuthService.clientCredentialCheck(request);
             }
+
         }
 
         if (DebugTools.isDebug && "1".equals(request.getParameter("allow"))) // 方便开发
