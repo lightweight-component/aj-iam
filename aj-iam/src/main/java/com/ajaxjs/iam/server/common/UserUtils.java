@@ -26,7 +26,7 @@ public class UserUtils {
     /**
      * 验证 email 是否合法正确
      */
-    private final static Pattern EMAIL_REG = Pattern.compile("^([a-z0-9A-Z]+[-|.]?)+[a-z0-9A-Z]@([a-z0-9A-Z]+(-[a-z0-9A-Z]+)?\\.)+[a-zA-Z]{2,}$");
+    private static final Pattern EMAIL_REG = Pattern.compile("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$");
 
     /**
      * 是否合法的邮件

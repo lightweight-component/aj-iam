@@ -121,10 +121,22 @@ public class UserLoginService implements UserLoginController, IamConstants {
     }
 
     private JwtToken login(String username, String password, App app) {
-        Integer tenantId = app.getTenantId();
+        return login(username, password, app, null);
+    }
+
+    private JwtToken login(String username, String password, App app, String tenantCode) {
+        Integer tenantId;
+
+        if (ObjectHelper.isEmptyText(tenantCode)) {
+            tenantId = app.getTenantId();
+
+            if (tenantId == null)
+                tenantId = TenantService.getTenantId(false);
+        } else
+            tenantId = new Action("SELECT id FROM tenant WHERE code = ?").query(tenantCode).oneValue(Integer.class);
 
         if (tenantId == null)
-            tenantId = TenantService.getTenantId(false);
+            throw new IllegalArgumentException("找不到租户 id");
 
         User user = getUserLoginByPassword(username, password, tenantId);
 
@@ -141,10 +153,10 @@ public class UserLoginService implements UserLoginController, IamConstants {
     }
 
     @Override
-    public JwtToken loginByClient(String username, String password) {
+    public JwtToken loginByClient(String username, String password, String tenantCode) {
         App app = ClientCredential.getApp(ClientCredential.getAppId());// TODO just clientId?
 
-        return login(username, password, app);
+        return login(username, password, app, tenantCode);
     }
 
     @Value("${user.loginIdType:3}")

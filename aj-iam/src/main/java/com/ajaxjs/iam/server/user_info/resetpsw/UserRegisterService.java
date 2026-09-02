@@ -3,7 +3,9 @@ package com.ajaxjs.iam.server.user_info.resetpsw;
 import com.ajaxjs.framework.database.EnableTransaction;
 import com.ajaxjs.iam.UserConstants;
 import com.ajaxjs.iam.model.App;
+import com.ajaxjs.iam.server.model.Tenant;
 import com.ajaxjs.iam.server.model.UserAccount;
+import com.ajaxjs.iam.server.model.UserAccountType;
 import com.ajaxjs.iam.server.model.UserFunction;
 import com.ajaxjs.iam.server.service.ClientCredential;
 import com.ajaxjs.iam.server.service.TenantService;
@@ -12,6 +14,7 @@ import com.ajaxjs.iam.server.user_info.controller.UserRegisterController;
 import com.ajaxjs.security.iplist.IpList;
 import com.ajaxjs.spring.DiContextUtil;
 import com.ajaxjs.sqlman.Action;
+import com.ajaxjs.sqlman.model.CreateResult;
 import com.ajaxjs.sqlman.util.SnowflakeId;
 import com.ajaxjs.sqlman.util.Utils;
 import com.ajaxjs.util.ObjectHelper;
@@ -137,10 +140,15 @@ public class UserRegisterService implements UserRegisterController {
         auth.setUserId(userId);
         auth.setPassword(passwordEncode.apply(psw));
         auth.setRegisterType(UserConstants.LoginType.PASSWORD);
+        auth.setType(UserAccountType.PASSWORD);
         auth.setRegisterIp(IpList.getClientIp(Objects.requireNonNull(DiContextUtil.getRequest())));
 
         return new Action(auth, "user_account").create().execute(true, Long.class).isOk();
     }
+
+    private static final String TENANT_NAME = "tenantName";
+
+    private static final String TENANT_CODE = "tenantCode";
 
     /**
      * Get the id of tenant for any cases.
@@ -149,21 +157,46 @@ public class UserRegisterService implements UserRegisterController {
      * @return The tenant id
      */
     int getTenantId(Map<String, Object> params) {
-        String clientId;
         int tenantId;
 
-        try {
-            clientId = ClientCredential.getAppId();
-        } catch (NullPointerException ignored) {
-            clientId = null;
-        }
+        if (params.containsKey(TENANT_NAME) && params.containsKey(TENANT_CODE)) {
+            String tenantCode = params.get(TENANT_CODE).toString();
+            Tenant tenant = new Action("SELECT * FROM tenant WHERE code = ? AND stat = 0").query(tenantCode).one(Tenant.class);
 
-        if (clientId != null) {
-            App app = ClientCredential.getApp(clientId);
-            tenantId = app.getTenantId();
+            if (tenant == null) {
+                // create if not exists
+                tenant = new Tenant();
+                tenant.setName(params.get(TENANT_NAME).toString());
+                tenant.setCode(tenantCode);
+                tenant.setDefaultRoleId(45);
+
+                CreateResult<Integer> execute = new Action(tenant).create().execute(true, Integer.class);
+
+                if (!execute.isOk())
+                    throw new NullPointerException("创建租户失败");
+
+                tenantId = execute.getNewlyId();
+            } else
+                tenantId = tenant.getId().intValue();
+
+            params.remove(TENANT_NAME);
+            params.remove(TENANT_CODE);
         } else {
-            Integer _c = TenantService.getTenantId(false);
-            tenantId = _c == null ? 0 : _c;
+            String clientId;
+
+            try {
+                clientId = ClientCredential.getAppId();
+            } catch (NullPointerException ignored) {
+                clientId = null;
+            }
+
+            if (clientId != null) {
+                App app = ClientCredential.getApp(clientId);
+                tenantId = app.getTenantId();
+            } else {
+                Integer _c = TenantService.getTenantId(false);
+                tenantId = _c == null ? 0 : _c;
+            }
         }
 
         if (tenantId == 0)

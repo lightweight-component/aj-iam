@@ -2,10 +2,16 @@ package com.ajaxjs.iam.server.model;
 
 import com.ajaxjs.framework.model.BaseModel;
 import com.ajaxjs.framework.model.IBaseModel;
+import com.ajaxjs.sqlman.annotation.Table;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 /**
  * 租户
  */
+@EqualsAndHashCode(callSuper = true)
+@Data
+@Table("tenant")
 public class Tenant extends BaseModel {
     /**
      * 租户编码
@@ -16,4 +22,6 @@ public class Tenant extends BaseModel {
      * 1、账号密码 2、二维码 3、手机验证码 4、微信授权 5、企业微信授权，一个租户类型可以选择多个登录方式，采用逗号隔开的方式
      */
     public String loginModes;
+
+    Integer defaultRoleId;
 }

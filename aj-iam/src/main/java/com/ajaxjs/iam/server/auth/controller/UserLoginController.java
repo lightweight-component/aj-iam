@@ -118,14 +118,15 @@ public interface UserLoginController {
      * 通过密码进行用户登录
      * 要求客户端认证，一般适合 App 登录
      *
-     * @param username 用户名/手机号/邮箱
-     * @param password 密码
+     * @param username   用户名/手机号/邮箱
+     * @param password   密码
+     * @param tenantCode 租户编码
      * @return 用户的 JWT Token
      */
     @PostMapping("/client")
     @ClientAuthentication
     @BizAction("用户登录")
-    JwtToken loginByClient(@RequestParam String username, @RequestParam String password);
+    JwtToken loginByClient(@RequestParam String username, @RequestParam String password, @RequestParam(required = false) String tenantCode);
 
     /**
      * 用户登录
