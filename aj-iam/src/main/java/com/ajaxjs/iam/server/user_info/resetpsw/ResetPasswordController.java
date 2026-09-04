@@ -1,10 +1,12 @@
 package com.ajaxjs.iam.server.user_info.resetpsw;
 
 import com.ajaxjs.iam.annotation.AllowOpenAccess;
+import com.ajaxjs.iam.annotation.ClientAuthentication;
 import com.ajaxjs.iam.client.SecurityManager;
 import com.ajaxjs.security.captcha.image.ImageCaptchaCheck;
 import com.ajaxjs.spring.annotation.BizAction;
 import com.ajaxjs.sqlman.Action;
+import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -42,6 +44,32 @@ public class ResetPasswordController {
             throw new UnsupportedOperationException("旧密码错误");
 
         return resetPasswordByEmailCode.updatePwd(user, dto.getNewPsw());
+    }
+
+    @Data
+    public static class UpdatePswDirectlyDto {
+        String email;
+        String password;
+        String tenantCode;
+    }
+
+    /**
+     * 直接修改密码 危险！！！
+     */
+    @PostMapping("/update_psw_directly")
+    @BizAction("直接修改密码")
+    @ClientAuthentication
+    public boolean updatePswDirectly(@RequestBody UpdatePswDirectlyDto dto) {
+        Long userId = new Action("SELECT * FROM user WHERE email = ? AND tenant_id = (SELECT id FROM tenant WHERE `code` = ?)")
+                .query(dto.getEmail(), dto.getTenantCode()).oneValue(Long.class);
+
+        UpdatePswUserInfoVO user = new Action(
+                "SELECT * FROM user_account WHERE type = 'PASSWORD' AND user_id = ?").query(userId).one(UpdatePswUserInfoVO.class);
+
+        if (user == null)
+            throw new NullPointerException("用户" + dto.getEmail() + "数据不完整");
+
+        return resetPasswordByEmailCode.updatePwd(user, dto.getPassword());
     }
 
     /**
