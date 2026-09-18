@@ -3,13 +3,13 @@ package com.ajaxjs.iam.server.service.token;
 import com.ajaxjs.framework.model.BusinessException;
 import com.ajaxjs.iam.jwt.JWebToken;
 import com.ajaxjs.iam.jwt.JWebTokenMgr;
+import com.ajaxjs.iam.jwt.JwtToken;
 import com.ajaxjs.iam.jwt.JwtUtils;
 import com.ajaxjs.iam.model.App;
 import com.ajaxjs.iam.server.common.IamConstants;
 import com.ajaxjs.iam.server.model.User;
 import com.ajaxjs.iam.server.service.TenantService;
 import com.ajaxjs.iam.server.service.token.model.AccessTokenPo;
-import com.ajaxjs.iam.jwt.JwtToken;
 import com.ajaxjs.iam.server.user_info.UserInfoService;
 import com.ajaxjs.spring.DiContextUtil;
 import com.ajaxjs.sqlman.Action;
@@ -79,7 +79,7 @@ public class JwtTokenService extends BaseTokenService {
         );
         jwtAccessToken.setToken(jWebToken.toString());
         jwtAccessToken.setTokenJson(jWebToken.getPayloadJson());
-        jwtAccessToken.setRefreshToken(RandomTools.uuidStr());
+        jwtAccessToken.setRefreshToken(RandomTools.uuidV7());
 
         return jwtAccessToken;
     }

@@ -85,6 +85,11 @@ public class User extends BaseModel implements UserConstants, IBaseModel {
     private Integer verifiedState;
 
     /**
+     * 是否设置了（密码、邮件、手机、用户名）的状态，采用 8421 码
+     */
+    private Integer setState;
+
+    /**
      * 绑定第三方登录账号的状态总值，采用 8421 码
      */
     private Integer bindState;

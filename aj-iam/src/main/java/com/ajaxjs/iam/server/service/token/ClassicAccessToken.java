@@ -35,8 +35,8 @@ public class ClassicAccessToken extends BaseTokenService {
         Integer refreshTokenExpires = getRefreshTokenExpires();
 
         AccessToken accessToken = new AccessToken();
-        accessToken.setAccess_token(RandomTools.uuidStr());
-        accessToken.setRefresh_token(RandomTools.uuidStr());
+        accessToken.setAccess_token(RandomTools.uuidV7());
+        accessToken.setRefresh_token(RandomTools.uuidV7());
 
         int tokenExpInSecs = app.getExpires() == null ? tokenExpires * 60 : app.getExpires() * 60;
         int refreshTokenExpInSecs = app.getRefreshExpires() == null ? refreshTokenExpires * 60 : app.getRefreshExpires() * 60;

@@ -1,8 +1,8 @@
 package com.ajaxjs.iam.server.common;
 
 import com.ajaxjs.util.CommonConstant;
-
 import jakarta.servlet.http.HttpServletResponse;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -19,8 +19,20 @@ public class UserUtils {
      * @param all 总值
      * @return true=已包含
      */
+    @Deprecated
     public static boolean testBCD(int v, int all) {
         return (v & all) == v;
+    }
+
+    public static boolean hasPermissions(int permissions, int required) {
+        return (permissions & required) == required;
+    }
+
+    public static int setIfNot(int permissions, int required) {
+        if (hasPermissions(permissions, required))
+            return permissions;
+
+        return permissions += required;
     }
 
     /**

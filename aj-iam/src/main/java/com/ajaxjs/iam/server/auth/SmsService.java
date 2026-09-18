@@ -15,9 +15,11 @@ import com.ajaxjs.iam.server.common.session.UserSession;
 import com.ajaxjs.iam.server.model.AppSecretMgr;
 import com.ajaxjs.iam.server.model.User;
 import com.ajaxjs.iam.server.model.UserAccountType;
+import com.ajaxjs.iam.server.model.UserFunction;
 import com.ajaxjs.iam.server.service.ClientCredential;
 import com.ajaxjs.iam.server.service.TenantService;
-
+import com.ajaxjs.iam.server.user_info.resetpsw.ResetPasswordByEmailCode;
+import com.ajaxjs.iam.server.user_info.resetpsw.UpdatePswUserInfoVO;
 import com.ajaxjs.spring.DiContextUtil;
 import com.ajaxjs.sqlman.Action;
 import com.ajaxjs.util.RandomTools;
@@ -119,7 +121,7 @@ public class SmsService implements SmsController {
             log.info("保存用户到 session");
             userSession.put(UserSession.SESSION_KEY, user);
 //            log.info("user in session:" + userSession.getUserFromSession());
-            log.info("session "+ DiContextUtil.getSession());
+            log.info("session " + DiContextUtil.getSession());
 
             return true;
         } else
@@ -172,6 +174,56 @@ public class SmsService implements SmsController {
             throw new SecurityException(LanguageMapping.getLanguageByKey("sms.phone.error_verification_code"));
     }
 
+    @Autowired
+    ResetPasswordByEmailCode resetPasswordByEmailCode;
+
+    @Override
+    public boolean resetPassword(String phone, String newPassword, String vcode) {
+        if (!StringUtils.hasText(phone) || !UserUtils.isValidPhone(phone))
+            throw new IllegalArgumentException(LanguageMapping.getLanguageByKey("sms.phone.invalid"));
+
+        if (!StringUtils.hasText(vcode) || !vcode.matches("\\d{4}"))
+            throw new IllegalArgumentException(LanguageMapping.getLanguageByKey("sms.phone.invalid_verification_code"));
+
+        // 先判断目标手机号码是否已有用户
+        Integer tenantId = TenantService.getTenantId(false);
+        User existUser = new Action("SELECT * FROM user WHERE phone = ? AND tenant_id = ? AND stat != 1").query(phone, tenantId).one(User.class);
+
+        if (existUser == null)
+            throw new UnsupportedOperationException(String.format("User %s not exist ", phone));
+
+        Integer i = cache.get(phone, Integer.class);
+
+        if (i != null && i.equals(Integer.parseInt(vcode))) {
+            cache.remove(phone);
+            Long userId = existUser.getId();// update user info
+
+            UpdatePswUserInfoVO user = new Action(
+                    "SELECT * FROM user_account WHERE type = 'PASSWORD' AND user_id = ?").query(userId).one(UpdatePswUserInfoVO.class);
+
+            if (user == null)
+                throw new NullPointerException("用户" + phone + "数据不完整");
+
+            updateSetState(existUser);
+
+            return resetPasswordByEmailCode.updatePwd(user, newPassword);
+        } else
+            throw new SecurityException(LanguageMapping.getLanguageByKey("sms.phone.error_verification_code"));
+    }
+
+    private void updateSetState(User existUser) {
+        User userSetState = new User(); // set psw state is set
+        Integer setState = existUser.getSetState();
+
+        if (setState == null)
+            setState = 0;
+
+        userSetState.setSetState(UserUtils.setIfNot(setState, UserFunction.SetState.PASSWORD));
+
+        if (!new Action(userSetState).update().withId().isOk())
+            log.warn("Update user set state failed");
+    }
+
     @Override
     public boolean test() {
         User user = new User();
@@ -184,8 +236,8 @@ public class SmsService implements SmsController {
         userSession.put(UserSession.SESSION_KEY, user);
         log.info("user in session:" + userSession.getUserFromSession());
 
-        log.info("session "+ DiContextUtil.getSession().getId());
-        log.info("session "+ DiContextUtil.getSession().getAttribute(UserSession.SESSION_KEY));
+        log.info("session " + DiContextUtil.getSession().getId());
+        log.info("session " + DiContextUtil.getSession().getAttribute(UserSession.SESSION_KEY));
 
         return true;
     }

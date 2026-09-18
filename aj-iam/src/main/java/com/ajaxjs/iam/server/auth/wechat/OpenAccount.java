@@ -13,8 +13,8 @@ import com.ajaxjs.spring.DiContextUtil;
 import com.ajaxjs.sqlman.Action;
 import com.ajaxjs.util.ObjectHelper;
 import com.ajaxjs.util.httpremote.Get;
-import com.ajaxjs.util.httpremote.HttpConstant;
 import com.ajaxjs.util.httpremote.Request;
+import com.ajaxjs.util.httpremote.model.HttpMethod;
 import com.ajaxjs.util.io.DataReader;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -115,7 +115,7 @@ public class OpenAccount extends BaseWechatService {
     }
 
     static byte[] getUrlImgAsBytes(String url) {
-        Request get = new Request(HttpConstant.HttpMethod.GET, url);
+        Request get = new Request(HttpMethod.GET, url);
 
         get.init(conn -> {// Set up connection properties
             conn.setDoInput(true);

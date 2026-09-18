@@ -1,9 +1,9 @@
 package com.ajaxjs.iam.server.service;
 
 import com.ajaxjs.iam.server.BaseTest;
-import com.ajaxjs.sqlman.model.UpdateResult;
 import com.ajaxjs.sqlman.Action;
-import com.ajaxjs.util.io.Resources;
+import com.ajaxjs.sqlman.model.UpdateResult;
+import com.ajaxjs.util.io.ResourceHelper;
 import com.luciad.imageio.webp.WebPWriteParam;
 import org.junit.jupiter.api.Test;
 
@@ -18,7 +18,7 @@ import java.io.*;
 public class TestAvatar extends BaseTest {
     @Test
     void testWriteAvatar() {
-        String imagePath = Resources.getResourcesFromClass(TestAvatar.class, "avatar.png");
+        String imagePath = new ResourceHelper("avatar.png", TestAvatar.class).getPath(true);
         File imageFile = new File(imagePath);
 
         try (FileInputStream inputStream = new FileInputStream(imageFile)) {
@@ -31,7 +31,7 @@ public class TestAvatar extends BaseTest {
 
     @Test
     void testWriteAvatarWebP() throws IOException {
-        String imagePath = Resources.getResourcesFromClass(TestAvatar.class, "avatar.png");
+        String imagePath = new ResourceHelper("avatar.png", TestAvatar.class).getPath(true);
 
         BufferedImage image = ImageIO.read(new File(imagePath));
         ImageWriter writer = ImageIO.getImageWritersByMIMEType("image/webp").next();

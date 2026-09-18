@@ -42,7 +42,7 @@ public class Jwt {
      * @return Jwt
      */
     public Jwt makeSignature(String secretKey) {
-        signature = HashHelper.getHmacSHA256(headerPayload, secretKey, true);
+        signature = HashHelper.hmacSHA256(headerPayload, secretKey, true);
 
         return this;
     }

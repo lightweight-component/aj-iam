@@ -90,14 +90,6 @@ public class UserRegisterService implements UserRegisterController {
         // 获取业务自定义的字段，存在 extract json 中
         Map<String, Object> extract = new HashMap<>();
         List<String> basicFields = Arrays.asList("loginId", "email", "phone", "password", "tenantId");
-//        final Map<String, Object> _params = new HashMap<>(params);
-//
-//        _params.forEach((key, value) -> {
-//            if (!basicFields.contains(key)) {
-//                _params.remove(key);
-//                extract.put(key, value);
-//            }
-//        });
 
         params.entrySet().removeIf(entry -> {
             String key = entry.getKey();
@@ -130,6 +122,17 @@ public class UserRegisterService implements UserRegisterController {
 
         params.put("uid", SnowflakeId.get());
         params.put("bindState", UserFunction.BindState.IAM);
+
+        int setState = UserFunction.SetState.PASSWORD;
+
+        if (!hasNoUsername)
+            setState += UserFunction.SetState.USERNAME;
+        else if (!hasNoEmail)
+            setState += UserFunction.SetState.EMAIL;
+        else if (!hasNoPhone)
+            setState += UserFunction.SetState.PHONE;
+
+        params.put("setState", setState);
         params = Utils.changeFieldToColumnName(params);
 
         long userId = new Action(params, "user").create().execute(true, Long.class).getNewlyId(); // 写入数据库

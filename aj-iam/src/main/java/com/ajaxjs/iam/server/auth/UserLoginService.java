@@ -109,7 +109,10 @@ public class UserLoginService implements UserLoginController, IamConstants {
 
     @Override
     public boolean login(String username, String password, String appId) {
-        return false;
+        App app = ClientCredential.getApp(appId);
+        User user = getUserLoginByPassword(username, password, app.getTenantId());
+
+        return user != null;
     }
 
     @Autowired
@@ -159,7 +162,7 @@ public class UserLoginService implements UserLoginController, IamConstants {
         return login(username, password, app, tenantCode);
     }
 
-    @Value("${user.loginIdType:3}")
+    @Value("${auth.user.loginIdType:3}")
     int loginIdType;
 
     @Autowired

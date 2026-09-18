@@ -61,7 +61,7 @@ public class JWebToken {
     public String signature(String secretKey) {
         String headerPayload = headerPayload();
 
-        return HashHelper.getHmacSHA256(headerPayload, secretKey, true);
+        return HashHelper.hmacSHA256(headerPayload, secretKey, true);
     }
 
     /**

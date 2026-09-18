@@ -3,7 +3,7 @@ package com.ajaxjs.iam.server.service;
 import com.ajaxjs.iam.client.SecurityManager;
 import com.ajaxjs.iam.model.SimpleUser;
 import com.ajaxjs.spring.DiContextUtil;
-import com.ajaxjs.util.DebugTools;
+
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.util.StringUtils;
 
@@ -47,7 +47,7 @@ public class TenantService {
         HttpServletRequest request = DiContextUtil.getRequest();
 
         if (request == null)
-            return DebugTools.isDebug ? 1 : 0; // 单测模式下，给个测试值
+            return 1; // 单测模式下，给个测试值
 
         String tenantIdStr = request.getHeader(AUTH_TENANT_ID);
 

@@ -52,11 +52,11 @@ public abstract class BaseOidcClientUserController {
         log.info("set state code:{}", state);
 
         String url = getAuthCodeUrl + "?response_type=code&client_id=" + clientId;
-        url += "&redirect_uri=" + new UrlEncode(clientCallbackUrl).encodeQuery();
+        url += "&redirect_uri=" + new UrlCodec(clientCallbackUrl).encodeQueryValue();
         url += "&state=" + state;
 
         if (StringUtils.hasText(webUrl))
-            url += "&web_url=" + new UrlEncode(webUrl).encodeQuery();
+            url += "&web_url=" + new UrlCodec(webUrl).encodeQueryValue();
 
         return new RedirectView(url);
     }

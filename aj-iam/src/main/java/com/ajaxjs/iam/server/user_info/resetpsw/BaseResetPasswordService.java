@@ -1,5 +1,6 @@
 package com.ajaxjs.iam.server.user_info.resetpsw;
 
+import com.ajaxjs.iam.server.common.UserUtils;
 import com.ajaxjs.iam.server.model.User;
 import com.ajaxjs.iam.server.model.UserAccount;
 import com.ajaxjs.iam.server.service.password.CheckStrength;

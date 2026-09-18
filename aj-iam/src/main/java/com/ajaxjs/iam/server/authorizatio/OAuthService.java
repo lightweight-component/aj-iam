@@ -82,7 +82,7 @@ public class OAuthService implements OAuthController, IamConstants {
             StringBuilder sb = new StringBuilder();
             sb.append("?state=").append(state);
             // 生成授权码（Authorization Code）
-            String code = HashHelper.getSHA1(clientId + RandomTools.generateRandomString(6));
+            String code = HashHelper.sha1(clientId + RandomTools.generateRandomString(6));
             sb.append("&code=").append(code);
 
             if (StringUtils.hasText(webUrl))

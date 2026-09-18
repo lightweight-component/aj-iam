@@ -7,11 +7,21 @@ public class UserFunction {
     /**
      * 是否验证了（手机号码、邮箱、实名、银行卡）的状态总值，采用 8421 码
      */
-    interface VerifiedState {
+    public interface VerifiedState {
         int PHONE = 1;
         int EMAIL = 2;
         int REAL_PERSON = 4;
         int BANK_CARD = 8;
+    }
+
+    /**
+     * 是否设置了（密码、邮件、手机、用户名）的状态，采用 8421 码
+     */
+    public interface SetState {
+        int PASSWORD = 1;
+        int EMAIL = 2;
+        int PHONE = 4;
+        int USERNAME = 8;
     }
 
     /**

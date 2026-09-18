@@ -55,7 +55,7 @@ public interface SmsController {
      * 如果登录成功，前端应该跳转到 OIDC 获取 code 的流程
      *
      * @param phone 手机号码
-     * @param code  验证码
+     * @param code 验证码
      * @return 是否成功
      */
     @PostMapping("/sms_login")
@@ -68,7 +68,7 @@ public interface SmsController {
      * 检查验证码是否匹配且未过期
      *
      * @param phone 手机号码
-     * @param code  验证码
+     * @param code 验证码
      * @return 是否成功
      */
     @PostMapping("/verify_code")
@@ -82,12 +82,26 @@ public interface SmsController {
      *
      * @param phone 手机号码
      * @param appId 应用 appId
-     * @param code  验证码
+     * @param code 验证码
      * @return 验证码是否通过
      */
     @PostMapping("/verify_code_update_phone")
     @BizAction("检查验证码是否匹配且未过期")
     boolean updateUserPhone(@RequestParam String phone, @RequestParam String appId, @RequestParam String code);
+
+    /**
+     * 检查验证码是否匹配且未过期
+     * 如果匹配，则重置密码
+     *
+     * @param phone       手机号码
+     * @param newPassword 新密码
+     * @param vcode       验证码
+     * @return 验证码是否通过
+     */
+    @PostMapping("/reset_psw")
+    @BizAction("重置密码")
+    @ClientAuthentication
+    boolean resetPassword(@RequestParam String phone, @RequestParam String newPassword, @RequestParam String vcode);
 
     @GetMapping("/test")
     @AllowOpenAccess

@@ -6,7 +6,7 @@ import com.ajaxjs.iam.server.model.User;
 import com.ajaxjs.iam.server.service.TenantService;
 import com.ajaxjs.message.email.ISendEmail;
 import com.ajaxjs.util.HashHelper;
-import com.ajaxjs.util.UrlEncode;
+import com.ajaxjs.util.UrlCodec;
 import com.ajaxjs.util.cryptography.Cryptography;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -55,7 +55,7 @@ public class ResetPasswordByEmailLink extends BaseResetPasswordService {
         User user = findUserBy("email", email, tenantId);
         String token = makeEmailToken(email, tenantId);
 
-        String url = websiteBasePath + FIND_BY_EMAIL + String.format("?email=%s&token=%s", new UrlEncode(email).encodeQuery(), new UrlEncode(token).encodeQuery());
+        String url = websiteBasePath + FIND_BY_EMAIL + String.format("?email=%s&token=%s", new UrlCodec(email).encodeQueryValue(), new UrlCodec(token).encodeQueryValue());
 
         String title = "重置密码";
         Map<String, String> map = new HashMap<>();
@@ -79,7 +79,7 @@ public class ResetPasswordByEmailLink extends BaseResetPasswordService {
      */
     public String makeEmailToken(String email, Integer tenantId) {
         String expireHex = Long.toHexString(System.currentTimeMillis());
-        String emailToken = HashHelper.getSHA1(encryptKey + email),
+        String emailToken = HashHelper.sha1(encryptKey + email),
                 timeToken = Cryptography.AES_encode(expireHex, encryptKey);
 
         return emailToken + timeToken;
@@ -108,7 +108,7 @@ public class ResetPasswordByEmailLink extends BaseResetPasswordService {
     public boolean checkEmailToken(String token, String email) {
         String emailToken = token.substring(0, 40), timeToken = token.substring(40);
 
-        if (!HashHelper.getSHA1(encryptKey + email).equals(emailToken))
+        if (!HashHelper.sha1(encryptKey + email).equals(emailToken))
             throw new SecurityException("非法 email 账号！ " + email);
 
         String expireHex = Cryptography.AES_decode(timeToken, encryptKey);

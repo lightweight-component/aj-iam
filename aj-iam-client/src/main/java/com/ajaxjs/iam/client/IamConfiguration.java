@@ -6,7 +6,7 @@ import com.ajaxjs.iam.permission.PermissionConfig;
 import com.ajaxjs.iam.permission.PermissionEntity;
 import com.ajaxjs.util.ObjectHelper;
 import com.ajaxjs.util.httpremote.Get;
-import com.ajaxjs.util.httpremote.Response;
+import com.ajaxjs.util.httpremote.model.Response;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
