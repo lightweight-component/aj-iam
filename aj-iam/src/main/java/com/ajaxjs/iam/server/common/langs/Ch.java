@@ -10,5 +10,6 @@ public class Ch {
         put("sms.phone.invalid_verification_code", "驗證碼非法");
         put("sms.phone.error_verification_code", "驗證碼錯誤 ");
         put("sms.phone.phone_exist", "當前手機 %s 的使用者已經註冊。不支援修改該手機號碼。");
+        put("sms.phone.user_not_exist", "使用者 %s 不存在。");
     }};
 }

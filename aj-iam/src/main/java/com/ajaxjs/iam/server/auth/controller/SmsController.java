@@ -29,12 +29,13 @@ public interface SmsController {
      * 根据手机号码发送短信
      *
      * @param phone 手机号码
+     * @param checkUserExist 是否检查用户已经存在，可选的，不填则不检查
      * @return 是否成功
      */
     @PostMapping("/send_verification_code")
     @BizAction("根据手机号码发送短信")
     @ClientAuthentication
-    boolean sendVerificationCode(@RequestParam String phone);
+    boolean sendVerificationCode(@RequestParam String phone, @RequestParam(required = false) Boolean checkUserExist);
 
     /**
      * 根据手机号码发送短信
@@ -96,7 +97,7 @@ public interface SmsController {
      * @param phone       手机号码
      * @param newPassword 新密码
      * @param vcode       验证码
-     * @return 验证码是否通过
+     * @return 是否成功
      */
     @PostMapping("/reset_psw")
     @BizAction("重置密码")

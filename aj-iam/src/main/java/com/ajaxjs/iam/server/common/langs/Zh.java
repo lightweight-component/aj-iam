@@ -10,5 +10,6 @@ public class Zh {
         put("sms.phone.invalid_verification_code", "验证码非法");
         put("sms.phone.error_verification_code", "验证码错误 ");
         put("sms.phone.phone_exist", "当前手机 %s 的用户已经注册。不支持修改该手机号码。");
+        put("sms.phone.user_not_exist", "用户 %s 不存在。");
     }};
 }

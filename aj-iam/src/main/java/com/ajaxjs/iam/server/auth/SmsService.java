@@ -4,6 +4,7 @@ import com.ajaxjs.framework.cache.Cache;
 import com.ajaxjs.framework.cache.delayqueue.ExpiryCache;
 import com.ajaxjs.iam.client.SecurityManager;
 import com.ajaxjs.iam.jwt.JwtToken;
+import com.ajaxjs.iam.model.App;
 import com.ajaxjs.iam.server.auth.apponekeylogin.AliyunOpenApi;
 import com.ajaxjs.iam.server.auth.apponekeylogin.AliyunSmsEntity;
 import com.ajaxjs.iam.server.auth.apponekeylogin.LoginOrRegister;
@@ -12,16 +13,14 @@ import com.ajaxjs.iam.server.auth.controller.SmsController;
 import com.ajaxjs.iam.server.common.UserUtils;
 import com.ajaxjs.iam.server.common.langs.LanguageMapping;
 import com.ajaxjs.iam.server.common.session.UserSession;
-import com.ajaxjs.iam.server.model.AppSecretMgr;
-import com.ajaxjs.iam.server.model.User;
-import com.ajaxjs.iam.server.model.UserAccountType;
-import com.ajaxjs.iam.server.model.UserFunction;
+import com.ajaxjs.iam.server.model.*;
 import com.ajaxjs.iam.server.service.ClientCredential;
 import com.ajaxjs.iam.server.service.TenantService;
 import com.ajaxjs.iam.server.user_info.resetpsw.ResetPasswordByEmailCode;
 import com.ajaxjs.iam.server.user_info.resetpsw.UpdatePswUserInfoVO;
 import com.ajaxjs.spring.DiContextUtil;
 import com.ajaxjs.sqlman.Action;
+import com.ajaxjs.sqlman.model.CreateResult;
 import com.ajaxjs.util.RandomTools;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,13 +48,17 @@ public class SmsService implements SmsController {
     private final Cache<String, Object> cache = ExpiryCache.getInstance();
 
     @Override
-    public boolean sendVerificationCode(String phone) {
+    public boolean sendVerificationCode(String phone, Boolean checkUserExist) {
         String appId = ClientCredential.getAppId();
 
-        return sendSms(appId, phone);
+        return sendSms(appId, phone, checkUserExist);
     }
 
     boolean sendSms(String appId, String phone) {
+        return sendSms(appId, phone, null);
+    }
+
+    boolean sendSms(String appId, String phone, Boolean checkUserExist) {
         if (!StringUtils.hasText(phone) || !UserUtils.isValidPhone(phone)) // 请提交有效的手机
             throw new IllegalArgumentException(LanguageMapping.getLanguageByKey("sms.phone.invalid"));
 
@@ -64,11 +67,14 @@ public class SmsService implements SmsController {
         if (appSecretMgr == null) // 请提供有效的 App 信息
             throw new NullPointerException(LanguageMapping.getLanguageByKey("sms.phone.provideAppInfo"));
 
+        if (Boolean.TRUE.equals(checkUserExist)) {// check if this user exists by this phone
+            App app = ClientCredential.getApp(appId);
+            getExistUserByPhone(phone, app.getTenantId());
+        }
+
         int randCode = RandomTools.generateNumber(4);
         String param = String.format("{\"code\":\"%s\",\"min\":\"5\"}", randCode);
         log.info("发送验证码：{}", param);
-        log.info("setAccessKeyId {}", appSecretMgr.getAppId());
-        log.info("setAccessSecret {}", appSecretMgr.getAppSecret());
         cache.put(phone, randCode, 60 * 5);
 
         AliyunSmsEntity entity = new AliyunSmsEntity();
@@ -113,11 +119,7 @@ public class SmsService implements SmsController {
             if (tenantId == null)
                 throw new IllegalArgumentException("请选择租户");
 
-            User user = new Action("SELECT * FROM user WHERE stat = 0 AND phone = ? AND tenant_id = ?").query(phone, tenantId).one(User.class);
-
-            if (user == null)
-                throw new NullPointerException("用户 " + phone + " 不存在");
-
+            User user = getExistUserByPhone(phone, tenantId);
             log.info("保存用户到 session");
             userSession.put(UserSession.SESSION_KEY, user);
 //            log.info("user in session:" + userSession.getUserFromSession());
@@ -155,6 +157,7 @@ public class SmsService implements SmsController {
 
         // 先判断目标手机号码是否已有用户
         Integer tenantId = TenantService.getTenantId(false);
+//        User existUser = getExistUserByPhone(phone, tenantId);
         User existUser = new Action("SELECT * FROM user WHERE phone = ? AND tenant_id = ? AND stat != 1").query(phone, tenantId).one(User.class);
 
         if (existUser != null) // "当前手机 " + phone + " 的用户已经注册。不支持修改该手机号码。"
@@ -187,22 +190,36 @@ public class SmsService implements SmsController {
 
         // 先判断目标手机号码是否已有用户
         Integer tenantId = TenantService.getTenantId(false);
-        User existUser = new Action("SELECT * FROM user WHERE phone = ? AND tenant_id = ? AND stat != 1").query(phone, tenantId).one(User.class);
-
-        if (existUser == null)
-            throw new UnsupportedOperationException(String.format("User %s not exist ", phone));
+        User existUser = getExistUserByPhone(phone, tenantId);
 
         Integer i = cache.get(phone, Integer.class);
 
         if (i != null && i.equals(Integer.parseInt(vcode))) {
             cache.remove(phone);
             Long userId = existUser.getId();// update user info
+            UpdatePswUserInfoVO user = new Action("SELECT * FROM user_account WHERE type = 'PASSWORD' AND user_id = ?").query(userId).one(UpdatePswUserInfoVO.class);
 
-            UpdatePswUserInfoVO user = new Action(
-                    "SELECT * FROM user_account WHERE type = 'PASSWORD' AND user_id = ?").query(userId).one(UpdatePswUserInfoVO.class);
+            if (user == null) {
+                // user has no password, add it
+                UserAccount userAccount = new UserAccount();
+                userAccount.setUserId(userId);
+                userAccount.setType(UserAccountType.PASSWORD);
+                userAccount.setPassword("--------TEMP---------");
 
-            if (user == null)
-                throw new NullPointerException("用户" + phone + "数据不完整");
+                CreateResult<Long> execute = new Action(userAccount).create().execute(true, Long.class);
+
+                if (execute.isOk()) {
+                    log.info("newlyId:{}", userAccount.getId());
+                    userAccount.setId(execute.getNewlyId());
+                    log.info("newlyId2:{}", userAccount.getId());
+
+                    user = new UpdatePswUserInfoVO();
+                    user.setId(userAccount.getId());
+                    user.setPassword(userAccount.getPassword());
+                } else
+                    throw new IllegalStateException("Creates password failed");
+            }
+//                throw new NullPointerException("用户" + phone + "数据不完整");
 
             updateSetState(existUser);
 
@@ -211,13 +228,24 @@ public class SmsService implements SmsController {
             throw new SecurityException(LanguageMapping.getLanguageByKey("sms.phone.error_verification_code"));
     }
 
-    private void updateSetState(User existUser) {
+    static User getExistUserByPhone(String phone, Integer tenantId) {
+        User existUser = new Action("SELECT * FROM user WHERE phone = ? AND tenant_id = ? AND stat != 1").query(phone, tenantId).one(User.class);
+
+        if (existUser == null)
+            throw new UnsupportedOperationException(
+                    String.format(LanguageMapping.getLanguageByKey("sms.phone.user_not_exist"), phone));
+
+        return existUser;
+    }
+
+    public static void updateSetState(User existUser) {
         User userSetState = new User(); // set psw state is set
         Integer setState = existUser.getSetState();
 
         if (setState == null)
             setState = 0;
 
+        userSetState.setId(existUser.getId());
         userSetState.setSetState(UserUtils.setIfNot(setState, UserFunction.SetState.PASSWORD));
 
         if (!new Action(userSetState).update().withId().isOk())

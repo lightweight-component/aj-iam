@@ -12,11 +12,17 @@ import com.ajaxjs.iam.client.SecurityManager;
 import com.ajaxjs.iam.model.SimpleUser;
 import com.ajaxjs.iam.server.model.User;
 import com.ajaxjs.iam.server.model.UserAccount;
+import com.ajaxjs.iam.server.model.UserAccountType;
 import com.ajaxjs.iam.server.user_info.controller.CurrentUserInfoController;
+import com.ajaxjs.iam.server.user_info.resetpsw.ResetPasswordByEmailCode;
+import com.ajaxjs.iam.server.user_info.resetpsw.UpdatePswUserInfoVO;
 import com.ajaxjs.spring.DiContextUtil;
 import com.ajaxjs.sqlman.Action;
+import com.ajaxjs.sqlman.model.CreateResult;
 import com.ajaxjs.util.JsonUtil;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -25,7 +31,10 @@ import java.io.UncheckedIOException;
 import java.util.List;
 import java.util.Objects;
 
+import static com.ajaxjs.iam.server.auth.SmsService.updateSetState;
+
 @Service
+@Slf4j
 public class CurrentUserInfoService implements CurrentUserInfoController {
     @Override
     public User currentUserInfo() {
@@ -87,6 +96,9 @@ public class CurrentUserInfoService implements CurrentUserInfoController {
         });
     }
 
+    @Autowired
+    ResetPasswordByEmailCode resetPasswordByEmailCode;
+
     @Override
     public boolean setPasswordAtFirstTime(String password) {
         Long userId = SecurityManager.getUser().getId();
@@ -97,11 +109,27 @@ public class CurrentUserInfoService implements CurrentUserInfoController {
         if (psw != null)
             throw new BusinessException("用户已设置密码");
 
-        // TODO
-        String sql = "UPDATE user_account SET password = ? WHERE user_id = ? AND type = 'PASSWORD' AND stat = 0";
-        new Action(sql).update(password, userId).execute();
+        UserAccount userAccount = new UserAccount();
+        userAccount.setUserId(userId);
+        userAccount.setType(UserAccountType.PASSWORD);
+        userAccount.setPassword("--------TEMP---------");
 
-        return true;
+        CreateResult<Long> execute = new Action(userAccount).create().execute(true, Long.class);
+
+        if (!execute.isOk())
+            throw new IllegalStateException("Creates password failed");
+
+        log.info("newlyId:{}", userAccount.getId());
+        userAccount.setId(execute.getNewlyId());
+        log.info("newlyId2:{}", userAccount.getId());
+
+        UpdatePswUserInfoVO user = new UpdatePswUserInfoVO();
+        user.setId(userAccount.getId());
+        user.setPassword(userAccount.getPassword());
+
+        updateSetState(currentUserInfo());
+
+        return resetPasswordByEmailCode.updatePwd(user, password);
     }
 
     @Override

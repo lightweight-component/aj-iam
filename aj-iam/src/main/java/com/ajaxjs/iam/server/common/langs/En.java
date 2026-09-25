@@ -10,5 +10,6 @@ public class En {
         put("sms.phone.invalid_verification_code", "Invalid verification code");
         put("sms.phone.error_verification_code", "Incorrect verification code");
         put("sms.phone.phone_exist", "The user with phone number %s is already registered. This phone number cannot be modified.");
+        put("sms.phone.user_not_exist", "User %s does not exist.");
     }};
 }

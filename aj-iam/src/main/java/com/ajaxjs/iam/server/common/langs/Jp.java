@@ -10,5 +10,6 @@ public class Jp {
         put("sms.phone.invalid_verification_code", "認証コードが無効です");
         put("sms.phone.error_verification_code", "認証コードが正しくありません");
         put("sms.phone.phone_exist", "電話番号 %s のユーザーは既に登録されています。この電話番号は変更できません。");
+        put("sms.phone.user_not_exist", "ユーザー %s は存在しません。");
     }};
 }
