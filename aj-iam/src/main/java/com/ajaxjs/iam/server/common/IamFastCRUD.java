@@ -1,7 +1,7 @@
 package com.ajaxjs.iam.server.common;
 
-import com.ajaxjs.framework.database.DataBaseConnection;
 import com.ajaxjs.dataservice.fastcrud.Namespaces;
+import com.ajaxjs.framework.database.DataBaseConnection;
 import com.ajaxjs.iam.client.SecurityManager;
 import com.ajaxjs.iam.server.service.TenantService;
 import com.ajaxjs.sqlman.JdbcConnection;
@@ -13,6 +13,8 @@ import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
+import java.sql.Connection;
+import java.sql.SQLException;
 
 @Component
 public class IamFastCRUD extends Namespaces {
@@ -73,8 +75,12 @@ public class IamFastCRUD extends Namespaces {
 
     @EventListener
     public void loadConfig(ApplicationReadyEvent event) {
-        DataBaseConnection.initDb();
-        loadFromDB(() -> SecurityManager.getUser().getId(), TenantService::getTenantId);
-        JdbcConnection.closeDb();
+        try (Connection conn = DataBaseConnection.initDb()) {
+            loadFromDB(() -> SecurityManager.getUser().getId(), TenantService::getTenantId);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            JdbcConnection.closeDb();
+        }
     }
 }
