@@ -17,6 +17,6 @@ public abstract class BaseTest {
 
     @AfterEach
     void closeDb() {
-        JdbcConnection.closeDb();
+        JdbcConnection.closeConnection();
     }
 }

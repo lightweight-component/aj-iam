@@ -6,7 +6,7 @@ import com.ajaxjs.iam.server.model.LogLogin;
 import com.ajaxjs.iam.server.model.User;
 import com.ajaxjs.security.iplist.IpList;
 import com.ajaxjs.sqlman.Action;
-import com.ajaxjs.sqlman.crud.page.PageResult;
+import com.ajaxjs.sqlman.page.PageResult;
 import com.ajaxjs.sqlman.model.CreateResult;
 import com.ajaxjs.util.httpremote.Get;
 import lombok.extern.slf4j.Slf4j;

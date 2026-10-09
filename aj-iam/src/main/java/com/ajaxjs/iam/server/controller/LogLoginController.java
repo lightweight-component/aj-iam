@@ -1,7 +1,7 @@
 package com.ajaxjs.iam.server.controller;
 
 import com.ajaxjs.iam.server.model.LogLogin;
-import com.ajaxjs.sqlman.crud.page.PageResult;
+import com.ajaxjs.sqlman.page.PageResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
