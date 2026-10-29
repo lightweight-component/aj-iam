@@ -112,7 +112,14 @@ public class UserLoginService implements UserLoginController, IamConstants {
         App app = ClientCredential.getApp(appId);
         User user = getUserLoginByPassword(username, password, app.getTenantId());
 
-        return user != null;
+        if (user == null)
+            return false;
+        else {
+            log.info("保存用户 {} 到 session", user.getLoginId());
+            userSession.put(UserSession.SESSION_KEY, user);
+
+            return true;
+        }
     }
 
     @Autowired
@@ -194,7 +201,7 @@ public class UserLoginService implements UserLoginController, IamConstants {
         if (user == null)
             throw new BusinessException("用户 " + loginId + " 登录失败，用户不存在或密码错误");
 
-        log.info("{} 登录成功！", user.getName());
+        log.info("{} 登录成功！", loginId);
 
         return user;
     }

@@ -61,7 +61,6 @@ public interface SmsController {
      */
     @PostMapping("/sms_login")
     @BizAction("用户登录 loginBySms")
-    @ImageCaptchaCheck
     @AllowOpenAccess
     boolean loginBySms(@RequestParam String phone, @RequestParam String code);
 

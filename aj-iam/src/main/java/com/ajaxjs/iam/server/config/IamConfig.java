@@ -1,5 +1,6 @@
 package com.ajaxjs.iam.server.config;
 
+import com.ajaxjs.dataservice.EndpointMgr;
 import com.ajaxjs.framework.cache.Cache;
 import com.ajaxjs.framework.cache.delayqueue.ExpiryCache;
 import com.ajaxjs.framework.cache.lru.LRUCache;
@@ -148,4 +149,10 @@ public class IamConfig implements WebMvcConfigurer {
     UserSession UserSession() {
         return new ServletUserSession();
     }
+
+    @Bean
+    EndpointMgr initEndpointMgr() {
+        return new EndpointMgr(1);
+    }
+
 }
