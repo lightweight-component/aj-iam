@@ -14,7 +14,7 @@ import java.util.List;
  * 用户信息的维护，仅限当前用户使用
  */
 @RestController
-@RequestMapping("/curr_user")
+@RequestMapping({"/curr_user", "/user"})
 public interface CurrentUserInfoController {
     /**
      * 获取当前用户详情
