@@ -8,6 +8,10 @@ public class JwtToken {
 
     private String tokenJson;
 
+    private String id_token;
+
+    private String refresh_token;
+
     /**
      * 刷新 Token
      */

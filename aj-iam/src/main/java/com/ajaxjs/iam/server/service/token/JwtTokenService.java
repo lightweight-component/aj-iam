@@ -70,7 +70,6 @@ public class JwtTokenService extends BaseTokenService {
         jwtAccessToken.setExpiresIn(tokenExpInSecs);
         jwtAccessToken.setRefreshExpiresIn(refreshTokenExpInSecs);
 
-
         // TODO user.getName() 中文名会乱码
         Long[][] userPermissions = getUserPermissions(user.getId());
         JWebToken jWebToken = getjWebTokenMgr().tokenFactory(
@@ -80,6 +79,8 @@ public class JwtTokenService extends BaseTokenService {
         jwtAccessToken.setToken(jWebToken.toString());
         jwtAccessToken.setTokenJson(jWebToken.getPayloadJson());
         jwtAccessToken.setRefreshToken(RandomTools.uuidV7());
+        jwtAccessToken.setId_token(jwtAccessToken.getToken()); // dep
+        jwtAccessToken.setRefresh_token(jwtAccessToken.getRefreshToken()); //dep
 
         return jwtAccessToken;
     }
