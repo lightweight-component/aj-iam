@@ -54,7 +54,8 @@ public class ResetPasswordController {
     }
 
     /**
-     * 直接修改密码 危险！！！
+     * 直接修改密码
+     * 危险！！！
      */
     @PostMapping("/update_psw_directly")
     @BizAction("直接修改密码")
@@ -73,7 +74,7 @@ public class ResetPasswordController {
     }
 
     /**
-     * 根据 email 重置密码 BY_CODE
+     * 根据 email code 重置密码
      *
      * @param email 用户邮件
      * @return true 表示发送成功
@@ -86,7 +87,7 @@ public class ResetPasswordController {
     }
 
     /**
-     * 校验 Email code 并更新密码。
+     * 校验 email code 并更新密码
      * <p>
      * 根据邮件查询用户，验证 token，若通过更新密码
      *
@@ -116,7 +117,7 @@ public class ResetPasswordController {
     }
 
     /**
-     * 校验 Sms code 并更新密码。
+     * 校验 sms code 并更新密码
      * <p>
      * 根据 手机  查询用户，验证 token，若通过更新密码
      *
@@ -133,7 +134,7 @@ public class ResetPasswordController {
     ResetPasswordByEmailLink resetPasswordByEmailLink;
 
     /**
-     * 根据 email 重置密码 BY_LINK
+     * 根据 email link 重置密码
      *
      * @param email 用户邮件
      * @return true 表示发送成功
@@ -145,7 +146,7 @@ public class ResetPasswordController {
     }
 
     /**
-     * 校验 Token 并更新密码。
+     * 校验 Token 并更新密码
      * <p>
      * 前后端分离模式下，前端是纯静态页面，得到 email 和 code，先展现页面允许修改密码(即使不合法code 或超时的也没关系)。
      * 到时提交到这个接口，验证 token，若通过更新密码。这个不足是进入页面没有马上提示 code 是否合法，而是执行提交才知道，不过也没太大关系。

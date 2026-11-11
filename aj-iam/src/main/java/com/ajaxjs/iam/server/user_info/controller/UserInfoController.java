@@ -6,7 +6,7 @@ import com.ajaxjs.spring.annotation.BizAction;
 import org.springframework.web.bind.annotation.*;
 
 /**
- * 用户信息的维护
+ * 用户信息
  * 必须通过客户端认证调用该接口
  */
 @RestController

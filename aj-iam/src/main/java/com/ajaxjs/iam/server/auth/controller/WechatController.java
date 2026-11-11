@@ -1,16 +1,16 @@
 package com.ajaxjs.iam.server.auth.controller;
 
 import com.ajaxjs.iam.annotation.AllowOpenAccess;
+import com.ajaxjs.iam.jwt.JwtToken;
 import com.ajaxjs.iam.server.model.wechat.MiniAppPhoneNumber;
 import com.ajaxjs.iam.server.model.wechat.PhoneChangeDTO;
 import com.ajaxjs.iam.server.model.wechat.PhoneNumberLoginDTO;
 import com.ajaxjs.iam.server.model.wechat.WechatAuthCode;
-import com.ajaxjs.iam.jwt.JwtToken;
 import com.ajaxjs.spring.annotation.BizAction;
 import org.springframework.web.bind.annotation.*;
 
 /**
- * 微信相关业务的控制器
+ * 微信业务的登录
  */
 @RestController
 @RequestMapping("/wechat")
@@ -38,7 +38,8 @@ public interface WechatController {
     boolean bindWechat2User(@RequestBody WechatAuthCode data);
 
     /**
-     * 解密小程序提供的加密数据，返回包含手机号码等信息的 JSON 对象
+     * 解密小程序提供的加密数据
+     * 返回包含手机号码等信息的 JSON 对象
      * 这个适用于用户已经登录有 token 的情况下
      *
      * @param data 加密数据
@@ -49,8 +50,8 @@ public interface WechatController {
     MiniAppPhoneNumber getMiniAppPhoneNumber(@RequestBody PhoneChangeDTO data);
 
     /**
-     * 解密小程序提供的加密数据，返回包含手机号码等信息的 JSON 对象
-     * 用于登录、注册
+     * 解密小程序提供的加密数据并登录
+     * 返回 JWT Token，用于登录、注册
      *
      * @param dto 加密数据
      * @return 手机号码等信息的 JSON 对象

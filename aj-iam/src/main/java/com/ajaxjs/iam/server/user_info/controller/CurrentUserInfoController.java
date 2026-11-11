@@ -11,7 +11,8 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 /**
- * 用户信息的维护，仅限当前用户使用
+ * 当前用户信息
+ * 仅限当前用户使用
  */
 @RestController
 @RequestMapping({"/curr_user", "/user"})
