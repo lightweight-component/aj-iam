@@ -10,7 +10,7 @@ import com.ajaxjs.spring.annotation.BizAction;
 import org.springframework.web.bind.annotation.*;
 
 /**
- * 微信业务的登录
+ * 微信业务登录
  */
 @RestController
 @RequestMapping("/wechat")

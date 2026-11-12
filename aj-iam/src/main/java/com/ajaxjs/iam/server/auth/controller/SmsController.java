@@ -8,7 +8,7 @@ import com.ajaxjs.spring.annotation.BizAction;
 import org.springframework.web.bind.annotation.*;
 
 /**
- * 短信发送
+ * 短信发送登录
  */
 @RestController
 @RequestMapping("/sms")

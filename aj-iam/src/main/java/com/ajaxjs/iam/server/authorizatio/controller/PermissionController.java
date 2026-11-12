@@ -1,15 +1,15 @@
 package com.ajaxjs.iam.server.authorizatio.controller;
 
-import com.ajaxjs.spring.annotation.BizAction;
 import com.ajaxjs.iam.annotation.AllowOpenAccess;
 import com.ajaxjs.iam.permission.Permission;
+import com.ajaxjs.spring.annotation.BizAction;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
 
 /**
- * 权限后台管理接口
+ * 权限后台管理
  */
 @RestController
 @RequestMapping("/permission")
@@ -54,6 +54,13 @@ public interface PermissionController {
     @BizAction("为角色添加权限 id 列表")
     boolean addPermissionsToRole(@RequestParam Integer roleId, @RequestParam List<Integer> permissionIds);
 
+    /**
+     * 根据权限编码获取索引
+     *
+     * @param permissionCodes 权限编码集合
+     * @param type            模块类型，只能是 "per_module" 或 "per_permission"
+     * @return 权限索引
+     */
     @GetMapping("/get_index_by_code")
     @BizAction("根据权限编码获取索引")
     @AllowOpenAccess

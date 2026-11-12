@@ -10,7 +10,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 /**
- * OAuth 控制器
+ * OAuth 授权认证
  */
 @RestController
 @RequestMapping("/oauth")

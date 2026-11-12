@@ -115,6 +115,21 @@ public interface UserLoginController {
     JwtToken loginWeb(@RequestParam String username, @RequestParam String password, @RequestParam String appId);
 
     /**
+     * 通过密码进行用户登录，用于 Web 登录
+     * 这个直接返回 token，一般情况下尽量避免使用。
+     *
+     * @param username 用户名/手机号/邮箱
+     * @param password 密码
+     * @param appId    应用 id
+     * @return 用户的 JWT Token
+     */
+    @PostMapping("/web_temp")
+    @AllowOpenAccess
+    @BizAction("用户登录")
+    @Deprecated
+    JwtToken loginWebTemp(@RequestParam String username, @RequestParam String password, @RequestParam String appId);
+
+    /**
      * 通过密码进行用户登录
      * 要求客户端认证，一般适合 App 登录
      *

@@ -12,6 +12,12 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/oauth/client")
 public interface ClientCredentialController {
+    /**
+     * 客户端认证注册
+     *
+     * @param app 客户端信息
+     * @return 是否成功
+     */
     @PostMapping
     @BizAction("客户端认证注册")
     @ClientAuthentication

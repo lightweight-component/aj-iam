@@ -130,6 +130,11 @@ public class UserLoginService implements UserLoginController, IamConstants {
         return login(username, password, ClientCredential.getApp(appId));
     }
 
+    @Override
+    public JwtToken loginWebTemp(String username, String password, String appId) {
+        return loginWeb(username, password, appId);
+    }
+
     private JwtToken login(String username, String password, App app) {
         return login(username, password, app, null);
     }
