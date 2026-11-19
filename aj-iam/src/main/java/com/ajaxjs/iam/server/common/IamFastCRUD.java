@@ -1,13 +1,13 @@
 package com.ajaxjs.iam.server.common;
 
 import com.ajaxjs.dataservice.fastcrud.Namespaces;
+import com.ajaxjs.dataservice.fastcrud.sqlgenerator.AutoQuery;
+import com.ajaxjs.dataservice.fastcrud.sqlgenerator.AutoQueryBusiness;
 import com.ajaxjs.framework.database.DataBaseConnection;
 import com.ajaxjs.iam.client.SecurityManager;
 import com.ajaxjs.iam.server.service.TenantService;
 import com.ajaxjs.sqlman.JdbcConnection;
 import com.ajaxjs.sqlman.model.tablemodel.TableModel;
-import com.ajaxjs.dataservice.fastcrud.sqlgenerator.AutoQuery;
-import com.ajaxjs.dataservice.fastcrud.sqlgenerator.AutoQueryBusiness;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;

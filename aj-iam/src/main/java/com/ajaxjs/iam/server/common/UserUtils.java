@@ -127,7 +127,6 @@ public class UserUtils {
         try {
             resp.getWriter().write(html);
         } catch (IOException ignored) {
-
         }
     }
 }

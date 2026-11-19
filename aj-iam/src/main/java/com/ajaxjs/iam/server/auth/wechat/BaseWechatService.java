@@ -6,7 +6,7 @@ import com.ajaxjs.iam.server.model.User;
 import com.ajaxjs.iam.server.model.UserAccount;
 import com.ajaxjs.iam.server.model.UserAccountType;
 import com.ajaxjs.iam.server.model.UserFunction;
-import com.ajaxjs.iam.server.model.wechat.Code2SessionResult;
+import com.ajaxjs.iam.server.auth.model.wechat.Code2SessionResult;
 import com.ajaxjs.iam.server.service.token.JwtTokenService;
 import com.ajaxjs.iam.server.user_info.UserInfoService;
 import com.ajaxjs.sqlman.Action;

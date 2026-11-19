@@ -2,10 +2,10 @@ package com.ajaxjs.iam.server.auth.controller;
 
 import com.ajaxjs.iam.annotation.AllowOpenAccess;
 import com.ajaxjs.iam.jwt.JwtToken;
-import com.ajaxjs.iam.server.model.wechat.MiniAppPhoneNumber;
-import com.ajaxjs.iam.server.model.wechat.PhoneChangeDTO;
-import com.ajaxjs.iam.server.model.wechat.PhoneNumberLoginDTO;
-import com.ajaxjs.iam.server.model.wechat.WechatAuthCode;
+import com.ajaxjs.iam.server.auth.model.wechat.MiniAppPhoneNumber;
+import com.ajaxjs.iam.server.auth.model.wechat.PhoneChangeDTO;
+import com.ajaxjs.iam.server.auth.model.wechat.PhoneNumberLoginDTO;
+import com.ajaxjs.iam.server.auth.model.wechat.WechatAuthCode;
 import com.ajaxjs.spring.annotation.BizAction;
 import org.springframework.web.bind.annotation.*;
 

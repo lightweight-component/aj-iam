@@ -20,12 +20,12 @@ Please check out [website](https://iam.ajaxjs.com).
 
 ## Install
 
-Runs on Java 8+. This is the maven of IAM client SDK:
+Runs on Java 17+. This is the maven of IAM client SDK:
 
 ```xml
 <dependency>
     <groupId>com.ajaxjs</groupId>
     <artifactId>aj-iam-client</artifactId>
-    <version>1.1</version>
+    <version>1.2</version>
 </dependency>
 ```

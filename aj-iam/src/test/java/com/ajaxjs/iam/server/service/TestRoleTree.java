@@ -2,8 +2,8 @@ package com.ajaxjs.iam.server.service;
 
 
 import com.ajaxjs.framework.tree.FlatArrayToTree;
-import com.ajaxjs.iam.server.BaseTest;
 import com.ajaxjs.iam.permission.Permission;
+import com.ajaxjs.iam.server.BaseTest;
 import com.ajaxjs.iam.server.authorizatio.PermissionService;
 import com.ajaxjs.sqlman.Action;
 import com.ajaxjs.util.JsonUtil;

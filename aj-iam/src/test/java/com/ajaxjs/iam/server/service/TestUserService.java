@@ -1,7 +1,7 @@
 package com.ajaxjs.iam.server.service;
 
-import com.ajaxjs.iam.server.BaseTest;
 import com.ajaxjs.iam.UserConstants;
+import com.ajaxjs.iam.server.BaseTest;
 import com.ajaxjs.iam.server.model.User;
 import com.ajaxjs.iam.server.user_info.UserInfoService;
 import org.junit.jupiter.api.Test;

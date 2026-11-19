@@ -102,7 +102,6 @@ public class CurrentUserInfoService implements CurrentUserInfoController {
     @Override
     public boolean setPasswordAtFirstTime(String password) {
         Long userId = SecurityManager.getUser().getId();
-
         String checkIfNotSetPsw = "SELECT password FROM user_account WHERE user_id = ? AND type = 'PASSWORD' AND stat = 0";
         String psw = new Action(checkIfNotSetPsw).query(userId).oneValue(String.class);
 

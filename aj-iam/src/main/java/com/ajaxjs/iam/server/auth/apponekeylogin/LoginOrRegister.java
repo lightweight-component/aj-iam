@@ -11,7 +11,6 @@ import com.ajaxjs.iam.server.service.token.JwtTokenService;
 import com.ajaxjs.iam.server.user_info.resetpsw.UserRegisterService;
 import com.ajaxjs.sqlman.Action;
 import com.ajaxjs.util.ObjectHelper;
-import com.ajaxjs.util.RandomTools;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor

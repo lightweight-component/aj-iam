@@ -4,13 +4,9 @@ import com.ajaxjs.framework.model.BaseEntityConstants;
 import com.ajaxjs.framework.model.BusinessException;
 import com.ajaxjs.iam.model.App;
 import com.ajaxjs.iam.server.model.User;
-import com.ajaxjs.iam.server.model.UserAccount;
-import com.ajaxjs.iam.server.model.UserAccountType;
 import com.ajaxjs.iam.server.service.ClientCredential;
 import com.ajaxjs.iam.server.user_info.controller.UserInfoController;
-import com.ajaxjs.iam.server.user_info.resetpsw.UpdatePswUserInfoVO;
 import com.ajaxjs.sqlman.Action;
-import com.ajaxjs.sqlman.model.CreateResult;
 import com.ajaxjs.sqlman.util.Utils;
 import org.springframework.stereotype.Service;
 
@@ -48,8 +44,7 @@ public class UserInfoService implements UserInfoController {
 
     @Override
     public boolean delete(Long id) {
-        String sql = "UPDATE user_account SET stat = 1 WHERE user_id = ?";
-        new Action(sql).update(id).execute();
+        new Action("UPDATE user_account SET stat = 1 WHERE user_id = ?").update(id).execute();
 
         User user = new User();
         user.setId(id);

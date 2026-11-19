@@ -1,6 +1,5 @@
 package com.ajaxjs.iam.server.common;
 
-import com.ajaxjs.iam.server.common.UserUtils;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;

@@ -14,7 +14,7 @@ import org.springframework.util.StringUtils;
 
 @Service
 @Slf4j
-public class ResetPasswordBySmsCode  extends BaseResetPasswordService implements ByCode {
+public class ResetPasswordBySmsCode extends BaseResetPasswordService implements ByCode {
     @Autowired
     @Qualifier("localCache")
     Cache<String, Object> cache;

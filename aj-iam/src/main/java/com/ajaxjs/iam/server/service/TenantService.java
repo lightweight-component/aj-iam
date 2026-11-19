@@ -3,7 +3,6 @@ package com.ajaxjs.iam.server.service;
 import com.ajaxjs.iam.client.SecurityManager;
 import com.ajaxjs.iam.model.SimpleUser;
 import com.ajaxjs.spring.DiContextUtil;
-
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.util.StringUtils;
 

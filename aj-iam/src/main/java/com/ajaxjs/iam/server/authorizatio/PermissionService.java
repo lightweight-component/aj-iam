@@ -5,6 +5,7 @@ import com.ajaxjs.iam.permission.Permission;
 import com.ajaxjs.iam.permission.PermissionControl;
 import com.ajaxjs.iam.permission.PermissionEntity;
 import com.ajaxjs.iam.server.authorizatio.controller.PermissionController;
+import com.ajaxjs.iam.server.authorizatio.model.Role;
 import com.ajaxjs.sqlman.Action;
 import com.ajaxjs.util.ObjectHelper;
 import lombok.extern.slf4j.Slf4j;

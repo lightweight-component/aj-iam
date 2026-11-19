@@ -6,6 +6,7 @@ import com.ajaxjs.iam.jwt.JwtToken;
 import com.ajaxjs.iam.model.App;
 import com.ajaxjs.iam.model.SimpleUser;
 import com.ajaxjs.iam.server.auth.controller.WechatController;
+import com.ajaxjs.iam.server.auth.model.wechat.*;
 import com.ajaxjs.iam.server.model.User;
 import com.ajaxjs.iam.server.model.UserAccount;
 import com.ajaxjs.iam.server.model.UserFunction;
@@ -86,7 +87,6 @@ public class WechatService extends BaseWechatService implements WechatController
         wechatAuthCode.setCode(dto.getCode());
 
         Code2SessionResult openIdByCode = getOpenIdByCode(wechatAuthCode);
-
         String sessionKey = openIdByCode.getSession_key();
         String iv = dto.getIv();
         String cipherText = dto.getData();

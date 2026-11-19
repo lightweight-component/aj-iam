@@ -3,12 +3,12 @@ package com.ajaxjs.iam.server.auth.wechat;
 import com.ajaxjs.framework.model.BusinessException;
 import com.ajaxjs.iam.UserConstants;
 import com.ajaxjs.iam.client.BaseOidcClientUserController;
+import com.ajaxjs.iam.jwt.JwtToken;
 import com.ajaxjs.iam.model.App;
-import com.ajaxjs.iam.server.model.wechat.WechatTokenResponse;
-import com.ajaxjs.iam.server.model.wechat.WechatUserInfoResponse;
+import com.ajaxjs.iam.server.auth.model.wechat.WechatTokenResponse;
+import com.ajaxjs.iam.server.auth.model.wechat.WechatUserInfoResponse;
 import com.ajaxjs.iam.server.service.ClientCredential;
 import com.ajaxjs.iam.server.service.TenantService;
-import com.ajaxjs.iam.jwt.JwtToken;
 import com.ajaxjs.spring.DiContextUtil;
 import com.ajaxjs.sqlman.Action;
 import com.ajaxjs.util.ObjectHelper;
@@ -30,11 +30,9 @@ import java.util.concurrent.atomic.AtomicReference;
 @Service
 @Slf4j
 public class OpenAccount extends BaseWechatService {
-    private final static String H5_LOGIN =
-            "https://api.weixin.qq.com/sns/oauth2/access_token?appid=%s&secret=%s&code=%s&grant_type=authorization_code";
+    private final static String H5_LOGIN = "https://api.weixin.qq.com/sns/oauth2/access_token?appid=%s&secret=%s&code=%s&grant_type=authorization_code";
 
-    private final static String H5_USER_INFO =
-            "https://api.weixin.qq.com/sns/userinfo?access_token=%s&openid=%s&lang=zh_CN";
+    private final static String H5_USER_INFO = "https://api.weixin.qq.com/sns/userinfo?access_token=%s&openid=%s&lang=zh_CN";
 
     public void login(String code, String state) {
         String appId = TenantService.getAppIdd();

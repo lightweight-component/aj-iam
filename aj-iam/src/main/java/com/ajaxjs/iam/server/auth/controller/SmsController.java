@@ -28,7 +28,7 @@ public interface SmsController {
     /**
      * 根据手机号码发送短信
      *
-     * @param phone 手机号码
+     * @param phone          手机号码
      * @param checkUserExist 是否检查用户已经存在，可选的，不填则不检查
      * @return 是否成功
      */
@@ -56,7 +56,7 @@ public interface SmsController {
      * 如果登录成功，前端应该跳转到 OIDC 获取 code 的流程
      *
      * @param phone 手机号码
-     * @param code 验证码
+     * @param code  验证码
      * @return 是否成功
      */
     @PostMapping("/sms_login")
@@ -68,7 +68,7 @@ public interface SmsController {
      * 检查验证码是否匹配且未过期
      *
      * @param phone 手机号码
-     * @param code 验证码
+     * @param code  验证码
      * @return 是否成功
      */
     @PostMapping("/verify_code")
@@ -82,7 +82,7 @@ public interface SmsController {
      *
      * @param phone 手机号码
      * @param appId 应用 appId
-     * @param code 验证码
+     * @param code  验证码
      * @return 验证码是否通过
      */
     @PostMapping("/verify_code_update_phone")

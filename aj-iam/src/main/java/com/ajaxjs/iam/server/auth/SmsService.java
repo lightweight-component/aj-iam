@@ -10,6 +10,7 @@ import com.ajaxjs.iam.server.auth.apponekeylogin.AliyunSmsEntity;
 import com.ajaxjs.iam.server.auth.apponekeylogin.LoginOrRegister;
 import com.ajaxjs.iam.server.auth.apponekeylogin.SendAliyunSms;
 import com.ajaxjs.iam.server.auth.controller.SmsController;
+import com.ajaxjs.iam.server.auth.model.AppSecretMgr;
 import com.ajaxjs.iam.server.common.UserUtils;
 import com.ajaxjs.iam.server.common.langs.LanguageMapping;
 import com.ajaxjs.iam.server.common.session.UserSession;

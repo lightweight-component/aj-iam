@@ -7,7 +7,7 @@ import com.ajaxjs.iam.server.auth.apponekeylogin.LoginOrRegister;
 import com.ajaxjs.iam.server.auth.controller.EmailCodeController;
 import com.ajaxjs.iam.server.common.UserUtils;
 import com.ajaxjs.iam.server.common.langs.LanguageMapping;
-import com.ajaxjs.iam.server.model.AppSecretMgr;
+import com.ajaxjs.iam.server.auth.model.AppSecretMgr;
 import com.ajaxjs.iam.server.model.UserAccountType;
 import com.ajaxjs.iam.server.service.ClientCredential;
 import com.ajaxjs.message.email.Email;
@@ -47,12 +47,11 @@ public class EmailCodeService implements EmailCodeController {
 
         cache.put(email, randCode, 60 * 10);
 
-        return sendEmail(randCode + "", email);
+        return sendEmail(String.valueOf(randCode), email);
     }
 
     private boolean sendEmail(String randCode, String email) {
         String subject = CODE_EMAIL_TITLE_ENG + randCode;
-
         Map<String, Object> params = ObjectHelper.mapOf("username", email, "product", "Wyndme", "min", "10");
         params.put("code", randCode);
         params.put("time", DateTools.nowShort());
@@ -108,13 +107,13 @@ public class EmailCodeService implements EmailCodeController {
             尊敬的 ${username}，
                 感谢您使用 ${product}。
                 我们收到了您的账户 [注册 / 登录] 请求。您的验证码为：
-            
+                        
                 ${code}
-            
+                        
                 该验证码将在 ${min} 分钟后失效。为了保障您的账户安全，请勿将验证码泄露给他人。
-            
+                        
                 如果您并未发起此请求，请忽略此邮件。您的账户依然是安全的。
-            
+                        
                 此致，
                     ${product} 团队
                     ${time}
@@ -126,12 +125,12 @@ public class EmailCodeService implements EmailCodeController {
             Dear user ${username},<br />
                 &nbsp;&nbsp;&nbsp;&nbsp;Thank you for using ${product}.<br />
                 &nbsp;&nbsp;&nbsp;&nbsp;We received a request to [sign up / log in] to your account. Your verification code is:<br /><br />
-            
+                        
                 &nbsp;&nbsp;&nbsp;&nbsp;<b>${code}</b><br /><br />
-            
+                        
                 &nbsp;&nbsp;&nbsp;&nbsp;This code will expire in ${min} minutes. For your account security, please do not share this code with anyone.<br />
                 &nbsp;&nbsp;&nbsp;&nbsp;If you did not initiate this request, please ignore this email. Your account remains secure.<br /><br />
-            
+                        
                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;    Best regards,<br />
                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;    The ${product} Team<br />
                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;    ${time}

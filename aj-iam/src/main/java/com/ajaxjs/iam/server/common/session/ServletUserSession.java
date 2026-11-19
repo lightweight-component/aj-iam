@@ -2,8 +2,8 @@ package com.ajaxjs.iam.server.common.session;
 
 import com.ajaxjs.iam.server.model.User;
 import com.ajaxjs.spring.DiContextUtil;
-
 import jakarta.servlet.http.HttpSession;
+
 import java.util.Enumeration;
 import java.util.Objects;
 

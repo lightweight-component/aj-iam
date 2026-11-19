@@ -4,12 +4,11 @@ import com.ajaxjs.iam.server.BaseTest;
 import com.ajaxjs.iam.server.model.User;
 import com.ajaxjs.iam.server.user_info.resetpsw.BaseResetPasswordService;
 import com.ajaxjs.iam.server.user_info.resetpsw.ResetPasswordByEmailCode;
+import jakarta.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
-
-import jakarta.servlet.http.HttpServletRequest;
 
 import static com.ajaxjs.iam.server.service.TenantService.AUTH_TENANT_ID;
 import static org.junit.jupiter.api.Assertions.assertTrue;

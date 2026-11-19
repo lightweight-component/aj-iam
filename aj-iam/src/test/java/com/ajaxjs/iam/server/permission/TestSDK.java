@@ -1,8 +1,8 @@
 package com.ajaxjs.iam.server.permission;
 
-import com.ajaxjs.iam.server.BaseTest;
 import com.ajaxjs.iam.permission.PermissionConfig;
 import com.ajaxjs.iam.permission.PermissionEntity;
+import com.ajaxjs.iam.server.BaseTest;
 import com.ajaxjs.iam.server.authorizatio.PermissionService;
 import com.ajaxjs.util.ObjectHelper;
 import com.ajaxjs.util.httpremote.Get;

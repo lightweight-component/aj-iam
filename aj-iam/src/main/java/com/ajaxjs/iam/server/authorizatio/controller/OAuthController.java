@@ -4,10 +4,9 @@ import com.ajaxjs.iam.annotation.AllowOpenAccess;
 import com.ajaxjs.iam.annotation.ClientAuthentication;
 import com.ajaxjs.iam.model.AccessToken;
 import com.ajaxjs.spring.annotation.BizAction;
-import org.springframework.web.bind.annotation.*;
-
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * OAuth 授权认证
