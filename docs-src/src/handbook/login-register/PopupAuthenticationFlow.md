@@ -134,6 +134,7 @@ postMessage 的 targetOrigin 必须是 IAM_API 的 origin，不使用 "*"。
 即使默认 IAM_API 和 ROBOT_API 同域，也要分别计算 origin。
 
 消息数据校验：
+
 - loggedIn 必须为 boolean。
 - jwt 必须为非空 string。
 - 密码模式的 username、password、captchaCode、captchaUuid 必须为非空 string。
@@ -144,6 +145,7 @@ postMessage 的 targetOrigin 必须是 IAM_API 的 origin，不使用 "*"。
 五、用户信息及会话接入
 
 当前用户接口使用 JSONP：
+
 - 动态创建 script 和唯一 callback 名。
 - 超时建议 10 秒。
 - 成功、失败、超时后均清理 script、回调和计时器。
@@ -153,6 +155,7 @@ postMessage 的 targetOrigin 必须是 IAM_API 的 origin，不使用 "*"。
 优先复用当前项目已有的 Token 和用户状态管理，不要另建一套不关联的登录状态。
 
 如果项目没有既有存储约定，可以使用：
+
 - localStorage.access_token：JWT
 - localStorage.userInfo：完整用户对象的 JSON
 - localStorage.isLoggedIn："true"
@@ -184,6 +187,7 @@ postMessage 的 targetOrigin 必须是 IAM_API 的 origin，不使用 "*"。
 
 完成生产构建和适用的类型检查，说明已有错误与本次新增错误。
 使用模拟测试验证：
+
 - IAM 已登录时获取 JWT 并完成跳转。
 - IAM 未登录时展示远端 iframe。
 - 短信登录流程。

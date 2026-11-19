@@ -10,7 +10,6 @@ import com.ajaxjs.iam.server.auth.model.wechat.*;
 import com.ajaxjs.iam.server.model.User;
 import com.ajaxjs.iam.server.model.UserAccount;
 import com.ajaxjs.iam.server.model.UserFunction;
-import com.ajaxjs.iam.server.model.wechat.*;
 import com.ajaxjs.iam.server.service.ClientCredential;
 import com.ajaxjs.iam.server.service.TenantService;
 import com.ajaxjs.iam.server.user_info.UserInfoService;

@@ -1,99 +1,99 @@
 <?xml version="1.0" encoding="utf-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-    
-        <url>
-            <loc>https://iam.ajaxjs.com/developer/model-cn/</loc>
-            <lastmod>2022-01-05T00:00:00.000Z</lastmod>
-        </url>
-    
-        <url>
-            <loc>https://iam.ajaxjs.com/developer/model/</loc>
-            <lastmod>2022-01-05T00:00:00.000Z</lastmod>
-        </url>
-    
-        <url>
-            <loc>https://iam.ajaxjs.com/developer/user-cn/</loc>
-            <lastmod>2022-01-05T00:00:00.000Z</lastmod>
-        </url>
-    
-        <url>
-            <loc>https://iam.ajaxjs.com/developer/user/</loc>
-            <lastmod>2022-01-05T00:00:00.000Z</lastmod>
-        </url>
-    
-        <url>
-            <loc>https://iam.ajaxjs.com/handbook/deploy-cn/</loc>
-            <lastmod>2022-01-05T00:00:00.000Z</lastmod>
-        </url>
-    
-        <url>
-            <loc>https://iam.ajaxjs.com/handbook/deploy/</loc>
-            <lastmod>2022-01-05T00:00:00.000Z</lastmod>
-        </url>
-    
-        <url>
-            <loc>https://iam.ajaxjs.com/handbook/dev-cn/</loc>
-            <lastmod>2022-01-05T00:00:00.000Z</lastmod>
-        </url>
-    
-        <url>
-            <loc>https://iam.ajaxjs.com/handbook/install-cn/</loc>
-            <lastmod>2022-01-05T00:00:00.000Z</lastmod>
-        </url>
-    
-        <url>
-            <loc>https://iam.ajaxjs.com/handbook/install/</loc>
-            <lastmod>2022-01-05T00:00:00.000Z</lastmod>
-        </url>
-    
-        <url>
-            <loc>https://iam.ajaxjs.com/handbook/refresh-token/</loc>
-            <lastmod>2022-01-05T00:00:00.000Z</lastmod>
-        </url>
-    
-        <url>
-            <loc>https://iam.ajaxjs.com/handbook/ropc-cn/</loc>
-            <lastmod>2022-01-05T00:00:00.000Z</lastmod>
-        </url>
-    
-        <url>
-            <loc>https://iam.ajaxjs.com/handbook/user-service/</loc>
-            <lastmod>2022-01-05T00:00:00.000Z</lastmod>
-        </url>
-    
-        <url>
-            <loc>https://iam.ajaxjs.com/index-en/</loc>
-            <lastmod>2022-01-05T00:00:00.000Z</lastmod>
-        </url>
-    
-        <url>
-            <loc>https://iam.ajaxjs.com/</loc>
-            <lastmod>2022-01-05T00:00:00.000Z</lastmod>
-        </url>
-    
-        <url>
-            <loc>https://iam.ajaxjs.com/misc/contact-cn/</loc>
-            <lastmod>2022-01-05T00:00:00.000Z</lastmod>
-        </url>
-    
-        <url>
-            <loc>https://iam.ajaxjs.com/misc/contact/</loc>
-            <lastmod>2022-01-05T00:00:00.000Z</lastmod>
-        </url>
-    
-        <url>
-            <loc>https://iam.ajaxjs.com/misc/versions-cn/</loc>
-            <lastmod>2022-01-05T00:00:00.000Z</lastmod>
-        </url>
-    
-        <url>
-            <loc>https://iam.ajaxjs.com/misc/versions/</loc>
-            <lastmod>2022-01-05T00:00:00.000Z</lastmod>
-        </url>
-    
-        <url>
-            <loc>https://iam.ajaxjs.com/asset/main.css</loc>
-            <lastmod>2025-06-25T01:24:54.929Z</lastmod>
-        </url>
-    
+
+    <url>
+        <loc>https://iam.ajaxjs.com/developer/model-cn/</loc>
+        <lastmod>2022-01-05T00:00:00.000Z</lastmod>
+    </url>
+
+    <url>
+        <loc>https://iam.ajaxjs.com/developer/model/</loc>
+        <lastmod>2022-01-05T00:00:00.000Z</lastmod>
+    </url>
+
+    <url>
+        <loc>https://iam.ajaxjs.com/developer/user-cn/</loc>
+        <lastmod>2022-01-05T00:00:00.000Z</lastmod>
+    </url>
+
+    <url>
+        <loc>https://iam.ajaxjs.com/developer/user/</loc>
+        <lastmod>2022-01-05T00:00:00.000Z</lastmod>
+    </url>
+
+    <url>
+        <loc>https://iam.ajaxjs.com/handbook/deploy-cn/</loc>
+        <lastmod>2022-01-05T00:00:00.000Z</lastmod>
+    </url>
+
+    <url>
+        <loc>https://iam.ajaxjs.com/handbook/deploy/</loc>
+        <lastmod>2022-01-05T00:00:00.000Z</lastmod>
+    </url>
+
+    <url>
+        <loc>https://iam.ajaxjs.com/handbook/dev-cn/</loc>
+        <lastmod>2022-01-05T00:00:00.000Z</lastmod>
+    </url>
+
+    <url>
+        <loc>https://iam.ajaxjs.com/handbook/install-cn/</loc>
+        <lastmod>2022-01-05T00:00:00.000Z</lastmod>
+    </url>
+
+    <url>
+        <loc>https://iam.ajaxjs.com/handbook/install/</loc>
+        <lastmod>2022-01-05T00:00:00.000Z</lastmod>
+    </url>
+
+    <url>
+        <loc>https://iam.ajaxjs.com/handbook/refresh-token/</loc>
+        <lastmod>2022-01-05T00:00:00.000Z</lastmod>
+    </url>
+
+    <url>
+        <loc>https://iam.ajaxjs.com/handbook/ropc-cn/</loc>
+        <lastmod>2022-01-05T00:00:00.000Z</lastmod>
+    </url>
+
+    <url>
+        <loc>https://iam.ajaxjs.com/handbook/user-service/</loc>
+        <lastmod>2022-01-05T00:00:00.000Z</lastmod>
+    </url>
+
+    <url>
+        <loc>https://iam.ajaxjs.com/index-en/</loc>
+        <lastmod>2022-01-05T00:00:00.000Z</lastmod>
+    </url>
+
+    <url>
+        <loc>https://iam.ajaxjs.com/</loc>
+        <lastmod>2022-01-05T00:00:00.000Z</lastmod>
+    </url>
+
+    <url>
+        <loc>https://iam.ajaxjs.com/misc/contact-cn/</loc>
+        <lastmod>2022-01-05T00:00:00.000Z</lastmod>
+    </url>
+
+    <url>
+        <loc>https://iam.ajaxjs.com/misc/contact/</loc>
+        <lastmod>2022-01-05T00:00:00.000Z</lastmod>
+    </url>
+
+    <url>
+        <loc>https://iam.ajaxjs.com/misc/versions-cn/</loc>
+        <lastmod>2022-01-05T00:00:00.000Z</lastmod>
+    </url>
+
+    <url>
+        <loc>https://iam.ajaxjs.com/misc/versions/</loc>
+        <lastmod>2022-01-05T00:00:00.000Z</lastmod>
+    </url>
+
+    <url>
+        <loc>https://iam.ajaxjs.com/asset/main.css</loc>
+        <lastmod>2025-06-25T01:24:54.929Z</lastmod>
+    </url>
+
 </urlset>

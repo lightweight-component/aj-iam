@@ -7,9 +7,11 @@ tags:
   - Refresh Token
 layout: layouts/docs.njk
 ---
+
 # Refresh Token
 
-当用户在登录成功之后，服务端生成并返回两个 token 给客户端，其中 token 1 是用户执行业务请求访问服务器的时候使用，假设设置过期时间为 24 小时； token 2 是用于给的 token 1和 token 2 续期的时候使用，假设设置过期时间为 48 小时，如下图示所示：
+当用户在登录成功之后，服务端生成并返回两个 token 给客户端，其中 token 1 是用户执行业务请求访问服务器的时候使用，假设设置过期时间为
+24 小时； token 2 是用于给的 token 1和 token 2 续期的时候使用，假设设置过期时间为 48 小时，如下图示所示：
 
 ![](wechat_2025-08-19_144808_986.jpg)
 
@@ -33,10 +35,13 @@ layout: layouts/docs.njk
 
 # 具体实现
 
-如何检测 Token 快要过期呢？如果前端拿到的 token 的话，可以设置一个定时器检测 Token 快要过期。不过笔者认为这不是一个好的方式。而且最重要的是，Token 仍在 HttpOnly Cookie 中，前端无法获取（当然你可以安排一个接口获取之，或者登录时候返回过期时间，总有办法的，但都不是好的方式）。
+如何检测 Token 快要过期呢？如果前端拿到的 token 的话，可以设置一个定时器检测 Token 快要过期。不过笔者认为这不是一个好的方式。而且最重要的是，Token
+仍在 HttpOnly Cookie 中，前端无法获取（当然你可以安排一个接口获取之，或者登录时候返回过期时间，总有办法的，但都不是好的方式）。
 
 ## 前端刷新
-既然前端不能获取 Token 或者超时时间，那么换种思路，就是全局监听 401 Unauthorized 错误，然后立即尝试刷新 token（当然要保存前面请求在上下文中）。获取成功后在发送原来的业务请求。
+
+既然前端不能获取 Token 或者超时时间，那么换种思路，就是全局监听 401 Unauthorized 错误，然后立即尝试刷新
+token（当然要保存前面请求在上下文中）。获取成功后在发送原来的业务请求。
 
 这要求：
 
@@ -111,7 +116,10 @@ axios.interceptors.response.use(
 ```
 
 ## 后端刷新
+
 前面介绍的是前端刷新机制，后端也可以做到，那样就不必修改前端了。
 
 ## 小结
-无论前端方案还是后端方案，都要求生成 JWT 时候一起生成 Refresh Token。传递 Token 的时候也要把 Refresh Token 一并传过来，包括通过 HTTP Head/QueryString 传递 Token，否则如果由于没有 Refresh Token，所以刷新 Token 失败，就会跳转到登录页。
+
+无论前端方案还是后端方案，都要求生成 JWT 时候一起生成 Refresh Token。传递 Token 的时候也要把 Refresh Token 一并传过来，包括通过
+HTTP Head/QueryString 传递 Token，否则如果由于没有 Refresh Token，所以刷新 Token 失败，就会跳转到登录页。

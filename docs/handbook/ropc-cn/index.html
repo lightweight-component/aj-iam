@@ -1,21 +1,23 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <meta charset="utf-8"/>
-        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
-        <title>AJ IAM /资源所有者密码凭证（ROPC）</title>
-        <meta name="description" content="轻量级用户认证系统 资源所有者密码凭证（ROPC）"/>
-        <meta name="keywords" content="用户, 认证, 会员系统, IAM, AJ-IAM, ROPC"/>
-        <meta name="viewport" content="width=device-width, initial-scale=1"/>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@200..900&family=Noto+Serif:ital,wght@0,100..900;1,100..900&display=swap&family=Noto+Sans+SC:wght@100..900&display=swap" />
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@100..900&family=Noto+Serif:ital,wght@0,100..900;1,100..900&display=swap" />
-        <link rel="stylesheet" href="https://framework.ajaxjs.com/static/new-ui/css/common.css" />
-        <link rel="stylesheet" href="/asset/main.css"/>
-        <link rel="icon" type="image/x-icon" href="https://framework.ajaxjs.com/aj-logo/logo.ico"/>
-        <script src="https://framework.ajaxjs.com/static/aj-docs/common.js"></script>
-        <script>
+<head>
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+    <title>AJ IAM /资源所有者密码凭证（ROPC）</title>
+    <meta name="description" content="轻量级用户认证系统 资源所有者密码凭证（ROPC）"/>
+    <meta name="keywords" content="用户, 认证, 会员系统, IAM, AJ-IAM, ROPC"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+    <link rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@200..900&family=Noto+Serif:ital,wght@0,100..900;1,100..900&display=swap&family=Noto+Sans+SC:wght@100..900&display=swap"/>
+    <link rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@100..900&family=Noto+Serif:ital,wght@0,100..900;1,100..900&display=swap"/>
+    <link rel="stylesheet" href="https://framework.ajaxjs.com/static/new-ui/css/common.css"/>
+    <link rel="stylesheet" href="/asset/main.css"/>
+    <link rel="icon" type="image/x-icon" href="https://framework.ajaxjs.com/aj-logo/logo.ico"/>
+    <script src="https://framework.ajaxjs.com/static/aj-docs/common.js"></script>
+    <script>
             var _hmt = _hmt || [];
             (function() {
               var hm = document.createElement("script");
@@ -23,59 +25,63 @@
               var s = document.getElementsByTagName("script")[0];
               s.parentNode.insertBefore(hm, s);
             })();
-        </script>
-    </head>
-    <body>
-        <nav>
-            <div>
-                <div class="links">
-                    <a href="/">🏠 首页</a>
-                    | ⚙️ 源码:
-                    <a target="_blank" href="https://github.com/lightweight-component/aj-iam">Github</a>/<a target="_blank" href="https://gitcode.com/lightweight-component/aj-iam">Gitcode</a>
-                </div>
-                <h1><img src="https://framework.ajaxjs.com/aj-logo/logo.png" style="vertical-align: middle;height: 45px;margin-bottom: 6px;" /> AJ IAM</h1>
-                <h3>轻量级用户认证系统</h3>
-            </div>
-        </nav>
-        <div>
-            <menu>
-                
-                <ul>
-                    <li class="selected">
-                        <a href="/">首页</a>
-                    </li>
-                </ul>
-                <h3>开发心得</h3>
-                <ul>
-                    <li>
-                        <a href="/developer/user-cn">用户系统</a>
-                    </li>
-                    <li>
-                        <a href="/developer/model-cn">用户权限模型</a>
-                    </li>
-                </ul>
-                <h3>部署</h3>
-                <ul>
-                      <li>
-                           <a href="/handbook/deploy-cn">部署方式</a>
-                      </li>
-                      <li>
-                           <a href="/handbook/dev-cn">开发环境部署</a>
-                      </li>
-                </ul>
 
-                <h3>其他</h3>
-                <ul>
-                    <li><a href="/misc/contact-cn">联系方式</a></li>
-                </ul>
-            </menu>
-            <article class="aj-text chinese">
-                <h1>资源所有者密码凭证（ROPC）</h1>
-<p>OAuth 规范中除了常见的授权模式外，还有一种密码凭证模式，即 Resource Owner Password Credentials（ROPC）。
-这种模式只能在高度信任的情况下使用，说白了就是登录页不与 IAM Server 在一起，而是跟业务系统一起。这是一种不得已的情况，一般不推荐，在新版 OAuth 中被弃用。</p>
-<p>虽然但是，有时候还是需要的。那么我们来看看 ROPC 在 IAM 中怎办使用。</p>
-<p>首先在你应用程序本地设置控制器：</p>
-<pre><code class="language-java">import com.ajaxjs.iam.annotation.AllowOpenAccess;
+    </script>
+</head>
+<body>
+<nav>
+    <div>
+        <div class="links">
+            <a href="/">🏠 首页</a>
+            | ⚙️ 源码:
+            <a target="_blank" href="https://github.com/lightweight-component/aj-iam">Github</a>/<a target="_blank"
+                                                                                                    href="https://gitcode.com/lightweight-component/aj-iam">Gitcode</a>
+        </div>
+        <h1><img src="https://framework.ajaxjs.com/aj-logo/logo.png"
+                 style="vertical-align: middle;height: 45px;margin-bottom: 6px;"/> AJ IAM</h1>
+        <h3>轻量级用户认证系统</h3>
+    </div>
+</nav>
+<div>
+    <menu>
+
+        <ul>
+            <li class="selected">
+                <a href="/">首页</a>
+            </li>
+        </ul>
+        <h3>开发心得</h3>
+        <ul>
+            <li>
+                <a href="/developer/user-cn">用户系统</a>
+            </li>
+            <li>
+                <a href="/developer/model-cn">用户权限模型</a>
+            </li>
+        </ul>
+        <h3>部署</h3>
+        <ul>
+            <li>
+                <a href="/handbook/deploy-cn">部署方式</a>
+            </li>
+            <li>
+                <a href="/handbook/dev-cn">开发环境部署</a>
+            </li>
+        </ul>
+
+        <h3>其他</h3>
+        <ul>
+            <li><a href="/misc/contact-cn">联系方式</a></li>
+        </ul>
+    </menu>
+    <article class="aj-text chinese">
+        <h1>资源所有者密码凭证（ROPC）</h1>
+        <p>OAuth 规范中除了常见的授权模式外，还有一种密码凭证模式，即 Resource Owner Password Credentials（ROPC）。
+            这种模式只能在高度信任的情况下使用，说白了就是登录页不与 IAM Server 在一起，而是跟业务系统一起。这是一种不得已的情况，一般不推荐，在新版
+            OAuth 中被弃用。</p>
+        <p>虽然但是，有时候还是需要的。那么我们来看看 ROPC 在 IAM 中怎办使用。</p>
+        <p>首先在你应用程序本地设置控制器：</p>
+        <pre><code class="language-java">import com.ajaxjs.iam.annotation.AllowOpenAccess;
 import com.zoomtech2008.rdd.model.dto.RddUserDTO;
 import com.zoomtech2008.rdd.model.vo.RddUserTokenVo;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -117,8 +123,8 @@ public interface UserController {
     boolean logout();
 }
 </code></pre>
-<p>实现它。</p>
-<pre><code class="language-java">import com.ajaxjs.framework.database.IgnoreDataBaseConnect;
+        <p>实现它。</p>
+        <pre><code class="language-java">import com.ajaxjs.framework.database.IgnoreDataBaseConnect;
 import com.ajaxjs.iam.annotation.AllowOpenAccess;
 import com.ajaxjs.iam.client.BaseOidcClientUserController;
 import com.ajaxjs.iam.jwt.JWebToken;
@@ -168,17 +174,17 @@ public class UserService extends BaseOidcClientUserController implements UserCon
     }
 }
 </code></pre>
-<p>如上主要是调用 IAM-SDK 的<code>ropcLogin()</code>获取 Token 返回返回。
-整个过程还是比较简单直接的，远没有授权码那样多次跳转那么麻烦（当然牺牲了安全性）。</p>
+        <p>如上主要是调用 IAM-SDK 的<code>ropcLogin()</code>获取 Token 返回返回。
+            整个过程还是比较简单直接的，远没有授权码那样多次跳转那么麻烦（当然牺牲了安全性）。</p>
 
-            </article>
-        </div>
-        <footer>
-             AJ-IAM，开源框架 <a href="https://framework.ajaxjs.com" target="_blank">AJ-Framework</a> 的一部分。联系方式：
-             frank@ajaxjs.com，<a href="https://blog.csdn.net/zhangxin09" target="_blank">作者博客</a>
-             <br />
-             <br />
-             Copyright © 2025 Frank Cheung. All rights reserved.
-         </footer>
-    </body>
+    </article>
+</div>
+<footer>
+    AJ-IAM，开源框架 <a href="https://framework.ajaxjs.com" target="_blank">AJ-Framework</a> 的一部分。联系方式：
+    frank@ajaxjs.com，<a href="https://blog.csdn.net/zhangxin09" target="_blank">作者博客</a>
+    <br/>
+    <br/>
+    Copyright © 2025 Frank Cheung. All rights reserved.
+</footer>
+</body>
 </html>

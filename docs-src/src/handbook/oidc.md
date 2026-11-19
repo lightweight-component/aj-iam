@@ -7,7 +7,9 @@ tags:
   - 协议简介
 layout: layouts/docs.njk
 ---
+
 # 资源所有者密码凭证（ROPC）
+
  <table class="oidc-doc-table">
                 <tr>
                     <th width="100">分類</th>

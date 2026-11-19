@@ -1,17 +1,17 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <meta charset="utf-8"/>
-        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
-        <title>AJ IAM/部署 IAM 程序</title>
-        <meta name="description" content="A lightweight User Authentication System for Java. 部署 IAM 程序"/>
-        <meta name="keywords" content="auth, authentication, lightweight, 部署"/>
-        <meta name="viewport" content="width=device-width, initial-scale=1"/>
-        <link rel="stylesheet" href="https://framework.ajaxjs.com/static/font/font.css" />
-        <link rel="stylesheet" href="/asset/main.css"/>
-        <link rel="icon" type="image/x-icon" href="https://framework.ajaxjs.com/aj-logo/logo.ico"/>
-        <script src="https://framework.ajaxjs.com/static/aj-docs/common.js"></script>
-        <script>
+<head>
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+    <title>AJ IAM/部署 IAM 程序</title>
+    <meta name="description" content="A lightweight User Authentication System for Java. 部署 IAM 程序"/>
+    <meta name="keywords" content="auth, authentication, lightweight, 部署"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <link rel="stylesheet" href="https://framework.ajaxjs.com/static/font/font.css"/>
+    <link rel="stylesheet" href="/asset/main.css"/>
+    <link rel="icon" type="image/x-icon" href="https://framework.ajaxjs.com/aj-logo/logo.ico"/>
+    <script src="https://framework.ajaxjs.com/static/aj-docs/common.js"></script>
+    <script>
             // 获取用户的默认语言
             var userLang = navigator.language || navigator.userLanguage;
 
@@ -27,85 +27,93 @@
               var s = document.getElementsByTagName("script")[0];
               s.parentNode.insertBefore(hm, s);
             })();
-        </script>
-    </head>
-    <body>
-        <nav>
-            <div>
-                <div class="links">
-                    <a href="/">🏠 Home</a>
-                    | ⚙️ Source:
-                    <a target="_blank" href="https://github.com/lightweight-component/aj-iam">Github</a>/<a target="_blank" href="https://gitcode.com/lightweight-component/aj-iam">Gitcode</a>
-                    |
-                    <a href="/cn">Chinese Version</a>
-                </div>
-                <h1><img src="https://framework.ajaxjs.com/aj-logo/logo.png" style="vertical-align: middle;height: 45px;margin-bottom: 6px;" /> AJ IAM</h1>
-                <h3>A lightweight User Authentication System</h3>
-            </div>
-        </nav>
-        <div>
-            <menu>
 
-                <ul>
-                    <li class="selected">
-                        <a href="/">Home</a>
-                    </li>
-                </ul>
-                <h3>Developer says</h3>
-                <ul>
-                    <li>
-                        <a href="/developer/user">User System</a>
-                    </li>
-                    <li>
-                       <a href="/developer/model">Authentication Model</a>
-                    </li>
-                </ul>
-                <h3>Usage</h3>
-                <ul>
-                      <li>
-                           <a href="/handbook/install">Install</a>
-                      </li>
-                      <li>
-                           <a href="/handbook/deploy">Deploy</a>
-                      </li>
-                </ul>
+    </script>
+</head>
+<body>
+<nav>
+    <div>
+        <div class="links">
+            <a href="/">🏠 Home</a>
+            | ⚙️ Source:
+            <a target="_blank" href="https://github.com/lightweight-component/aj-iam">Github</a>/<a target="_blank"
+                                                                                                    href="https://gitcode.com/lightweight-component/aj-iam">Gitcode</a>
+            |
+            <a href="/cn">Chinese Version</a>
+        </div>
+        <h1><img src="https://framework.ajaxjs.com/aj-logo/logo.png"
+                 style="vertical-align: middle;height: 45px;margin-bottom: 6px;"/> AJ IAM</h1>
+        <h3>A lightweight User Authentication System</h3>
+    </div>
+</nav>
+<div>
+    <menu>
 
-                <h3>Misc.</h3>
-                <ul>
-                    <li><a href="/misc/contact">Contact</a></li>
-                </ul>
-            </menu>
-            <article>
-                <h1>部署 IAM 程序</h1>
-<p>我们通过源码检出和 IDEA 来完整 IAM 程序的部署，目标是 Linux 的服务器。</p>
-<h2>配置文件</h2>
-<p>Git checkout 源码后默认是没有任何有效的配置文件，——除了一个<code>application.yaml</code>演示文件，
-位于<code>profiles</code>目录下。我们在 <code>profiles</code>目录中新建<code>dev</code>、<code>prod</code>、<code>test</code>子目录，分别对应着开发、生产、测试环境。
-如不满足还可以自定义更多的子目录。</p>
-<p><img src="/asset/imgs/iam-yaml-dirs.jpg" alt=""></p>
-<p>把<code>application.yaml</code>复制并改名<code>application.yml</code>到具体的<code>dev</code>、<code>prod</code>、<code>test</code>目录中，然后修改你具体的配置。</p>
-<h2>一键部署</h2>
-<p>如果你采用原始的 JAR 发布机制（而非 Jenkins/Docker/K8S），那么可以使用我们准备的“一键部署”。</p>
-<p>技巧：你可以使用源码中<code>/src/startup.sh</code>的 SHELL 脚本快速启动程序</p>
-<h1>划分域（Domain）来进行部署</h1>
-<p>首先 IAM 是一套中间件程序，这套程序也符合常规前后端分离的 Web 程序，即：</p>
-<ul>
-<li>前端（Web）UI，纯 HTML/CSS/JS 程序，其实就是 IAM 的管理程序界面</li>
-<li>后端 API 程序，SpringBoot 服务端程序</li>
-</ul>
-<p>然后跟你的应用程序进行对接整合。具体整合通过 SDK 或者纯接口都可以。
-但这里有一个特殊的程序需要与 IAM 在用一个域（Domain）下面部署，就是<strong>用户的登录页面</strong>。为什么登录页面要单独“拎”出来还要和 IAM 一起部署呢？
-这是因为安装 OAuth/OIDC 规范，登录操作不能跨域的缘故，一句话就是为了安全起见的。同时，登录页面在 SSO 语境中通常也被认为是统一登录，即不单单为某个程序所使用，而是多个程序使用这一个登录入口。</p>
-<p>由此，关于是否跨域，我们可以稍作整理一下：</p>
-<ul>
-<li>IAM 程序本身，前端后端固然在一个域下</li>
-<li>业务系统的用户登录页面，与 IAM 在一个域下</li>
-<li>业务系统，访问或者调用 IAM，不跟 IAM 一个域，即跨域调用（更多的是后端调用，于是是否跨域无所谓了）</li>
-</ul>
-<p>理解好之后便不难写出 Nginx 配置了。</p>
-<h2>为 IAM 配置 Nginx</h2>
-<p>假设域名 iam.service.com 是为 IAM 所准备的。把登陆页面、IAM 管理 UI、IAM API 放置同一个域下面。</p>
-<pre><code>server {
+        <ul>
+            <li class="selected">
+                <a href="/">Home</a>
+            </li>
+        </ul>
+        <h3>Developer says</h3>
+        <ul>
+            <li>
+                <a href="/developer/user">User System</a>
+            </li>
+            <li>
+                <a href="/developer/model">Authentication Model</a>
+            </li>
+        </ul>
+        <h3>Usage</h3>
+        <ul>
+            <li>
+                <a href="/handbook/install">Install</a>
+            </li>
+            <li>
+                <a href="/handbook/deploy">Deploy</a>
+            </li>
+        </ul>
+
+        <h3>Misc.</h3>
+        <ul>
+            <li><a href="/misc/contact">Contact</a></li>
+        </ul>
+    </menu>
+    <article>
+        <h1>部署 IAM 程序</h1>
+        <p>我们通过源码检出和 IDEA 来完整 IAM 程序的部署，目标是 Linux 的服务器。</p>
+        <h2>配置文件</h2>
+        <p>Git checkout 源码后默认是没有任何有效的配置文件，——除了一个<code>application.yaml</code>演示文件，
+            位于<code>profiles</code>目录下。我们在
+            <code>profiles</code>目录中新建<code>dev</code>、<code>prod</code>、<code>test</code>子目录，分别对应着开发、生产、测试环境。
+            如不满足还可以自定义更多的子目录。</p>
+        <p><img src="/asset/imgs/iam-yaml-dirs.jpg" alt=""></p>
+        <p>
+            把<code>application.yaml</code>复制并改名<code>application.yml</code>到具体的<code>dev</code>、<code>prod</code>、<code>test</code>目录中，然后修改你具体的配置。
+        </p>
+        <h2>一键部署</h2>
+        <p>如果你采用原始的 JAR 发布机制（而非 Jenkins/Docker/K8S），那么可以使用我们准备的“一键部署”。</p>
+        <p>技巧：你可以使用源码中<code>/src/startup.sh</code>的 SHELL 脚本快速启动程序</p>
+        <h1>划分域（Domain）来进行部署</h1>
+        <p>首先 IAM 是一套中间件程序，这套程序也符合常规前后端分离的 Web 程序，即：</p>
+        <ul>
+            <li>前端（Web）UI，纯 HTML/CSS/JS 程序，其实就是 IAM 的管理程序界面</li>
+            <li>后端 API 程序，SpringBoot 服务端程序</li>
+        </ul>
+        <p>然后跟你的应用程序进行对接整合。具体整合通过 SDK 或者纯接口都可以。
+            但这里有一个特殊的程序需要与 IAM 在用一个域（Domain）下面部署，就是<strong>用户的登录页面</strong>。为什么登录页面要单独“拎”出来还要和
+            IAM 一起部署呢？
+            这是因为安装 OAuth/OIDC 规范，登录操作不能跨域的缘故，一句话就是为了安全起见的。同时，登录页面在 SSO
+            语境中通常也被认为是统一登录，即不单单为某个程序所使用，而是多个程序使用这一个登录入口。</p>
+        <p>由此，关于是否跨域，我们可以稍作整理一下：</p>
+        <ul>
+            <li>IAM 程序本身，前端后端固然在一个域下</li>
+            <li>业务系统的用户登录页面，与 IAM 在一个域下</li>
+            <li>业务系统，访问或者调用 IAM，不跟 IAM 一个域，即跨域调用（更多的是后端调用，于是是否跨域无所谓了）</li>
+        </ul>
+        <p>理解好之后便不难写出 Nginx 配置了。</p>
+        <h2>为 IAM 配置 Nginx</h2>
+        <p>假设域名 iam.service.com 是为 IAM 所准备的。把登陆页面、IAM 管理 UI、IAM API 放置同一个域下面。</p>
+        <pre><code>server {
     listen       80;
     server_name  iam.service.com;
 
@@ -137,12 +145,13 @@
     }
 }
 </code></pre>
-<p>当然 IAM 管理页面的登录也走统一一套的那个登录页面。</p>
-<h2>前端开发环境的跨域</h2>
-<p>如果是简单的 HTML 开发，那么很简单，通过 Nginx 轻松配置在一个域下。但是如果是复杂的前端开发，比如基于 Node 的 React/Vue 开发，
-一般都是开启 Node 代理来避免跨域问题的。</p>
-<p>前端工程<code>vue.config.js</code>配置代理例子如下。</p>
-<pre><code class="language-json">devServer: {
+        <p>当然 IAM 管理页面的登录也走统一一套的那个登录页面。</p>
+        <h2>前端开发环境的跨域</h2>
+        <p>如果是简单的 HTML 开发，那么很简单，通过 Nginx 轻松配置在一个域下。但是如果是复杂的前端开发，比如基于 Node 的
+            React/Vue 开发，
+            一般都是开启 Node 代理来避免跨域问题的。</p>
+        <p>前端工程<code>vue.config.js</code>配置代理例子如下。</p>
+        <pre><code class="language-json">devServer: {
     proxy: {
         '/login': {
             target: 'http://local.ajaxjs.com', // 登录页面的实际地址
@@ -168,26 +177,30 @@
     }
 },
 </code></pre>
-<p>宏观上讲，这等于在 Nginx 代理上又套了一层 NodeJS 的代理。——没关系，请谨记，我们最终的 URL 是以 Node 所运行的 URL 为准，
-也就是，我们把所有涉及 IAM 的 URL 都改为 NodeJS 的即可。</p>
-<p>至于最终打包后的前端程序，无须 NodeJS 代理，那么就是普通的 HTML 程序，按照前面的方法部署一起即可。</p>
-<h1>多租户支持</h1>
-<p>IAM 支持多租户模式，即一个租户一个域，不论多少个租户呈现，但背后只有一套程序在运行——这有点像套马甲的样子。</p>
-<h2>租户</h2>
-<p>IAM 通过租户<code>tenant</code>来区分用户体系。一个租户下的用户 id（<code>login_id</code>）不能重复。涉及的租户的数据库表、API 接口均有保存<code>tenant_id</code>的字段或入参。
-怎么入参比较优雅呢（相对于调接口都要传参<code>tenant_id</code>）？我们采用域名区分的方法来划分租户。</p>
-<ul>
-<li>首先分配一个域名给某个租户，例如 bar.foo.com 但不是根据这个域名关联那个租户</li>
-<li>在 Nginx 代理中加入自定义头<code>auth-tenant-id</code>，表示某个组件，这样就是能在每个接口中获取租户了</li>
-</ul>
+        <p>宏观上讲，这等于在 Nginx 代理上又套了一层 NodeJS 的代理。——没关系，请谨记，我们最终的 URL 是以 Node 所运行的 URL
+            为准，
+            也就是，我们把所有涉及 IAM 的 URL 都改为 NodeJS 的即可。</p>
+        <p>至于最终打包后的前端程序，无须 NodeJS 代理，那么就是普通的 HTML 程序，按照前面的方法部署一起即可。</p>
+        <h1>多租户支持</h1>
+        <p>IAM 支持多租户模式，即一个租户一个域，不论多少个租户呈现，但背后只有一套程序在运行——这有点像套马甲的样子。</p>
+        <h2>租户</h2>
+        <p>IAM 通过租户<code>tenant</code>来区分用户体系。一个租户下的用户 id（<code>login_id</code>）不能重复。涉及的租户的数据库表、API
+            接口均有保存<code>tenant_id</code>的字段或入参。
+            怎么入参比较优雅呢（相对于调接口都要传参<code>tenant_id</code>）？我们采用域名区分的方法来划分租户。</p>
+        <ul>
+            <li>首先分配一个域名给某个租户，例如 bar.foo.com 但不是根据这个域名关联那个租户</li>
+            <li>在 Nginx 代理中加入自定义头<code>auth-tenant-id</code>，表示某个组件，这样就是能在每个接口中获取租户了
+            </li>
+        </ul>
 
-            </article>
-        </div>
-        <footer>
-            AJ IAM, a part of
-            <a href="https://framework.ajaxjs.com" target="_blank">AJ-Framework</a>
-            open source. Mail:frank@ajaxjs.com, visit
-            <a href="https://blog.csdn.net/zhangxin09" target="_blank">my blog(In Chinese)</a>. <br/> <br/> Copyright © 2025 Frank Cheung. All rights reserved.
-        </footer>
-    </body>
+    </article>
+</div>
+<footer>
+    AJ IAM, a part of
+    <a href="https://framework.ajaxjs.com" target="_blank">AJ-Framework</a>
+    open source. Mail:frank@ajaxjs.com, visit
+    <a href="https://blog.csdn.net/zhangxin09" target="_blank">my blog(In Chinese)</a>. <br/> <br/> Copyright © 2025
+    Frank Cheung. All rights reserved.
+</footer>
+</body>
 </html>
