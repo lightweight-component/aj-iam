@@ -43,6 +43,7 @@ public interface UserLoginController {
 
     /**
      * 获取 Token
+     * 这个是后端调用的接口
      *
      * @param authorization client 信息
      * @param grantType     授权码流程

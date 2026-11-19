@@ -7,6 +7,13 @@ npm run dev
 npm run build
 ```
 
+线上管理端部署在 `https://wyndme.cn/admin/`，并与 `/iam_api/`、`/iam_login/` 同源。
+管理端从 `/iam_api/client/to_login` 发起授权，IAM 后端通过
+`/iam_api/client/callback` 接收回调并调用 `/iam_api/user_login/token` 兑换令牌。后端配置
+`auth.clientId=lKi9p9FyicBd6eA`，并通过服务端配置提供对应的 `auth.clientSecret`。
+本地 Vite 将 `/iam_api/`、`/iam_admin_api/` 和 `/iam_login/` 转发到线上站点。
+在 `http://localhost:5173/` 登录后返回本地首页；开发环境的 API 操作也会作用于线上数据。
+
 ## config in Nginx
 
 

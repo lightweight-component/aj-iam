@@ -1,6 +1,7 @@
 package com.ajaxjs.iam.server.auth;
 
 import com.ajaxjs.iam.UserConstants;
+import com.ajaxjs.iam.annotation.AllowOpenAccess;
 import com.ajaxjs.iam.client.BaseOidcClientUserController;
 import com.ajaxjs.iam.client.CacheProvider;
 import com.ajaxjs.iam.jwt.JwtToken;
@@ -46,11 +47,13 @@ public class ClientController extends BaseOidcClientUserController {
         return token;
     }
 
+    @AllowOpenAccess
     @GetMapping("/to_login")
     public RedirectView loginPageUrl(@RequestParam(required = false) String web_url) {
-        return loginPageUrl("/iam_api/oidc/authorization", getClientId(), "/iam_api/client/callback", web_url);
+        return loginPageUrl("/iam_api/user_login/authorization", "/iam_api/client/callback", web_url);
     }
 
+    @AllowOpenAccess
     @GetMapping("/callback")
     public ModelAndView callbackToken(@RequestParam String code, @RequestParam String state, @RequestParam(required = false) String web_url, HttpServletResponse resp) {
         return callbackToken(getClientId(), getClientSecret(), code, state, web_url, resp);

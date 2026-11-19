@@ -56,22 +56,25 @@ public class OAuthService implements OAuthController, IamConstants {
 
         User user = userSession.getUserFromSession();
 
-        log.info("session " + DiContextUtil.getSession().getId());
-        log.info("session " + DiContextUtil.getSession().getAttribute(UserSession.SESSION_KEY));
-
+        log.info("session {}", DiContextUtil.getSession().getId());
+        log.info("session {}", DiContextUtil.getSession().getAttribute(UserSession.SESSION_KEY));
 
         if (user == null) { // 未登录
             // 返回一段 HTML
             String qs = req.getQueryString();
             String loginPage;
+            String appLoginPage = ClientCredential.getApp(clientId).getLoginPage();
 
-            // 根据 租户 获取登录地址
-            Integer tenantId = TenantService.getTenantId(false);
+            if (ObjectHelper.hasText(appLoginPage)) // 有两个 loginPage，优先 app，其次 tenant
+                loginPage = appLoginPage;
+            else {
+                Integer tenantId = TenantService.getTenantId(false);
 
-            if (tenantId == null) // 没租户 id，超级管理员登录
-                loginPage = "../../iam/login";
-            else// 根据 appId 获取登录地址
-                loginPage = new Action("SELECT login_page FROM tenant WHERE stat = 0 AND id = ?").query(tenantId).one(String.class);
+                if (tenantId == null) // 没租户 id，超级管理员登录
+                    loginPage = "../../iam/login";
+                else // 根据租户 ID 获取登录地址
+                    loginPage = new Action("SELECT login_page FROM tenant WHERE stat = 0 AND id = ?").query(tenantId).one(String.class);
+            }
 
             if (ObjectHelper.isEmptyText(loginPage))
                 throw new BusinessException("应用或登录地址不存在");

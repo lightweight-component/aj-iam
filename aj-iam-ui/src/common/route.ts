@@ -4,6 +4,7 @@ import { admin, system, IAM, shop, ConfigWdiget } from '@ajaxjs/ui';
 import Org from '../pages/user/org.vue';
 import RBAC from '../pages/rbac/Rbac.vue';
 import Permission from '../pages/permission/Permission.vue';
+import { startLogin } from './login';
 
 const UserView = { template: '<div>User: {{ $route.params.id }}</div>' }
 
@@ -17,7 +18,11 @@ const routes = [
 
     {
         path: '/login',
-        component: admin.Login
+        component: { render: () => null },
+        beforeEnter: () => {
+            startLogin();
+            return false;
+        },
     },
     {
         path: '/user/org',

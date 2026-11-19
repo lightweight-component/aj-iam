@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8" />
+    <title>IAM 管理登录</title>
+    <link rel="icon" type="image/x-icon" href="./favicon.ico" />
+    <link rel="stylesheet" href="common.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css" />
+    <style>
+        html,
+        body {
+            height: 100%;
+            overflow: hidden;
+        }
+
+        .fieldset-box {
+            --login-input-height: 32px;
+        }
+
+        .fieldset-box .text-input-1,
+        .fieldset-box .button-1 {
+            box-sizing: border-box;
+            width: 270px;
+            max-width: 100%;
+        }
+
+        .fieldset-box .text-input-1 {
+            height: var(--login-input-height);
+            padding-block: 0;
+        }
+
+        .captcha-row {
+            display: flex;
+            align-items: stretch;
+            gap: 8px;
+            width: 270px;
+            max-width: 100%;
+            margin: 0 auto;
+        }
+
+        .captcha-row .text-input-1 {
+            flex: 1;
+            min-width: 0;
+        }
+
+        #refresh-captcha {
+            flex: none;
+            box-sizing: border-box;
+            height: var(--login-input-height);
+            padding: 0;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            background: transparent;
+            cursor: pointer;
+        }
+
+        #captcha-image {
+            display: block;
+            height: 100%;
+            width: auto;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <table width="100%" style="height:100%;">
+        <tr>
+            <td align="center" valign="middle">
+                <fieldset class="fieldset-box" style="width:350px;">
+
+                    <legend>IAM 管理登录</legend>
+
+                    <input class="text-input-1" type="text" name="username" placeholder="用户名" autocomplete="username" />
+                    <br />
+                    <br />
+                    <input class="text-input-1" type="password" name="password" placeholder="密码" autocomplete="current-password" />
+                    <br />
+                    <br />
+                    <div class="captcha-row">
+                        <input class="text-input-1" type="text" name="captcha_code" placeholder="图片验证码" aria-label="图片验证码" autocomplete="off" />
+                        <button type="button" id="refresh-captcha" aria-label="刷新图片验证码">
+                            <img id="captcha-image" alt="图片验证码，点击刷新" />
+                        </button>
+                    </div>
+                    <br />
+                    <button class="button-1" onclick="login();return false;">登录</button>
+                    <p id="login-message" role="status" hidden></p>
+                    <!-- <a href="../register">注册用户</a> -->
+                </fieldset>
+                <br />
+                <br />
+                <br />
+                <br />
+                <br />
+                <br />
+            </td>
+        </tr>
+    </table>
+</body>
+<script>
+    const captchaInput = document.querySelector('[name=captcha_code]');
+    const loginButton = document.querySelector('button.button-1');
+    const message = document.querySelector('#login-message');
+    let captchaUuid;
+
+    function refreshCaptcha() {
+        captchaUuid = Array.from(crypto.getRandomValues(new Uint8Array(16)), byte => byte.toString(16).padStart(2, '0')).join('');
+        document.querySelector('#captcha-image').src = '/iam_api/captcha?uuid=' + captchaUuid;
+        captchaInput.value = '';
+    }
+
+    function showMessage(text) {
+        message.textContent = text;
+        message.hidden = false;
+    }
+
+    document.querySelector('#refresh-captcha').addEventListener('click', refreshCaptcha);
+    refreshCaptcha();
+
+    async function login() {
+        if (loginButton.disabled)
+            return;
+
+        const username = document.querySelector('[name=username]').value.trim();
+        const password = document.querySelector('[name=password]').value;
+        const captchaCode = captchaInput.value.trim();
+
+        if (!username || !password || !captchaCode) {
+            showMessage('请输入用户名、密码和图片验证码。');
+            return;
+        }
+
+        loginButton.disabled = true;
+        message.hidden = true;
+        let success = false;
+
+        try {
+            const response = await fetch('/iam_api/user_login', {
+                method: 'POST',
+                body: new URLSearchParams({ username, password, appId: 'lKi9p9FyicBd6eA', uuid: captchaUuid, captcha_code: captchaCode })
+            });
+            const result = await response.json().catch(() => null);
+            success = response.ok && (result === true || result?.data === true);
+
+            if (success) {
+                document.querySelector('[name=password]').value = '';
+                showMessage('登录成功。');
+                const authorization = new URLSearchParams(location.search);
+
+                if (authorization.get('response_type') === 'code' && authorization.get('state')
+                    && authorization.get('redirect_uri') === '/iam_api/client/callback') {
+                    authorization.set('client_id', 'lKi9p9FyicBd6eA');
+                    location.replace('/iam_api/user_login/authorization?' + authorization);
+                }
+            } else {
+                showMessage(result?.message || (response.ok ? '登录失败，请检查用户名和密码。' : `登录请求失败（HTTP ${response.status}）。`));
+            }
+        } catch {
+            showMessage('无法连接登录服务，请稍后重试。');
+        } finally {
+            if (!success) {
+                refreshCaptcha();
+                loginButton.disabled = false;
+            }
+        }
+    }
+
+    // 监听回车键事件
+    document.addEventListener('keydown', function (event) {
+        if (event.key === 'Enter' && event.target.matches('input')) {
+            event.preventDefault(); // 阻止可能的默认行为（如页面刷新）
+            loginButton.click();
+        }
+    });
+</script>
+
+</html>

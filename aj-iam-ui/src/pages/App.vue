@@ -92,7 +92,7 @@
 
         <Header :style="{ background: '#fff', boxShadow: '0 2px 3px 2px rgba(0,0,0,.1)' }">
           <div style="float: right; cursor: pointer;" @click="$router.push('/user/profile')">
-            <Avatar shape="square" :src="avatarUrl || '/images/empty-avatar.png'" /> {{ userLoginId }} 已登录
+            <Avatar shape="square" :src="avatarUrl || '/images/empty-avatar.png'" /> {{ userLoginId }}
           </div>
           <span style="font-size:18px;font-weight: bold;letter-spacing: 1px;">AJ-IAM 管理后台</span>
         </Header>
@@ -112,8 +112,7 @@
 </template>
 
 <script lang="ts">
-if (localStorage.getItem('isLoggedIn') !== 'true' && confirm('你未登录，是否跳转到登录窗口？'))
-  location.assign('#/login');
+import { promptLogin } from '../common/login';
 
 export default {
   data() {
@@ -131,29 +130,26 @@ export default {
       ]
     }
   },
-  mounted(): void {
-    // App 启动时恢复状态
-    const storedInfo = localStorage.getItem('userInfo');
+  async mounted(): Promise<void> {
+    try {
+      const response = await fetch(`${window.config.iamApi}/curr_user`);
 
-    if (storedInfo) {
-      try {
-        const userInfo: any = JSON.parse(storedInfo);
-        this.userLoginId = userInfo.loginId;
-        this.avatarUrl = 'data:image/;base64,' + userInfo.avatarBlob;
-      } catch (e) {
-        console.error('Failed to parse user info from localStorage:', e);
-        localStorage.removeItem('userInfo');
+      if (response.status === 401) {
+        promptLogin();
+        return;
       }
+
+      if (!response.ok) return;
+
+      const result = await response.json();
+      const user = result.data ?? result;
+      if (typeof user.loginId !== 'string') return;
+
+      this.userLoginId = user.loginId;
+      this.avatarUrl = user.avatarBlob ? 'data:image/;base64,' + user.avatarBlob : '';
+    } catch (error) {
+      console.error('无法加载当前用户', error);
     }
-  },
-  watch: {
-    '$route.query.login_ok'(newId, oldId): void {
-      if (newId == 1) {
-        const userInfo: any = JSON.parse(localStorage.getItem('userInfo') as string);
-        this.userLoginId = userInfo.loginId;
-        this.avatarUrl = 'data:image/;base64,' + userInfo.avatarBlob;
-      }
-    },
   }
 }
 </script>

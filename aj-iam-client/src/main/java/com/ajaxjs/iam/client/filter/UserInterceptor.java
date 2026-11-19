@@ -80,6 +80,9 @@ public class UserInterceptor implements HandlerInterceptor {
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
         if (handler instanceof HandlerMethod) {
             HandlerMethod handlerMethod = (HandlerMethod) handler;
+//            log.info("UserInterceptor.java {}",handlerMethod.toString());
+//            log.info("UserInterceptor.java {}", request.getRequestURI());
+//            log.info("UserInterceptor.java {}", ClientUtils.getAnnotationFromMethod(handlerMethod, AllowOpenAccess.class) != null);
             // allows open access without any authentication
             if (ClientUtils.getAnnotationFromMethod(handlerMethod, AllowOpenAccess.class) != null)
                 return true;

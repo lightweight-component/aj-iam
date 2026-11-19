@@ -76,7 +76,7 @@ public class JWebTokenMgr {
         String[] parts = tokenStr.split("\\.");
 
         if (parts.length != 3)
-            throw new IllegalArgumentException("Invalid Token of: " + tokenStr);
+            throw new IllegalArgumentException("Invalid token format");
 
         if (!JWebToken.HEADER.equals(parts[0]))
             throw new IllegalArgumentException("Invalid JWT Header: " + parts[0]);

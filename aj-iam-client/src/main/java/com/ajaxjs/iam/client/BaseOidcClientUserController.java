@@ -40,6 +40,18 @@ public abstract class BaseOidcClientUserController {
      * 获取重定向视图，用于认证流程中的第一步：跳转到登录页面。
      *
      * @param getAuthCodeUrl    获取授权码的 URL，指 IAM 提供的 endpoint。
+     * @param clientCallbackUrl 应用的网站 URL，授权服务器完成授权后会重定向到该 URL 的回调接口。
+     * @param webUrl            前端页面地址，用于跳到这里以便获取 Token。
+     * @return RedirectView 返回一个重定向视图对象，包含了构造的重定向 URL。
+     */
+    public RedirectView loginPageUrl(String getAuthCodeUrl, String clientCallbackUrl, String webUrl) {
+        return loginPageUrl(getAuthCodeUrl, clientId, clientCallbackUrl, webUrl);
+    }
+
+    /**
+     * 获取重定向视图，用于认证流程中的第一步：跳转到登录页面。
+     *
+     * @param getAuthCodeUrl    获取授权码的 URL，指 IAM 提供的 endpoint。
      * @param clientId          客户端 ID，用于识别请求 OAuth 服务的应用。
      * @param clientCallbackUrl 应用的网站 URL，授权服务器完成授权后会重定向到该 URL 的回调接口。
      * @param webUrl            前端页面地址，用于跳到这里以便获取 Token。
@@ -80,10 +92,11 @@ public abstract class BaseOidcClientUserController {
 //            session.removeAttribute(ClientUtils.OAUTH_STATE);
             getCacheProvider().remove(ClientUtils.OAUTH_STATE);
 
-        String tokenApi = getIamService() + "/iam_api/oidc/token";
+        String iamBase = getIamService().trim().replaceFirst("/+$", "");
+        String tokenApi = (iamBase.endsWith("/iam_api") ? iamBase : iamBase + "/iam_api") + "/user_login/token";
 
         Map<String, String> params = ObjectHelper.mapOf("grant_type", "authorization_code", "code", code, "state", state);
-        Map<String, Object> result = Post.api(tokenApi, params, conn -> conn.setRequestProperty("Authorization", OAuthTools.encodeClient(clientId, clientSecret)));
+        Map<String, Object> result = Post.form(tokenApi, params, conn -> conn.setRequestProperty("Authorization", OAuthTools.encodeClient(clientId, clientSecret)));
 
         if (result != null) {// 处理授权成功的逻辑，例如解析并保存访问令牌和刷新令牌等
             if ((int) result.get("status") == 1) {
@@ -96,8 +109,8 @@ public abstract class BaseOidcClientUserController {
                 } else
                     return new ModelAndView("redirect:/");
             } else {
-                log.info("error:{}", result);
-                throw new SecurityException("获取 JWT Token 失败，原因: " + result.get("message"));
+                log.warn("获取 JWT Token 失败，IAM errorCode: {}", result.get("errorCode"));
+                throw new SecurityException("获取 JWT Token 失败");
             }
         } else
 //			 处理授权失败的逻辑
