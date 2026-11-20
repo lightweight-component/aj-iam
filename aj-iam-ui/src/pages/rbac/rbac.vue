@@ -17,21 +17,24 @@
             </div>
             <table class="aj-table">
                 <!-- <caption>权限管理系统</caption> -->
-                <tr>
-                    <th style="width: 180px;padding:0">
-                        <div class="out"><b>操作权限</b> <em>功能模块</em></div>
-                    </th>
-                    <th>子模块</th>
-                    <th style="width: 380px;">操作权限</th>
-                </tr>
-
-                <tr v-for="(item, index) in resources" :key="index">
-                    <td align="center" class="group">{{ item.group }}</td>
-                    <td>#{{ item.id }} {{ item.name }}</td>
-                    <td align="center">
-                        <Operate :res-id="item.id" />
-                    </td>
-                </tr>
+                <thead>
+                    <tr>
+                        <th style="width: 180px;padding:0">
+                            <div class="out"><b>操作权限</b> <em>功能模块</em></div>
+                        </th>
+                        <th>子模块</th>
+                        <th style="width: 380px;">操作权限</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for="(item, index) in resources" :key="index">
+                        <td align="center" class="group">{{ item.group }}</td>
+                        <td>#{{ item.id }} {{ item.name }}</td>
+                        <td align="center">
+                            <Operate :res-id="item.id" />
+                        </td>
+                    </tr>
+                </tbody>
             </table>
 
             <Modal v-model="roleInherit.isShow" title="角色继承（复制）" ok-text="继承">
@@ -206,10 +209,10 @@ table {
 
     }
 
-    tr {
+    tbody tr {
         // .transition (background-color 400ms ease-out);
 
-        &:nth-child(odd) {
+        &:nth-child(even) {
             background: #f5f5f5;
             box-shadow: 0 1px 0 rgba(255, 255, 255, 0.8) inset;
         }

@@ -56,9 +56,17 @@
 </template>
 
 <script lang="ts">
-import { CommonUI } from '@ajaxjs/ui';
+import { h } from 'vue';
 import { DateFormat } from '@ajaxjs/util';
 import { promptLogin } from '../../common/login';
+import { copyWriteFields } from '../../common/entity-payload';
+
+const permissionStatuses: Record<number, { label: string; color: string }> = {
+    [-1]: { label: '草稿', color: 'gray' },
+    0: { label: '启用', color: 'green' },
+    1: { label: '已删除', color: 'red' },
+    2: { label: '禁用', color: 'red' },
+};
 
 export default {
     props: {
@@ -77,7 +85,7 @@ export default {
                 total: 0,
                 limit: 5,
                 current: 1,
-                data: []
+                data: [] as PermissionEntry[]
             },
             ruleValidate: {
                 name: [
@@ -95,7 +103,7 @@ export default {
     computed: {
         columnsDef() {
             return [
-                CommonUI.List.id,
+                { title: '#', width: 60, key: 'id', align: 'center' },
                 {
                     title: "权限名称",
                     key: "name",
@@ -105,8 +113,21 @@ export default {
                     key: "code",
                     ellipsis: true
                 },
-                ...(this.isPickup ? [] : [CommonUI.List.status]),
-                CommonUI.List.createDate,
+                ...(this.isPickup ? [] : [{
+                    title: '状态',
+                    width: 80,
+                    render: (_render: typeof h, { row }: { row: PermissionEntry }) => {
+                        const { label, color } = permissionStatuses[Number(row.stat)] ?? permissionStatuses[0];
+                        return h('div', { style: { color } }, label);
+                    },
+                }]),
+                {
+                    title: '创建日期',
+                    width: 160,
+                    align: 'center',
+                    render: (_render: typeof h, { row }: { row: PermissionEntry }) =>
+                        h('div', this.formatPermissionDate(row.createDate)),
+                },
                 {
                     title: "操作",
                     slot: "action",
@@ -151,8 +172,10 @@ export default {
                 path += '&q_stat=0';
 
             const result = await this.requestPermission(path, '获取权限列表失败');
-            if (result)
-                CommonUI.List.getPageList(this, this.list)(result);
+            if (result) {
+                this.list.total = result.data.totalCount ?? 0;
+                this.list.data = result.data.list ?? [];
+            }
         },
         pickup(index: number): void { },
         doSearch(): void {
@@ -193,7 +216,7 @@ export default {
         },
         async save(): Promise<void> {
             if (this.isSaving) return;
-            const data = CommonUI.List.copyBeanClean(this.permissionData);
+            const data = copyWriteFields(this.permissionData);
             const isCreate = this.isCreate;
 
             this.isSaving = true;

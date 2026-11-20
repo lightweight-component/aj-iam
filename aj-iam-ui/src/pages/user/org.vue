@@ -1,13 +1,7 @@
 <template>
   <Tabs value="name1" :animated="false" style="padding:1% 3%;">
-    <TabPane label="组织列表" name="name1">
-      <p>按分级组织树结构对机构、部门、人员进行管理</p>
-      <TreeTable name="组织机构" :list="list" :api="api" :form-fields="formFields" />
-    </TabPane>
-    <TabPane label="职务列表" name="name2">
-      <p>按按照职务层级关系配置职务，关联相关用户</p>
-      <TreeTable name="职务" :list="list" :api="api" :form-fields="formFields" />
-    </TabPane>
+    <TabPane label="组织列表" name="name1" />
+    <TabPane label="职务列表" name="name2" />
     <TabPane label="岗位列表" name="name3">
       <p>从整体角度概览配置岗位，关联相关用户</p>
       <ListLoader :id="120" />
@@ -23,69 +17,8 @@
   </Tabs>
 </template>
 
-<script>
-import { ConfigWdiget } from '@ajaxjs/ui';
-import { CommonUI } from '@ajaxjs/ui';
-
-export default {
-  components: { ListLoader: ConfigWdiget.ListLoader, TreeTable: CommonUI.TreeTable },
-  data() {
-    const api = window['config'].iamApi + '/api/cms/sys_datadict';
-
-    return {
-      list: [
-        {
-          title: '名称',
-          key: 'name',
-          align: 'left',
-          tree: true,
-          maxWidth: 200
-        },
-        {
-          title: '值（value）',
-          key: 'value',
-          align: 'center',
-        },
-        {
-          title: '说明',
-          align: 'center',
-          key: 'content'
-        },
-        {
-          title: '扩展属性',
-          align: 'center',
-          key: 'extraData'
-        },
-        {
-          title: '创建日期',
-          align: 'center',
-          width: 150,
-          render(h, { row }) {
-            if (row.createDate) {
-              let arr = row.createDate.split(':');
-              arr.pop();
-
-              return h('span', arr.join(':'));
-            }
-          },
-          // key: 'createDate'
-        },
-      ],
-
-      api: Object.freeze({
-        list: api + '/list',
-        create: api,
-        update: api,
-        delete: api,
-      }),
-      formFields: [{
-        name: '值（Value）',
-        key: 'value'
-      }]
-    };
-  }
-
-}
+<script setup>
+import { ListLoader } from '@ajax-js/configurable-widget';
 </script>
 
 <style scoped>

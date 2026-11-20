@@ -1,6 +1,8 @@
 import '@ajaxjs/ui/style.css';
+import '@ajax-js/configurable-widget/style.css';
 import { createRouter, createWebHashHistory, type Router } from 'vue-router';
-import { admin, system, IAM, shop, ConfigWdiget } from '@ajaxjs/ui';
+import { admin, system, IAM, shop } from '@ajaxjs/ui';
+import { FormInfo, FormMgr, ListInfo, ListMgr } from '@ajax-js/configurable-widget';
 import Org from '../pages/user/org.vue';
 import RBAC from '../pages/rbac/rbac.vue';
 import Permission from '../pages/permission/Permission.vue';
@@ -89,22 +91,23 @@ const routes = [
     {
         path: '/system/list-mgr',
         meta: { breadcrumbs: ['系统管理', '列表管理'] },
-        component: ConfigWdiget.ListMgr
+        component: ListMgr
     },
     {
         path: '/list-info',
         meta: { breadcrumbs: ['系统管理', '列表管理', '列表详情'] },
-        component: ConfigWdiget.ListInfo
+        component: ListInfo
     },
     {
         path: '/system/form-mgr',
         meta: { breadcrumbs: ['系统管理', '表单管理'] },
-        component: ConfigWdiget.FormMgr
+        component: FormMgr
     },
     {
         path: '/system/form-info',
+        alias: '/form-info',
         meta: { breadcrumbs: ['系统管理', '表单管理', '表单详情'] },
-        component: ConfigWdiget.FormInfo
+        component: FormInfo
     },
     // {
     //     path: '/system/schedule',

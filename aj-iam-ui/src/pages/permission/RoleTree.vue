@@ -42,7 +42,7 @@
 
 <script lang="ts">
 import { XhrFetch } from '@ajaxjs/util';
-import { CommonUI } from '@ajaxjs/ui';
+import { copyWriteFields } from '../../common/entity-payload';
 
 type ContextData = {
     id?: number;
@@ -141,7 +141,7 @@ export default {
         },
 
         saveRole(): void {
-            const data: any = CommonUI.List.copyBeanClean(this.currentRole);
+            const data = copyWriteFields(this.currentRole);
             if (this.roleForm.isCreate) {
                 data.parentId = this.contextData.id;
                 XhrFetch.post(this.roleApi, data, (j: ApiResponseResult) => {
