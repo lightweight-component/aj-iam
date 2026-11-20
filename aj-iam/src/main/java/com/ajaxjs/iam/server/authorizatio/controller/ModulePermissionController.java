@@ -1,7 +1,8 @@
-package com.ajaxjs.iam.server.authorizatio;
+package com.ajaxjs.iam.server.authorizatio.controller;
 
 import com.ajaxjs.iam.permission.Permission;
 import com.ajaxjs.iam.permission.PermissionControl;
+import com.ajaxjs.iam.server.authorizatio.PermissionService;
 import com.ajaxjs.iam.server.authorizatio.model.Role;
 import com.ajaxjs.spring.annotation.BizAction;
 import com.ajaxjs.sqlman.Action;
@@ -76,6 +77,7 @@ public class ModulePermissionController {
 //        System.out.println(allPermissionIIdList);
 //        System.out.println(Arrays.toString(indexes));
         long num = 0L;
+
         for (int index : indexes) {
             if (index == -1)
                 throw new IllegalStateException("找不到权限");

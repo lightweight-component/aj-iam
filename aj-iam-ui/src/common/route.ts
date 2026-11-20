@@ -2,8 +2,9 @@ import '@ajaxjs/ui/style.css';
 import { createRouter, createWebHashHistory, type Router } from 'vue-router';
 import { admin, system, IAM, shop, ConfigWdiget } from '@ajaxjs/ui';
 import Org from '../pages/user/org.vue';
-import RBAC from '../pages/rbac/Rbac.vue';
+import RBAC from '../pages/rbac/rbac.vue';
 import Permission from '../pages/permission/Permission.vue';
+import PermissionList from '../pages/permission/PermissionList.vue';
 import { startLogin } from './login';
 
 const UserView = { template: '<div>User: {{ $route.params.id }}</div>' }
@@ -26,80 +27,104 @@ const routes = [
     },
     {
         path: '/user/org',
+        meta: { breadcrumbs: ['用户管理', '组织机构管理'] },
         component: Org
     },
     {
         path: '/permission/rbac',
+        meta: { breadcrumbs: ['角色授权', '角色管理'] },
         component: RBAC
     },
     {
+        path: '/permission/list',
+        meta: { breadcrumbs: ['角色授权', '权限管理'] },
+        component: PermissionList
+    },
+    {
         path: '/permission/permission',
+        meta: { breadcrumbs: ['角色授权', '角色授权'] },
         component: Permission
     },
 
     {
         path: '/pay/transaction',
+        meta: { breadcrumbs: ['支付管理', '交易记录'] },
         component: shop.Transaction
     },
     {
         path: '/user/list',
+        meta: { breadcrumbs: ['用户管理', '用户列表'] },
         component: IAM.User
     },
     {
         path: '/user/login_log',
+        meta: { breadcrumbs: ['用户管理', '登录日志'] },
         component: IAM.LoginLog
     },
     {
         path: '/user/tenant',
+        meta: { breadcrumbs: ['认证管理', '租户管理'] },
         component: IAM.Tenant
     },
     {
         path: '/user/app',
+        meta: { breadcrumbs: ['认证管理', '应用管理'] },
         component: IAM.App
     },
     {
         path: '/user/token',
+        meta: { breadcrumbs: ['认证管理', 'Token 管理'] },
         component: IAM.Token
     },
     {
         path: '/user/profile',
+        meta: { breadcrumbs: ['个人中心'] },
         component: IAM.UserCenter
     },
     {
         path: '/system/data_dict',
+        meta: { breadcrumbs: ['系统管理', '数据字典'] },
         component: system.DataDict
     },
     {
         path: '/system/list-mgr',
+        meta: { breadcrumbs: ['系统管理', '列表管理'] },
         component: ConfigWdiget.ListMgr
     },
     {
         path: '/list-info',
+        meta: { breadcrumbs: ['系统管理', '列表管理', '列表详情'] },
         component: ConfigWdiget.ListInfo
     },
     {
         path: '/system/form-mgr',
+        meta: { breadcrumbs: ['系统管理', '表单管理'] },
         component: ConfigWdiget.FormMgr
     },
     {
         path: '/system/form-info',
+        meta: { breadcrumbs: ['系统管理', '表单管理', '表单详情'] },
         component: ConfigWdiget.FormInfo
     },
-    {
-        path: '/system/schedule',
-        component: system.Schedule
-    },
+    // {
+    //     path: '/system/schedule',
+    //     meta: { breadcrumbs: ['系统管理', '任务调度'] },
+    //     component: system.Schedule
+    // },
     {
         path: '/resource/article',
+        meta: { breadcrumbs: ['资源管理', '文章管理'] },
         component: system.Article
     },
 
     {
         path: '/resource/article_edit',
+        meta: { breadcrumbs: ['资源管理', '文章管理', '编辑文章'] },
         component: system.ArticleEdit
     },
     {
         path: '/user/:id', // 动态路径参数
+        meta: { breadcrumbs: ['用户管理', '用户详情'] },
         name: 'user',
         component: UserView,
         // props: true // 将路由参数作为 props 传递给组件 (推荐做法)
@@ -156,6 +181,7 @@ const routes = [
     },
     {
         path: '/:pathMatch(.*)*', // Catch-all 通配符路由 (放在最后)
+        meta: { breadcrumbs: ['页面不存在'] },
         name: 'NotFound',
         component: { template: '<div>404 - Page Not Found</div>' }
     }

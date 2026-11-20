@@ -12,7 +12,7 @@
             <template v-slot:action="{ row }">
                 <a v-if="isPickup" style="margin-right: 5px" @click="onPickup(row)">选择</a>
                 <span v-if="!isPickup">
-                    <Poptip confirm title="确定删除？" @on-ok="doDelete(row.id)">
+                    <Poptip confirm transfer title="确定删除？" @on-ok="doDelete(row.id)">
                         <a style="margin-right: 5px;color:red" icon="ios-trash">删除</a>
                     </Poptip>
                     |
@@ -26,7 +26,7 @@
             size="small" show-total show-elevator show-sizer />
 
         <Modal v-model="isShowEditWin" :title="isCreate ? '创建权限' : '编辑权限' + permissionData.id" width="600"
-            @on-ok="save">
+            :closable="!isSaving" :mask-closable="!isSaving">
             <Form :model="permissionData" :rules="ruleValidate" :label-width="100"
                 style="margin-right: 10%;margin-left: 3%;">
                 <FormItem label="权限名称" prop="name">
@@ -43,16 +43,22 @@
                     <label><input type="radio" v-model="permissionData.stat" value="2" /> 禁用</label>
                 </FormItem>
                 <FormItem v-if="!isCreate" style="color:gray;">
-                    创建于 {{ permissionData.createDate }} 修改于 {{ permissionData.updateDate }}
+                    创建于 {{ formatPermissionDate(permissionData.createDate) }}
+                    修改于 {{ formatPermissionDate(permissionData.updateDate) }}
                 </FormItem>
             </Form>
+            <template #footer>
+                <Button :disabled="isSaving" @click="isShowEditWin = false">取消</Button>
+                <Button type="primary" :loading="isSaving" @click="save">确定</Button>
+            </template>
         </Modal>
     </div>
 </template>
 
 <script lang="ts">
-import { XhrFetch } from '@ajaxjs/util';
 import { CommonUI } from '@ajaxjs/ui';
+import { DateFormat } from '@ajaxjs/util';
+import { promptLogin } from '../../common/login';
 
 export default {
     props: {
@@ -64,27 +70,8 @@ export default {
             api: `${window['config'].iamApi}/common_api`,
             isCreate: true,
             isShowEditWin: false,
+            isSaving: false,
             permissionData: {} as PermissionEntry,
-            columnsDef: [
-                CommonUI.List.id,
-                {
-                    title: "权限名称",
-                    key: "name",
-                },
-                {
-                    title: "权限编码",
-                    key: "code",
-                    ellipsis: true
-                },
-                CommonUI.List.status,
-                CommonUI.List.createDate,
-                {
-                    title: "操作",
-                    slot: "action",
-                    key: 'action', // 添加一个唯一的 key
-                    width: 120,
-                },
-            ],
             listData: [] as PermissionEntry[],
             list: {
                 total: 0,
@@ -106,17 +93,66 @@ export default {
         this.getData();
     },
     computed: {
+        columnsDef() {
+            return [
+                CommonUI.List.id,
+                {
+                    title: "权限名称",
+                    key: "name",
+                },
+                {
+                    title: "权限编码",
+                    key: "code",
+                    ellipsis: true
+                },
+                ...(this.isPickup ? [] : [CommonUI.List.status]),
+                CommonUI.List.createDate,
+                {
+                    title: "操作",
+                    slot: "action",
+                    key: 'action', // 添加一个唯一的 key
+                    width: 120,
+                },
+            ];
+        },
         modalTitle(): string {  // 使用计算属性来动态生成标题，避免在模板中进行字符串拼接
             return this.isCreate ? '创建权限' : `编辑权限 ${this.permissionData.id || ''}`;
         }
     },
     methods: {
-        getData(): void {
-            let api: string = `${this.api}/permission/page_no?pageNo=${this.list.current}&limit=${this.list.limit}`;
-            if (this.isPickup)
-                api += '&q_stat=0';
+        formatPermissionDate(value?: string): string {
+            if (!value || Number.isNaN(Date.parse(value)))
+                return '—';
 
-            XhrFetch.get(api, CommonUI.List.getPageList(this, this.list));
+            return DateFormat.dateFormat(value, 'yyyy-MM-dd hh:mm:ss');
+        },
+        async requestPermission(path: string, failure: string, options: RequestInit = {}): Promise<ApiResponseResult | null> {
+            try {
+                const response = await fetch(this.api + path, { credentials: 'include', ...options });
+                const result = await response.json().catch(() => null);
+
+                if (!response.ok || !result?.status || result.data === false) {
+                    const detail = result?.message || (!response.ok ? `HTTP ${response.status}` : '');
+                    this.$Message.error(detail ? `${failure}：${detail}` : failure);
+                    if (response.status === 401)
+                        promptLogin();
+                    return null;
+                }
+
+                return result;
+            } catch {
+                this.$Message.error(`${failure}：无法连接服务器，请稍后重试`);
+                return null;
+            }
+        },
+        async getData(): Promise<void> {
+            let path = `/permission/page_no?pageNo=${this.list.current}&limit=${this.list.limit}`;
+            if (this.isPickup)
+                path += '&q_stat=0';
+
+            const result = await this.requestPermission(path, '获取权限列表失败');
+            if (result)
+                CommonUI.List.getPageList(this, this.list)(result);
         },
         pickup(index: number): void { },
         doSearch(): void {
@@ -127,22 +163,23 @@ export default {
             this.isShowEditWin = true;
             this.isCreate = true;
         },
-        doDelete(id: number): void {
-            XhrFetch.del(`${this.api}/permission/${id}`, (j: ApiResponseResult) => {
-                if (j.status) {
-                    this.$Message.success('删除成功');
-                    this.getData();
-                }
-            });
+        async doDelete(id: number): Promise<void> {
+            if (await this.requestPermission(`/permission/${id}`, '删除权限失败', { method: 'DELETE' })) {
+                this.$Message.success('删除成功');
+                this.getData();
+            }
         },
-        edit(id: number): void {
+        async edit(id: number): Promise<void> {
+            const result = await this.requestPermission(`/permission/${id}`, '获取权限详情失败');
+            if (!result) return;
+            if (!result.data) {
+                this.$Message.error('未找到该权限的详情');
+                return;
+            }
+
+            this.permissionData = result.data as PermissionEntry;
             this.isShowEditWin = true;
             this.isCreate = false;
-
-            XhrFetch.get(`${this.api}/permission/${id}`, (j: ApiResponseResult) => {
-                if (j.status)
-                    this.permissionData = j.data as PermissionEntry;
-            });
         },
         handleChangePageSize(p: number): void {
             this.list.limit = p;
@@ -154,38 +191,31 @@ export default {
             this.list.current = page;
             this.getData();
         },
-        save(): void {
-            let data: any = CommonUI.List.copyBeanClean(this.permissionData);
+        async save(): Promise<void> {
+            if (this.isSaving) return;
+            const data = CommonUI.List.copyBeanClean(this.permissionData);
+            const isCreate = this.isCreate;
 
-            if (this.isCreate) {
-                XhrFetch.post(`${this.api}/permission`, (j: ApiResponseResult) => {
-                    if (j.status) {
-                        this.$Message.success('创建成功');
-                        this.getData();
-                    }
-                }, data);
-            } else {
-                XhrFetch.put(`${this.api}/permission/${this.permissionData.id}`, (j: ApiResponseResult) => {
-                    if (j.status) {
-                        this.$Message.success('修改成功');
-                        this.getData();
-                    }
-                }, data);
+            this.isSaving = true;
+            try {
+                const result = await this.requestPermission('/permission', isCreate ? '创建权限失败' : '修改权限失败', {
+                    method: isCreate ? 'POST' : 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(isCreate ? data : { ...data, id: this.permissionData.id }),
+                });
+                if (result) {
+                    this.isShowEditWin = false;
+                    this.$Message.success(isCreate ? '创建成功' : '修改成功');
+                    this.getData();
+                }
+            } finally {
+                this.isSaving = false;
             }
         }
     },
     watch: {
-        isPickup(v: boolean): void {
+        isPickup(): void {
             this.getData();
-
-            if (v) {
-                for (let i: number = 0; i < this.columnsDef.length; i++)
-                    if (this.columnsDef[i].title === '状态') {
-                        this.columnsDef.splice(i, 1);
-                        break;
-                    }
-            } else
-                this.columnsDef.splice(3, 0, CommonUI.List.status);
         }
     }
 };

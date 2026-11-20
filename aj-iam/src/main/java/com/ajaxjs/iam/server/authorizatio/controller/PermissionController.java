@@ -2,6 +2,7 @@ package com.ajaxjs.iam.server.authorizatio.controller;
 
 import com.ajaxjs.iam.annotation.AllowOpenAccess;
 import com.ajaxjs.iam.permission.Permission;
+import com.ajaxjs.iam.server.authorizatio.model.Role;
 import com.ajaxjs.spring.annotation.BizAction;
 import org.springframework.web.bind.annotation.*;
 

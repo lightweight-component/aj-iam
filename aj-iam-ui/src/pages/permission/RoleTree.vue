@@ -54,7 +54,7 @@ export default {
     emits: ['select-change'],
     data() {
         return {
-            roleApi: `${window.config.iamApi}/role`,
+            roleApi: `${window.config.iamApi}/common_api/role`,
             permissionApi: `${window.config.iamApi}/permission`,
             isShisShowRoleEditForm: false,
             contextData: {} as ContextData,
@@ -77,16 +77,28 @@ export default {
             this.contextData = data;
         },
         editRole(): void {
-            this.roleForm.isCreate = false;
-            this.isShisShowRoleEditForm = true;
+            const node = this.contextData;
+            const { id } = node;
 
-            this.roleForm.isTop = this.contextData.parentId == -1;
+            if (id == null || id <= 0) {
+                this.$Message.warning('请选择要编辑的角色');
+                return;
+            }
 
-            XhrFetch.get(`${this.roleApi}/${this.contextData.id}`, (j: ApiResponseResult) => {
-                if (j.status) {
-                    this.currentRole = j.data as Role;
-                } else
-                    this.$Message.warning(j.message || '获取数据失败');
+            XhrFetch.get(`${this.roleApi}/${id}`, (j: ApiResponseResult) => {
+                if (this.contextData !== node)
+                    return;
+
+                const role = j?.data as Role | null | undefined;
+                if (!j?.status || role?.id == null || String(role.id) !== String(id)) {
+                    this.$Message.warning(j?.status ? '未找到该角色的详情，请刷新角色列表后重试' : j?.message || '获取角色详情失败');
+                    return;
+                }
+
+                this.currentRole = role;
+                this.roleForm.isCreate = false;
+                this.roleForm.isTop = node.parentId == -1;
+                this.isShisShowRoleEditForm = true;
             });
         },
         createTopRoleNode(): void {
@@ -130,22 +142,22 @@ export default {
 
         saveRole(): void {
             const data: any = CommonUI.List.copyBeanClean(this.currentRole);
-            data.parentId = this.contextData.id;
-
-            if (this.roleForm.isCreate)
+            if (this.roleForm.isCreate) {
+                data.parentId = this.contextData.id;
                 XhrFetch.post(this.roleApi, data, (j: ApiResponseResult) => {
                     if (j.status) {
                         this.$Message.success('创建成功');
                         this.refreshRoleList();
                     }
                 });
-            else
-                XhrFetch.put(`${this.roleApi}/${data.id}`, data, (j: ApiResponseResult) => {
+            } else {
+                XhrFetch.put(this.roleApi, { ...data, id: this.currentRole.id }, (j: ApiResponseResult) => {
                     if (j.status) {
                         this.$Message.success('修改成功');
                         this.refreshRoleList();
                     }
                 });
+            }
         },
         onTreeNodeClk(nodeArr: any[], node: any): void {
             // debugger

@@ -11,6 +11,8 @@ layout: layouts/docs.njk
 
 # 用户的注册、登录
 
+- [OIDC 授权码登录接入](./standard-oidc/)
+
 # Logout 登出
 
 登出方式有两种，视乎你的业务场景而定。

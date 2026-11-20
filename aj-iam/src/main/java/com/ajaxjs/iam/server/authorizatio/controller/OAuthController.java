@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/oauth")
 public interface OAuthController {
     /**
+     * 获取授权码
      * 获取授权码（Authorization Code）
      *
      * @param responseType 授权模式，固定为 code
@@ -45,6 +46,7 @@ public interface OAuthController {
     AccessToken token(@RequestHeader String authorization, @RequestParam("grant_type") String grantType, @RequestParam String code, @RequestParam String state);
 
     /**
+     * 刷新 Access Token
      * 通过 Refresh Token 刷新 Access Token
      * 这是通过头传输 client_id/client_secret
      *

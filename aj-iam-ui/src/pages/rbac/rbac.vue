@@ -2,7 +2,7 @@
     <Tabs value="name1" :animated="false" style="padding:1% 3%;">
         <TabPane label="角色管理" name="name1">
             <h2 style="margin-bottom:25px;">用户角色管理<span>角色管理是将所有权限进行分类，形成角色，什么样的角色该拥有什么样的权限，分配给相应的管理人员</span></h2>
-            <TreeTable name="角色" :list="UserRole_List" :api="roleListApi" />
+            <RoleTreeTable />
         </TabPane>
 
         <TabPane label="授权管理" name="name2">
@@ -52,14 +52,13 @@
 </template>
 
 <script lang="ts">
-import { UserRole_List } from './list-cfg';
 import Operate from './RbacOperate.vue';
-import { CommonUI } from '@ajaxjs/ui';
+import RoleTreeTable from './RoleTreeTable.vue';
 
 const TEST_resources = [{ "name": "设备模块", "id": 3, "group": "充电桩系统" }, { "name": "运营商模块", "id": 4, "group": "充电桩系统" }, { "name": "厂商模块", "id": 5, "group": "充电桩系统" }, { "name": "图文系统", "id": 1, "group": "基本业务" }, { "name": "留言系统", "id": 2, "group": "基本业务" }];
 
 export default {
-    components: { Operate, TreeTable: CommonUI.TreeTable, TreeSelector: CommonUI.TreeSelector },
+    components: { Operate, RoleTreeTable },
     data() {
         try {
             TEST_resources.sort((a: any, b: any) => a.id < b.id ? -1 : 1);
@@ -68,17 +67,8 @@ export default {
         }
 
         console.log(TEST_resources)
-        const api = window['config'].iamApi + '/api/cms/user_role';
-
         return {
-            roleListApi: {
-                list: api + '/list',
-                create: api,
-                update: api,
-                delete: api,
-            },
             resources: Object.freeze(TEST_resources),
-            UserRole_List,
             roleInherit: {
                 isShow: false,
                 sonRoleName: 'ddd'

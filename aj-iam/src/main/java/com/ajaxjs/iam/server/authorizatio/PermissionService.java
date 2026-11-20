@@ -19,6 +19,10 @@ import java.util.stream.Collectors;
 @Service
 @Slf4j
 public class PermissionService implements PermissionController {
+    public Role getRoleInfo(Integer roleId) {
+        return new Action("SELECT * FROM per_role WHERE id = ?").query(roleId).one(Role.class);
+    }
+
     @Override
     public List<Map<String, Object>> getRoleTree() {
         List<Map<String, Object>> nodes = new Action("SELECT * FROM per_role WHERE stat != 1").query().list();
@@ -42,7 +46,7 @@ public class PermissionService implements PermissionController {
 
     @Override
     public List<Permission> getPermissionListByRole(Integer roleId) {
-        Role role = new Action("SELECT * FROM per_role WHERE id = ?").query(roleId).one(Role.class);
+        Role role = getRoleInfo(roleId);
         Objects.requireNonNull(role, "There is NO role, id:" + roleId);
         List<Permission> result = new ArrayList<>();
         // get all permission lists
@@ -91,7 +95,7 @@ public class PermissionService implements PermissionController {
             num = PermissionControl.set(num, index, true);//设置[权限项 index]为true
         }
 
-        log.info("permissionValue: " + num);
+        log.info("permissionValue: {}", num);
         Map<String, Object> map = ObjectHelper.mapOf("id", roleId, "permission_value", num);
 
         return new Action(map, "per_role").update().withId().isOk();
@@ -214,6 +218,8 @@ public class PermissionService implements PermissionController {
             iViewMap.put("id", map.get("id"));
             iViewMap.put("title", map.get("name"));
             iViewMap.put("parentId", map.get("parentId"));
+            iViewMap.put("content", map.get("content"));
+            iViewMap.put("updateDate", map.get("updateDate"));
             iViewMap.put("expand", true);
             iViewMap.put("contextmenu", true);
 
@@ -222,7 +228,7 @@ public class PermissionService implements PermissionController {
             if (_children != null) {
                 List<Map<String, Object>> children = (List<Map<String, Object>>) _children;
 
-                if (children.size() > 0)
+                if (!children.isEmpty())
                     iViewMap.put("children", transformToTreeStructure(children));
             }
 
@@ -256,10 +262,10 @@ public class PermissionService implements PermissionController {
                         throw new IllegalStateException("找不到权限");
 
                     permissionEntity.setIndex(index);
-                    log.info("Field: " + permissionEntity);
+                    log.info("Field: {}", permissionEntity);
                 }
             } catch (IllegalAccessException e) {
-                log.error("获取字段值时出错：" + e.getMessage(), e);
+                log.error("获取字段值时出错：{}", e.getMessage(), e);
                 throw new RuntimeException(e);
             }
         }

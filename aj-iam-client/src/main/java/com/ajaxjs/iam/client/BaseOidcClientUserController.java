@@ -80,7 +80,6 @@ public abstract class BaseOidcClientUserController {
 
     public ModelAndView callbackToken(String clientId, String clientSecret, String code, String state, String webUrl, HttpServletResponse resp) {
         // 从会话中获取之前保存的 state 值
-//        String savedState = (String) TEMP_CACHE.get(ClientUtils.OAUTH_STATE);
         String savedState = getCacheProvider().get(ClientUtils.OAUTH_STATE);
 
         if (!state.equals(savedState)) { // 检查返回的 state 值是否与之前保存的值匹配
@@ -89,7 +88,6 @@ public abstract class BaseOidcClientUserController {
 
             return null;
         } else
-//            session.removeAttribute(ClientUtils.OAUTH_STATE);
             getCacheProvider().remove(ClientUtils.OAUTH_STATE);
 
         String iamBase = getIamService().trim().replaceFirst("/+$", "");

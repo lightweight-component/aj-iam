@@ -25,15 +25,19 @@
           <Submenu name="per">
             <template #title>
               <Icon type="ios-people" />
-              权限管理
+              角色授权
             </template>
             <MenuItem name="per-rbac" to="/permission/rbac">
             <Icon type="ios-person"></Icon>
             <span>角色管理</span>
             </MenuItem>
+            <MenuItem name="per-list" to="/permission/list">
+            <Icon type="ios-list"></Icon>
+            <span>权限管理</span>
+            </MenuItem>
             <MenuItem name="per-per" to="/permission/permission">
             <Icon type="ios-cube-outline"></Icon>
-            <span>权限管理</span>
+            <span>角色授权</span>
             </MenuItem>
           </Submenu>
 
@@ -69,18 +73,6 @@
             <Icon type="ios-paper-outline" />
             <span>表单管理</span>
             </MenuItem>
-            <MenuItem name="3-4" to="/system/data_dict">
-            <Icon type="md-grid" />
-            <span>数据字典</span>
-            </MenuItem>
-            <MenuItem name="3-2">
-            <Icon type="settings"></Icon>
-            <span>文件管理</span>
-            </MenuItem>
-            <MenuItem name="3-6" to="/system/schedule">
-            <Icon type="search" />
-            <span>任务调度</span>
-            </MenuItem>
             <MenuItem name="3-3">
             <Icon type="search"></Icon>
             <span>操作日志</span>
@@ -98,9 +90,8 @@
         </Header>
         <Content :style="{ padding: '0 16px 16px' }">
           <Breadcrumb :style="{ margin: '16px 0' }">
-            <BreadcrumbItem>Home</BreadcrumbItem>
-            <BreadcrumbItem>Components</BreadcrumbItem>
-            <BreadcrumbItem>Layout</BreadcrumbItem>
+            <BreadcrumbItem :to="$route.path === '/' ? undefined : '/'">首页</BreadcrumbItem>
+            <BreadcrumbItem v-for="(label, index) in breadcrumbs" :key="index">{{ label }}</BreadcrumbItem>
           </Breadcrumb>
           <Card style="min-height: 600px;overflow: hidden;padding-bottom: 20px;">
             <router-view />
@@ -123,6 +114,10 @@ export default {
     };
   },
   computed: {
+    breadcrumbs(): string[] {
+      const labels = this.$route.meta.breadcrumbs;
+      return Array.isArray(labels) ? labels : [];
+    },
     menuitemClasses() {
       return [
         'menu-item',
