@@ -4,8 +4,8 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.ajaxjs</groupId>
-        <artifactId>ajaxjs-cms</artifactId>
-        <version>1.0.5</version>
+        <artifactId>ajaxjs-base</artifactId>
+        <version>1.3.1</version>
         <relativePath/>
     </parent>
 
@@ -90,19 +90,6 @@
                     <artifactId>jakarta.servlet-api</artifactId>
                 </exclusion>
             </exclusions>
-        </dependency>
-
-        <!-- Spring 测试 -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-test</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-webmvc</artifactId>
-            <version>7.0.6</version>
-            <scope>provided</scope>
         </dependency>
 
         <!-- RedisTemplate -->
