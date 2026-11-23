@@ -13,8 +13,16 @@ public class LanguageMapping {
     static {
         MAPPING.put(Language.ZH, Zh.MAP);
         MAPPING.put(Language.CH, Ch.MAP);
-        MAPPING.put(Language.EN, En.MAP);
         MAPPING.put(Language.JA, Jp.MAP);
+        MAPPING.put(Language.KO, Ko.MAP);
+        MAPPING.put(Language.MS, Ms.MAP);
+        MAPPING.put(Language.EN, En.MAP);
+        MAPPING.put(Language.FR, Fr.MAP);
+        MAPPING.put(Language.ES, Es.MAP);
+        MAPPING.put(Language.PT, Pt.MAP);
+        MAPPING.put(Language.RU, Ru.MAP);
+        MAPPING.put(Language.DE, De.MAP);
+        MAPPING.put(Language.AR, Ar.MAP);
     }
 
     public static Map<String, String> getLangsMap() {
