@@ -22,11 +22,5 @@ export default defineConfig({
     },
   },
   plugins: [vue()],
-  optimizeDeps: {
-    // 本地 UI 包直接提供 Vue 源码，由 Vue 插件编译。
-    exclude: ['@ajaxjs/ui'],
-    // 显式预构建源码组件内部使用的 UMD 依赖，转换为浏览器 ESM。
-    include: ['vuedraggable'],
-  },
   base: './', // <-- 关键：设置为相对路径
 });

@@ -55,7 +55,7 @@ CREATE TABLE `app` (
   `login_page` varchar(200) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '登录页面的 URL 地址',
   `stat` tinyint DEFAULT '0' COMMENT '数据字典：状态',
   `expires` int DEFAULT NULL COMMENT 'Token 有效期，单位：分钟',
-  `refresh_expires` int DEFAULT NULL COMMENT 'RefreshToken 有效期，单位：天',
+  `refresh_expires` int DEFAULT NULL COMMENT 'RefreshToken 有效期，单位：分钟',
   `extend` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci COMMENT '扩展 JSON 字段',
   `creator` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL COMMENT '创建人名称（可冗余的）',
   `creator_id` int DEFAULT NULL COMMENT '创建人 id',

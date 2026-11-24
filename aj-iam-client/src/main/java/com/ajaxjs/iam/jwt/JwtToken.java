@@ -19,6 +19,7 @@ public class JwtToken {
 
     /**
      * 有效期，以秒为单位
+     * 从签发起还能用多少秒
      */
     private Integer expiresIn;
 

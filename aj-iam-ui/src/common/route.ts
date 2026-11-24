@@ -1,22 +1,23 @@
-import '@ajaxjs/ui/style.css';
-import '@ajax-js/configurable-widget/style.css';
 import { createRouter, createWebHashHistory, type Router } from 'vue-router';
-import { admin, system, IAM, shop } from '@ajaxjs/ui';
 import { FormInfo, FormMgr, ListInfo, ListMgr } from '@ajax-js/configurable-widget';
-import Org from '../pages/user/org.vue';
-import RBAC from '../pages/rbac/rbac.vue';
-import Permission from '../pages/permission/Permission.vue';
+import { startLogin } from './utils';
+import HomePage from '../pages/admin/Home.vue';
+import Orgs from '../pages/user/Orgs.vue';
+import LoginLog from '../pages/user/LoginLog.vue';
+import IamApp from '../pages/auth/App.vue';
+import Tenant from '../pages/auth/Tenant.vue';
+import Token from '../pages/auth/Token.vue';
+import User from '../pages/user/User.vue';
+import UserCenter from '../pages/user/profile/index.vue';
+import RoleTreeTable from '../pages/permission/RoleTreeTable.vue';
+import Permission from '../pages/permission/PermissionAuth.vue';
 import PermissionList from '../pages/permission/PermissionList.vue';
-import { startLogin } from './login';
 
-const UserView = { template: '<div>User: {{ $route.params.id }}</div>' }
-
-// 2. 定义路由数组
 const routes = [
     {
         path: '/',
         name: 'home',
-        component: admin.HomePage
+        component: HomePage
     },
 
     {
@@ -30,12 +31,12 @@ const routes = [
     {
         path: '/user/org',
         meta: { breadcrumbs: ['用户管理', '组织机构管理'] },
-        component: Org
+        component: Orgs
     },
     {
         path: '/permission/rbac',
         meta: { breadcrumbs: ['角色授权', '角色管理'] },
-        component: RBAC
+        component: RoleTreeTable
     },
     {
         path: '/permission/list',
@@ -49,44 +50,34 @@ const routes = [
     },
 
     {
-        path: '/pay/transaction',
-        meta: { breadcrumbs: ['支付管理', '交易记录'] },
-        component: shop.Transaction
-    },
-    {
         path: '/user/list',
         meta: { breadcrumbs: ['用户管理', '用户列表'] },
-        component: IAM.User
+        component: User
     },
     {
         path: '/user/login_log',
         meta: { breadcrumbs: ['用户管理', '登录日志'] },
-        component: IAM.LoginLog
+        component: LoginLog
     },
     {
         path: '/user/tenant',
         meta: { breadcrumbs: ['认证管理', '租户管理'] },
-        component: IAM.Tenant
+        component: Tenant
     },
     {
         path: '/user/app',
         meta: { breadcrumbs: ['认证管理', '应用管理'] },
-        component: IAM.App
+        component: IamApp
     },
     {
         path: '/user/token',
         meta: { breadcrumbs: ['认证管理', 'Token 管理'] },
-        component: IAM.Token
+        component: Token
     },
     {
         path: '/user/profile',
         meta: { breadcrumbs: ['个人中心'] },
-        component: IAM.UserCenter
-    },
-    {
-        path: '/system/data_dict',
-        meta: { breadcrumbs: ['系统管理', '数据字典'] },
-        component: system.DataDict
+        component: UserCenter
     },
     {
         path: '/system/list-mgr',
@@ -108,42 +99,6 @@ const routes = [
         alias: '/form-info',
         meta: { breadcrumbs: ['系统管理', '表单管理', '表单详情'] },
         component: FormInfo
-    },
-    // {
-    //     path: '/system/schedule',
-    //     meta: { breadcrumbs: ['系统管理', '任务调度'] },
-    //     component: system.Schedule
-    // },
-    {
-        path: '/resource/article',
-        meta: { breadcrumbs: ['资源管理', '文章管理'] },
-        component: system.Article
-    },
-
-    {
-        path: '/resource/article_edit',
-        meta: { breadcrumbs: ['资源管理', '文章管理', '编辑文章'] },
-        component: system.ArticleEdit
-    },
-    {
-        path: '/user/:id', // 动态路径参数
-        meta: { breadcrumbs: ['用户管理', '用户详情'] },
-        name: 'user',
-        component: UserView,
-        // props: true // 将路由参数作为 props 传递给组件 (推荐做法)
-        props: (route: any) => ({ id: parseInt(route.params.id) }) // 函数模式，可以进行类型转换
-    },
-    {
-        path: '/users/:userId/posts/:postId',
-        name: 'userPost',
-        component: { template: '<div>User ID: {{ $route.params.userId }}, Post ID: {{ $route.params.postId }}</div>' }
-        // props: true // 多个动态参数也会作为 props 传递
-    },
-    {
-        path: '/search',
-        name: 'search',
-        component: { template: '<div>Search Query: {{ $route.query.q }}</div>' }, // 访问查询参数 ?q=something
-        props: (route: any) => ({ query: route.query.q || '' })
     },
     {
         path: '/admin',
@@ -172,15 +127,6 @@ const routes = [
         //   // 方法接收目标路由作为参数
         //   // return 重定向的字符串路径/路径对象
         // }
-    },
-    {
-        path: '/old-about',
-        redirect: '/about' // 别名重定向示例
-    },
-    {
-        path: '/about-us', // 别名
-        alias: '/about',
-        // component: AboutView // 访问 /about-us 和 /about 都会渲染 AboutView
     },
     {
         path: '/:pathMatch(.*)*', // Catch-all 通配符路由 (放在最后)

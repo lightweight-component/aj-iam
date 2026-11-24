@@ -1,14 +1,11 @@
 package com.ajaxjs.iam.server.auth;
 
-import com.ajaxjs.iam.UserConstants;
 import com.ajaxjs.iam.annotation.AllowOpenAccess;
 import com.ajaxjs.iam.client.BaseOidcClientUserController;
 import com.ajaxjs.iam.client.CacheProvider;
 import com.ajaxjs.iam.jwt.JwtToken;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.ResponseCookie;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -32,17 +29,7 @@ public class ClientController extends BaseOidcClientUserController {
 
     @Override
     public JwtToken onAccessTokenGot(JwtToken token, HttpServletResponse resp) {
-        String tokenStr = token.getToken();
-        // 设置 Token 到 Cookie
-        ResponseCookie cookie = ResponseCookie.from(UserConstants.ACCESS_TOKEN_KEY, tokenStr)
-                .httpOnly(true)
-                .secure(false) // TODO for prod
-                .path("/")
-                .sameSite("Strict") // 设置 SameSite 属性
-                .maxAge(3600 * 24 * 3) // 有效期 1 小时
-                .build();
-
-        resp.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+        setTokenToCookie(token, resp);
 
         return token;
     }

@@ -33,7 +33,13 @@ public abstract class BaseTokenService {
     public Integer getTokenExpires() {
         String s = DiContextUtil.getConfigFromYml("auth.token.expires");
 
-        return ObjectHelper.hasText(s) ? Integer.parseInt(s) : this.tokenExpires;
+        return ObjectHelper.hasText(s) ? Integer.parseInt(s) : tokenExpires;
+    }
+
+    public Integer getRefreshTokenExpires() {
+        String s = DiContextUtil.getConfigFromYml("auth.token.refreshExpires");
+
+        return ObjectHelper.hasText(s) ? Integer.parseInt(s) : refreshTokenExpires;
     }
 
     /**

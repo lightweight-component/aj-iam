@@ -1,7 +1,7 @@
 <template>
   <div class="layout">
     <Layout :style="{ minHeight: '100vh' }">
-      <Sider collapsible :collapsed-width="78" v-model="isCollapsed">
+      <Sider collapsible hide-trigger :width="224" :collapsed-width="78" v-model="isCollapsed">
         <Menu active-name="" theme="dark" width="auto" :class="menuitemClasses" style="margin-top: 64px;">
           <Submenu name="user">
             <template #title>
@@ -73,7 +73,7 @@
             <Icon type="ios-paper-outline" />
             <span>表单管理</span>
             </MenuItem>
-            <MenuItem name="3-3">
+            <MenuItem name="3-3" @click="$Message.info('TODO')">
             <Icon type="search"></Icon>
             <span>操作日志</span>
             </MenuItem>
@@ -103,7 +103,7 @@
 </template>
 
 <script lang="ts">
-import { promptLogin } from '../common/login';
+import { promptLogin } from '../common/utils';
 
 export default {
   data() {
@@ -158,7 +158,7 @@ export default {
 .menu-item span {
   display: inline-block;
   overflow: hidden;
-  width: 75px;
+  /* width: 75px;*/
   text-overflow: ellipsis;
   white-space: nowrap;
   vertical-align: bottom;

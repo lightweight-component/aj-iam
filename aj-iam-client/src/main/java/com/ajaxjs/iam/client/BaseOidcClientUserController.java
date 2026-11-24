@@ -37,6 +37,11 @@ public abstract class BaseOidcClientUserController {
     private static int STATE_EXPIRE = 60 * 5;
 
     /**
+     * 兜底的 cookie 过期时间，默认为三天
+     */
+    private static final int DEFAULT_COOKIE_MAX_AGE_SECONDS = 3 * 24 * 60 * 60;
+
+    /**
      * 获取重定向视图，用于认证流程中的第一步：跳转到登录页面。
      *
      * @param getAuthCodeUrl    获取授权码的 URL，指 IAM 提供的 endpoint。
@@ -161,13 +166,20 @@ public abstract class BaseOidcClientUserController {
     }
 
     public static void setTokenToCookie(JwtToken token, HttpServletResponse resp) {
+        Integer maxAge = token.getRefreshExpiresIn();
+
+        if (maxAge == null)
+            maxAge = token.getExpiresIn();
+
+        long cookieMaxAgeSeconds = maxAge == null ? DEFAULT_COOKIE_MAX_AGE_SECONDS : Math.max(0, maxAge);
+
         // 设置 Token 到 Cookie
         ResponseCookie cookie = ResponseCookie.from(UserConstants.ACCESS_TOKEN_KEY, token.getToken())
                 .httpOnly(true)
                 .secure(false) // TODO for prod
                 .path("/")
-                .sameSite("Strict") // 设置 SameSite 属性
-                .maxAge(3600 * 24 * 3) // TODO 改为一致的失效时间
+                .sameSite("Strict")
+                .maxAge(cookieMaxAgeSeconds)
                 .build();
 
         resp.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
@@ -176,8 +188,8 @@ public abstract class BaseOidcClientUserController {
                 .httpOnly(true)
                 .secure(false) // TODO for prod
                 .path("/")
-                .sameSite("Strict") // 设置 SameSite 属性
-                .maxAge(3600 * 24 * 3)
+                .sameSite("Strict")
+                .maxAge(cookieMaxAgeSeconds)
                 .build();
 
         resp.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());

@@ -23,7 +23,7 @@ public class Payload {
     private String aud;
 
     /**
-     * 过期时间
+     * 过期时间 单位：小时
      */
     private Long exp;
 

@@ -39,7 +39,7 @@ public class App {
     private Integer expires;
 
     /**
-     * RefreshToken 有效期，单位：天
+     * RefreshToken 有效期，单位：分钟
      */
     private Integer refreshExpires;
 

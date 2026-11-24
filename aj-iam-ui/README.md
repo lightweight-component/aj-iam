@@ -13,7 +13,7 @@ npm run build
 管理页使用 `window.__AJ_DATASERVICE_CONFIG__.adminApiRoot`，加载器使用 `window.config.dsApiRoot`；本项目在 `index.html` 中将两者指向同一个 API 根路径。
 `/list-info` 和 `/system/form-info`（别名 `/form-info`）使用新包的配置编辑页。
 安装时的 `postinstall` 会给新包补上 IAM 数字状态兼容：`1` 转为 `true`，`0` 转为 `false`。升级组件库后请重新核对这段兼容逻辑。
-安装依赖前请备份本机的 `node_modules/@ajaxjs/ui` 和 `node_modules/@ajaxjs/util`；本项目仍有页面依赖它们，npm 可能会清理这些手动恢复的包。
+个人中心、请求和日期格式化均由 IAM 前端本地代码提供，无需安装 `@ajaxjs/ui` 或 `@ajaxjs/util`。
 
 线上管理端部署在 `https://wyndme.cn/admin/`，并与 `/iam_api/`、`/iam_login/` 同源。
 管理端从 `/iam_api/client/to_login` 发起授权，IAM 后端通过

@@ -45,3 +45,14 @@ body {
     background-color: #f9f9f9;
   }
 }
+
+h2 span {
+  font-size: 14px;
+  color: gray;
+  padding-left: 20px;
+  font-weight: normal;
+}
+
+.holder {
+  padding: 20px 30px;
+}

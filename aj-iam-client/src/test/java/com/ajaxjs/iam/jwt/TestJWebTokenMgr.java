@@ -66,6 +66,22 @@ public class TestJWebTokenMgr {
     }
 
     @Test
+    public void testZeroExpirationIsInvalidAndNotRefreshable() {
+        Payload payload = new Payload();
+        payload.setSub("admin");
+        payload.setExp(0L);
+
+        JWebToken token = new JWebToken(payload);
+        token.setPayloadJson("{\"sub\":\"admin\",\"exp\":0}");
+        token.setSignature(token.signature(jWebTokenMgr.getSecretKey()));
+
+        var detail = jWebTokenMgr.validAndDetail(token);
+
+        assertFalse(detail.isValid());
+        assertFalse(detail.isExpired());
+    }
+
+    @Test
     public void testTokenFactoryWithValidInput() {
         String sub = "user123";
         String name = "John Doe";

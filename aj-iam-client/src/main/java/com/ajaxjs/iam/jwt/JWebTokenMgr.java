@@ -107,20 +107,17 @@ public class JWebTokenMgr {
         String _signature = token.signature(secretKey);
         boolean isMatch = token.getSignature().equals(_signature); // signature matched
         Long exp = token.getPayload().getExp();
-
         TokenValidDetail detail = new TokenValidDetail();
 
-        if (exp == 0L) { /* 0 表示永不过期，不用检查是否超时 */
-            detail.setValid(true);
+        if (exp == 0L) {
+            detail.setValid(false);
             detail.setExpired(false);
             detail.setExpiredTime(0L);
         } else {
             boolean isExp = exp < JwtUtils.now(); // true = token expired
 
-            if (isExp) {
-                log.debug("超时:" + exp + ", now:" + JwtUtils.now());
-                log.debug("超时:" + JwtUtils.toRealTime(exp) + ", now:" + JwtUtils.toRealTime(JwtUtils.now()));
-            }
+            if (isExp)
+                log.warn("validAndDetail 超时:{}, now:{}", JwtUtils.toRealTime(exp), JwtUtils.toRealTime(JwtUtils.now()));
 
             boolean isValid = !isExp && isMatch;
 

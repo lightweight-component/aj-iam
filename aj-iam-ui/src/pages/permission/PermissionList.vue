@@ -1,5 +1,7 @@
 <template>
-    <div>
+    <div class="holder">
+        <h2 style="margin-bottom:25px;">权限管理<span></span></h2>
+
         <div style="margin-bottom: 20px;">
             <span style="float:right;">
                 <Button @click="showCreate" v-if="!isPickup" type="primary" icon="ios-add"
@@ -57,9 +59,7 @@
 
 <script lang="ts">
 import { h } from 'vue';
-import { DateFormat } from '@ajaxjs/util';
-import { promptLogin } from '../../common/login';
-import { copyWriteFields } from '../../common/entity-payload';
+import { copyWriteFields, dateFormat, promptLogin } from '../../common/utils';
 
 const permissionStatuses: Record<number, { label: string; color: string }> = {
     [-1]: { label: '草稿', color: 'gray' },
@@ -123,7 +123,7 @@ export default {
                 }]),
                 {
                     title: '创建日期',
-                    width: 160,
+                    width: 180,
                     align: 'center',
                     render: (_render: typeof h, { row }: { row: PermissionEntry }) =>
                         h('div', this.formatPermissionDate(row.createDate)),
@@ -145,7 +145,7 @@ export default {
             if (!value || Number.isNaN(Date.parse(value)))
                 return '—';
 
-            return DateFormat.dateFormat(value, 'yyyy-MM-dd hh:mm:ss');
+            return dateFormat(value, 'yyyy-MM-dd hh:mm:ss');
         },
         async requestPermission(path: string, failure: string, options: RequestInit = {}): Promise<ApiResponseResult | null> {
             try {

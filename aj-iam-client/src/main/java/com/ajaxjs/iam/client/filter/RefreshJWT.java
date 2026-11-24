@@ -7,15 +7,17 @@ import com.ajaxjs.iam.client.model.TokenValidDetail;
 import com.ajaxjs.iam.jwt.JwtToken;
 import com.ajaxjs.util.JsonUtil;
 import com.ajaxjs.util.ObjectHelper;
-import lombok.AllArgsConstructor;
-
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
 import java.util.Map;
 
 /**
  * 刷新访问令牌
  */
+@Slf4j
 @AllArgsConstructor
 public class RefreshJWT {
     TokenValidDetail tokenValidDetail;
@@ -59,19 +61,24 @@ public class RefreshJWT {
             // 将返回数据转换为 JwtAccessToken 对象并设置到 Cookie 中
             JwtToken token = JsonUtil.map2pojo((Map<String, Object>) result.get("data"), JwtToken.class);
             BaseOidcClientUserController.setTokenToCookie(token, response);
+            log.info("刷新成功，生成新的 Access Token");
         } else
-            System.err.println("刷新失败:" + result.get("message"));
+            log.warn("刷新失败:{}", result.get("message"));
     }
 
-    private static final long REFRESH_THRESHOLD = 60 * 1000; // 一小时内过期就刷新
+    /**
+     * 提前一小时允许刷新
+     */
+    private static final long REFRESH_THRESHOLD_SECONDS = 60 * 60;
 
     /**
      * 检查 Access Token 是否快过期了，且有有效的 Refresh Token，则刷新
      */
     public void checkAlmostExpire() {
-        long timeUntilExpiry = tokenValidDetail.getExpiredTime() - System.currentTimeMillis() / 1000;
+        long expiresAt = tokenValidDetail.getExpiredTime();
+        long secondsUntilExpiry = expiresAt - System.currentTimeMillis() / 1000;
 
-        if (timeUntilExpiry < REFRESH_THRESHOLD) {
+        if (expiresAt > 0 && secondsUntilExpiry > 0 && secondsUntilExpiry <= REFRESH_THRESHOLD_SECONDS) {
             String refreshToken = RefreshJWT.extractRefreshToken(request);
 
             if (refreshToken != null)

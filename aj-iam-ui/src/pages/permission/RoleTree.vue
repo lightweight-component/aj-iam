@@ -5,7 +5,7 @@
             <Button type="info" icon="ios-refresh" @click="refreshRoleList">刷新</Button>
         </span>
     </div>
-    <h2>角色管理</h2>
+    <h3>角色管理</h3>
 
     <div class="tree">
         <Tree :data="roleTreeData" @on-select-change="onTreeNodeClk" @on-contextmenu="handleContextMenu">
@@ -41,8 +41,8 @@
 </template>
 
 <script lang="ts">
-import { XhrFetch } from '@ajaxjs/util';
-import { copyWriteFields } from '../../common/entity-payload';
+import { XhrFetch } from '../../common/http';
+import { copyWriteFields } from '../../common/utils';
 
 type ContextData = {
     id?: number;
@@ -169,9 +169,8 @@ export default {
 </script>
 
 <style lang="less" scoped>
-h2 {
-    font-weight: bold;
-    padding: 10px 0;
+h3 {
+    margin-top: 15px;
 }
 
 .btns {

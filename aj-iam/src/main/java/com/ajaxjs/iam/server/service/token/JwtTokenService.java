@@ -15,13 +15,17 @@ import com.ajaxjs.spring.DiContextUtil;
 import com.ajaxjs.sqlman.Action;
 import com.ajaxjs.util.ObjectHelper;
 import com.ajaxjs.util.RandomTools;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 public class JwtTokenService extends BaseTokenService {
+    private static final int SECONDS_PER_HOUR = 3600;
+
     public JwtTokenService(App app, User user) {
         super(app, IamConstants.GrantType.OIDC, user);
     }
@@ -65,15 +69,20 @@ public class JwtTokenService extends BaseTokenService {
         Integer refreshTokenExpires = getRefreshTokenExpires();
         int tokenExpInSecs = app.getExpires() == null ? tokenExpires * 60 : app.getExpires() * 60;
         int refreshTokenExpInSecs = app.getRefreshExpires() == null ? refreshTokenExpires * 60 : app.getRefreshExpires() * 60;
+        int tokenExpInHours = tokenExpInSecs / SECONDS_PER_HOUR;
+
+        if (tokenExpInSecs % SECONDS_PER_HOUR != 0)
+            log.warn("JWT access token lifetime is not a whole hour: configured {} seconds, signing for {} whole hours.",
+                    tokenExpInSecs, tokenExpInHours);
 
         JwtToken jwtAccessToken = new JwtToken();
-        jwtAccessToken.setExpiresIn(tokenExpInSecs);
+        jwtAccessToken.setExpiresIn(tokenExpInHours * 3600);
         jwtAccessToken.setRefreshExpiresIn(refreshTokenExpInSecs);
 
         // TODO user.getName() 中文名会乱码
         Long[][] userPermissions = getUserPermissions(user.getId());
         JWebToken jWebToken = getjWebTokenMgr().tokenFactory(
-                String.valueOf(user.getId()), user.getLoginId(), DEFAULT_SCOPE, JwtUtils.setExpire(tokenExpInSecs / 3600),
+                String.valueOf(user.getId()), user.getLoginId(), DEFAULT_SCOPE, JwtUtils.setExpire(tokenExpInHours),
                 user.getTenantId().intValue(), userPermissions[0], userPermissions[1]
         );
         jwtAccessToken.setToken(jWebToken.toString());

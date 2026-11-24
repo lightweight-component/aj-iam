@@ -453,7 +453,8 @@ public class UserInterceptor implements HandlerInterceptor {
      * @return API 返回的对象
      */
     public Map<String, Object> refreshToken(String refreshToken) {
-        String tokenApi = iamService + "/iam_api/oidc/refresh_token";
+        String iamBase = iamService.trim().replaceFirst("/+$", "");
+        String tokenApi = (iamBase.endsWith("/iam_api") ? iamBase : iamBase + "/iam_api") + "/user_login/refresh_token";
 
         Map<String, String> params = ObjectHelper.mapOf("grant_type", "refresh_token", "refresh_token", refreshToken);
         Map<String, Object> result = Post.form(tokenApi, params, conn -> conn.setRequestProperty("Authorization", OAuthTools.encodeClient(clientId, clientSecret)));
