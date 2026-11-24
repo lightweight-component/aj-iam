@@ -14,7 +14,9 @@ import java.lang.reflect.Method;
 public class ClientUtils {
     public static final String OAUTH_STATE = "OAUTH_STATE";
 
-    // 返回自定义错误页面
+    /**
+     * 返回自定义错误页面
+     */
     private static final String html = "<html><body><h1>403 Forbidden</h1><p>非法操作，请求被拒绝。</p></body></html>";
 
     /**
@@ -48,7 +50,6 @@ public class ClientUtils {
             return annotation;
 
         Method method = handlerMethod.getMethod(); // The real controller method
-
         annotation = method.getAnnotation(annotationClass);
 
         if (annotation != null)

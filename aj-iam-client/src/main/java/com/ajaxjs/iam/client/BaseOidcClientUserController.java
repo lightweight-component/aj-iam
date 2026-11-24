@@ -2,7 +2,6 @@ package com.ajaxjs.iam.client;
 
 import com.ajaxjs.iam.UserConstants;
 import com.ajaxjs.iam.jwt.JwtToken;
-import com.ajaxjs.iam.oauth.OAuthTools;
 import com.ajaxjs.util.*;
 import com.ajaxjs.util.httpremote.Post;
 import jakarta.servlet.http.HttpServletResponse;
@@ -29,8 +28,6 @@ public abstract class BaseOidcClientUserController {
 
     @Value("${auth.clientSecret}")
     String clientSecret;
-
-//    static Map<String, Object> TEMP_CACHE = new HashMap<>(); // TODO
 
     abstract public CacheProvider getCacheProvider();
 
@@ -65,7 +62,6 @@ public abstract class BaseOidcClientUserController {
     public RedirectView loginPageUrl(String getAuthCodeUrl, String clientId, String clientCallbackUrl, String webUrl) {
         String state = RandomTools.generateRandomString(5);
         getCacheProvider().save(ClientUtils.OAUTH_STATE, state, STATE_EXPIRE);
-
         log.info("set state code:{}", state);
 
         String url = getAuthCodeUrl + "?response_type=code&client_id=" + clientId;
@@ -99,7 +95,7 @@ public abstract class BaseOidcClientUserController {
         String tokenApi = (iamBase.endsWith("/iam_api") ? iamBase : iamBase + "/iam_api") + "/user_login/token";
 
         Map<String, String> params = ObjectHelper.mapOf("grant_type", "authorization_code", "code", code, "state", state);
-        Map<String, Object> result = Post.form(tokenApi, params, conn -> conn.setRequestProperty("Authorization", OAuthTools.encodeClient(clientId, clientSecret)));
+        Map<String, Object> result = Post.form(tokenApi, params, conn -> conn.setRequestProperty("Authorization", IOAuthService.encodeClient(clientId, clientSecret)));
 
         if (result != null) {// 处理授权成功的逻辑，例如解析并保存访问令牌和刷新令牌等
             if ((int) result.get("status") == 1) {
@@ -156,7 +152,7 @@ public abstract class BaseOidcClientUserController {
 
         ResponseCookie refreshCookie = ResponseCookie.from(UserConstants.REFRESH_TOKEN_KEY, CommonConstant.EMPTY_STRING)
                 .httpOnly(true)
-                .secure(false) // TODO for prod
+                .secure(false)
                 .path("/")
                 .sameSite("Strict") // 设置 SameSite 属性
                 .maxAge(0)
@@ -176,7 +172,7 @@ public abstract class BaseOidcClientUserController {
         // 设置 Token 到 Cookie
         ResponseCookie cookie = ResponseCookie.from(UserConstants.ACCESS_TOKEN_KEY, token.getToken())
                 .httpOnly(true)
-                .secure(false) // TODO for prod
+                .secure(false)
                 .path("/")
                 .sameSite("Strict")
                 .maxAge(cookieMaxAgeSeconds)
@@ -186,7 +182,7 @@ public abstract class BaseOidcClientUserController {
 
         ResponseCookie refreshCookie = ResponseCookie.from(UserConstants.REFRESH_TOKEN_KEY, token.getRefreshToken())
                 .httpOnly(true)
-                .secure(false) // TODO for prod
+                .secure(false)
                 .path("/")
                 .sameSite("Strict")
                 .maxAge(cookieMaxAgeSeconds)

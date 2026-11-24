@@ -4,14 +4,13 @@ import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.time.ZoneOffset;
 
 public class TestJWT {
     JWebTokenMgr mgr = new JWebTokenMgr();
 
     @Test
     public void testMakeToken() {
-        JWebToken token = mgr.tokenFactory("1000", "user01", "admin, guest", JwtUtils.setExpire(24), null, null, null);
+        JWebToken token = mgr.tokenFactory("1000", "user01", "admin, guest", JWebTokenMgr.setExpire(24), null, null, null);
         System.out.println(token.toString().length());
 
         System.out.println(mgr.isValid(token.toString()));
@@ -35,22 +34,22 @@ public class TestJWT {
     public void testNow() {
         long timestamp = System.currentTimeMillis() / 1000;
         System.out.println(timestamp);
-        System.out.println(JwtUtils.toRealTime(timestamp));
+        System.out.println(JWebTokenMgr.toRealTime(timestamp));
 
         timestamp= LocalDateTime.now().atZone(ZoneId.systemDefault()) // <-- 关键：关联时区
                 .toInstant().getEpochSecond();
 
         System.out.println(timestamp);
-        System.out.println(JwtUtils.toRealTime(timestamp));
+        System.out.println(JWebTokenMgr.toRealTime(timestamp));
 
     }
 
     @Test
     public void testToRealTime() {
-        String realTime = JwtUtils.toRealTime(1721233114L);
+        String realTime = JWebTokenMgr.toRealTime(1721233114L);
         System.out.println(realTime);
 
-        realTime = JwtUtils.toRealTime(JwtUtils.now());
+        realTime = JWebTokenMgr.toRealTime(JWebTokenMgr.now());
         System.out.println(realTime);
     }
 }

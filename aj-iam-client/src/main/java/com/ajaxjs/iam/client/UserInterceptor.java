@@ -1,17 +1,14 @@
-package com.ajaxjs.iam.client.filter;
+package com.ajaxjs.iam.client;
 
 import com.ajaxjs.iam.UserConstants;
 import com.ajaxjs.iam.annotation.AllowOpenAccess;
 import com.ajaxjs.iam.annotation.ClientAuthentication;
 import com.ajaxjs.iam.annotation.PermissionCheck;
-import com.ajaxjs.iam.client.ClientUtils;
-import com.ajaxjs.iam.client.IOAuthService;
 import com.ajaxjs.iam.client.model.TokenValidDetail;
 import com.ajaxjs.iam.jwt.JWebToken;
 import com.ajaxjs.iam.jwt.JWebTokenMgr;
 import com.ajaxjs.iam.jwt.Payload;
 import com.ajaxjs.iam.model.SimpleUser;
-import com.ajaxjs.iam.oauth.OAuthTools;
 import com.ajaxjs.iam.permission.PermissionConfig;
 import com.ajaxjs.iam.permission.PermissionEntity;
 import com.ajaxjs.util.CommonConstant;
@@ -380,7 +377,7 @@ public class UserInterceptor implements HandlerInterceptor {
      * @return 返回提取到的 token，如果未能提取到则返回 null。
      */
     public static String extractToken(HttpServletRequest request) {
-//        String token = extractHeaderToken(request); // 尝试从请求头的"Authorization"字段提取 token
+//        String token = extractHeaderToken(request); // 尝试从请求头的"Authorization" 字段提取 token
         String token = request.getHeader(AUTHORIZATION); // 尝试从请求头的"Authorization"字段以另一种大小写形式提取 token
 
         // 如果从请求头的"Authorization"字段提取不到 token，尝试从请求头的"token"字段提取
@@ -457,7 +454,7 @@ public class UserInterceptor implements HandlerInterceptor {
         String tokenApi = (iamBase.endsWith("/iam_api") ? iamBase : iamBase + "/iam_api") + "/user_login/refresh_token";
 
         Map<String, String> params = ObjectHelper.mapOf("grant_type", "refresh_token", "refresh_token", refreshToken);
-        Map<String, Object> result = Post.form(tokenApi, params, conn -> conn.setRequestProperty("Authorization", OAuthTools.encodeClient(clientId, clientSecret)));
+        Map<String, Object> result = Post.form(tokenApi, params, conn -> conn.setRequestProperty("Authorization", IOAuthService.encodeClient(clientId, clientSecret)));
 
         if (result == null)
             throw new IllegalAccessError("通讯失败");

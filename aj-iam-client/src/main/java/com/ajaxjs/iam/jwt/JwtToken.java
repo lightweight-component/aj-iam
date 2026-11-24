@@ -2,6 +2,9 @@ package com.ajaxjs.iam.jwt;
 
 import lombok.Data;
 
+/**
+ * JWT value object
+ */
 @Data
 public class JwtToken {
     private String token;

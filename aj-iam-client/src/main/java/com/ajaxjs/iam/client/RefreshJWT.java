@@ -1,8 +1,6 @@
-package com.ajaxjs.iam.client.filter;
+package com.ajaxjs.iam.client;
 
 import com.ajaxjs.iam.UserConstants;
-import com.ajaxjs.iam.client.BaseOidcClientUserController;
-import com.ajaxjs.iam.client.ClientUtils;
 import com.ajaxjs.iam.client.model.TokenValidDetail;
 import com.ajaxjs.iam.jwt.JwtToken;
 import com.ajaxjs.util.JsonUtil;

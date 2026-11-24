@@ -1,6 +1,5 @@
 package com.ajaxjs.iam.client;
 
-import com.ajaxjs.iam.client.filter.UserInterceptor;
 import com.ajaxjs.iam.jwt.JWebTokenMgr;
 import com.ajaxjs.iam.permission.PermissionConfig;
 import com.ajaxjs.iam.permission.PermissionEntity;
@@ -22,9 +21,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
+@Slf4j
 @Configuration
 //@ComponentScan("com.ajaxjs.iam.client")
-@Slf4j
 public class IamConfiguration implements WebMvcConfigurer {
     @Value("${auth.iam_service: }")
     private String iamService;

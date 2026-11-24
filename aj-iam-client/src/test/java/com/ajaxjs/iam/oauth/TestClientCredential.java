@@ -1,5 +1,6 @@
 package com.ajaxjs.iam.oauth;
 
+import com.ajaxjs.iam.client.IOAuthService;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -16,7 +17,7 @@ public class TestClientCredential {
         String expectedEncoded = "dGVzdENsaWVudElkOnRlc3RDbGllbnRTZWNyZXQ="; // This is the Base64 encoding of "testClientId:testClientSecret"
 
         // Act
-        String actualEncoded = OAuthTools.encodeClient(clientId, clientSecret);
+        String actualEncoded = IOAuthService.encodeClient(clientId, clientSecret);
 
         // Assert
         assertTrue(actualEncoded.startsWith(expectedPrefix), "The returned string should start with 'Basic '");
@@ -30,7 +31,7 @@ public class TestClientCredential {
         String clientId = "";
         String clientSecret = "";
 
-        String actualEncoded = OAuthTools.encodeClient(clientId, clientSecret);
+        String actualEncoded = IOAuthService.encodeClient(clientId, clientSecret);
         System.out.println(actualEncoded);
     }
 }

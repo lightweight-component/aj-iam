@@ -1,6 +1,5 @@
 package com.ajaxjs.iam.client;
 
-import com.ajaxjs.iam.client.filter.UserInterceptor;
 import com.ajaxjs.iam.jwt.JWebTokenMgr;
 import org.junit.jupiter.api.Test;
 

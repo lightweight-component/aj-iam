@@ -4,7 +4,6 @@ import com.ajaxjs.framework.model.BusinessException;
 import com.ajaxjs.iam.jwt.JWebToken;
 import com.ajaxjs.iam.jwt.JWebTokenMgr;
 import com.ajaxjs.iam.jwt.JwtToken;
-import com.ajaxjs.iam.jwt.JwtUtils;
 import com.ajaxjs.iam.model.App;
 import com.ajaxjs.iam.server.common.IamConstants;
 import com.ajaxjs.iam.server.model.User;
@@ -82,7 +81,7 @@ public class JwtTokenService extends BaseTokenService {
         // TODO user.getName() 中文名会乱码
         Long[][] userPermissions = getUserPermissions(user.getId());
         JWebToken jWebToken = getjWebTokenMgr().tokenFactory(
-                String.valueOf(user.getId()), user.getLoginId(), DEFAULT_SCOPE, JwtUtils.setExpire(tokenExpInHours),
+                String.valueOf(user.getId()), user.getLoginId(), DEFAULT_SCOPE, JWebTokenMgr.setExpire(tokenExpInHours),
                 user.getTenantId().intValue(), userPermissions[0], userPermissions[1]
         );
         jwtAccessToken.setToken(jWebToken.toString());

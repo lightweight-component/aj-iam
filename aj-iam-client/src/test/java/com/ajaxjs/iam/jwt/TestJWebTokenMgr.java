@@ -31,7 +31,7 @@ public class TestJWebTokenMgr {
         payload.setSub("1234567890");
         payload.setName("John Doe");
         payload.setAud("https://api.foo.bar");
-        long expires = JwtUtils.now() + 3600; // Expires in 1 hour
+        long expires = JWebTokenMgr.now() + 3600; // Expires in 1 hour
         payload.setExp(expires);
 
         JWebToken token = jWebTokenMgr.tokenFactory(payload);
@@ -58,7 +58,7 @@ public class TestJWebTokenMgr {
         payload.setSub("1234567890");
         payload.setName("John Doe");
         payload.setAud("https://api.foo.bar");
-        long expires = JwtUtils.now() + 3600; // Expires in 1 hour
+        long expires = JWebTokenMgr.now() + 3600; // Expires in 1 hour
         payload.setExp(expires);
 
         JWebToken token = jWebTokenMgr.tokenFactory(payload);

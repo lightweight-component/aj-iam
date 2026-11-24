@@ -1,4 +1,4 @@
-package com.ajaxjs.iam.jwtv2;
+package com.ajaxjs.iam.jwt.jwtv2;
 
 import lombok.Data;
 

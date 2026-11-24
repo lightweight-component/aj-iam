@@ -4,9 +4,9 @@ import lombok.Data;
 
 @Data
 public class TokenValidDetail {
-    boolean isValid;
+    private boolean isValid;
 
-    boolean isExpired;
+    private boolean isExpired;
 
-    long expiredTime;
+    private long expiredTime;
 }

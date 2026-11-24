@@ -4,8 +4,13 @@ package com.ajaxjs.iam.jwt;
 import com.ajaxjs.iam.client.model.TokenValidDetail;
 import com.ajaxjs.util.Base64Utils;
 import com.ajaxjs.util.JsonUtil;
+import com.ajaxjs.util.date.Formatter;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 /**
  * JWT 管理器
@@ -31,7 +36,7 @@ public class JWebTokenMgr {
      * @return JWT Token
      */
     public JWebToken tokenFactory(Payload payload) {
-        payload.setIat(JwtUtils.now());
+        payload.setIat(now());
         payload.setIss(issuer);
 
         JWebToken token = new JWebToken(payload);
@@ -114,10 +119,10 @@ public class JWebTokenMgr {
             detail.setExpired(false);
             detail.setExpiredTime(0L);
         } else {
-            boolean isExp = exp < JwtUtils.now(); // true = token expired
+            boolean isExp = exp < now(); // true = token expired
 
             if (isExp)
-                log.warn("validAndDetail 超时:{}, now:{}", JwtUtils.toRealTime(exp), JwtUtils.toRealTime(JwtUtils.now()));
+                log.warn("validAndDetail 超时:{}, now:{}", toRealTime(exp), toRealTime(now()));
 
             boolean isValid = !isExp && isMatch;
 
@@ -137,5 +142,36 @@ public class JWebTokenMgr {
      */
     public boolean isValid(String tokenStr) {
         return validAndDetail(parse(tokenStr)).isValid();
+    }
+
+    /**
+     * 返回 EpochSecond 时间
+     *
+     * @return 当前时间
+     */
+    public static long now() {
+        return System.currentTimeMillis() / 1000;
+    }
+
+    /**
+     * 返回过期时间
+     * 转换小时数为时间戳
+     *
+     * @param hours 小时数
+     * @return 过期时间的时间戳
+     */
+    public static long setExpire(int hours) {
+        return now() + hours * 3600L;
+    }
+
+    /**
+     * EpochSecond 时间戳转换为真实的时间
+     *
+     * @return 真实的时间
+     */
+    public static String toRealTime(long timestamp) {
+        LocalDateTime localDateTime = Instant.ofEpochSecond(timestamp).atZone(ZoneId.systemDefault()).toLocalDateTime();
+
+        return Formatter.getDateTimeFormatter().format(localDateTime);
     }
 }
