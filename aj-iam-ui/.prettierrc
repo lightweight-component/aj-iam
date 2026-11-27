@@ -1,5 +1,5 @@
 {
-  "printWidth": 180,        
+  "printWidth": 220,
   "htmlWhitespaceSensitivity": "ignore",
   "semi": true,
   "singleQuote": true,

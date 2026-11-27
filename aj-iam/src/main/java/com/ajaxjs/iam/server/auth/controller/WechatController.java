@@ -58,7 +58,7 @@ public interface WechatController {
      */
     @PostMapping("/phone_number_login")
     @AllowOpenAccess
-    @BizAction("解密小程序提供的加密数据，返回包含手机号码等信息的 JSON 对象")
+    @BizAction("解密小程序提供的加密数据并登录，返回包含手机号码等信息的 JSON 对象")
     JwtToken loginByMiniAppPhoneNumber(@RequestBody PhoneNumberLoginDTO dto);
 
     /**

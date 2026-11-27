@@ -16,8 +16,8 @@ import com.ajaxjs.util.ObjectHelper;
 import com.ajaxjs.util.RandomTools;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -79,7 +79,7 @@ public class JwtTokenService extends BaseTokenService {
         jwtAccessToken.setRefreshExpiresIn(refreshTokenExpInSecs);
 
         // TODO user.getName() 中文名会乱码
-        Long[][] userPermissions = getUserPermissions(user.getId());
+        Map<String, Long>[] userPermissions = getUserPermissions(user.getId());
         JWebToken jWebToken = getjWebTokenMgr().tokenFactory(
                 String.valueOf(user.getId()), user.getLoginId(), DEFAULT_SCOPE, JWebTokenMgr.setExpire(tokenExpInHours),
                 user.getTenantId().intValue(), userPermissions[0], userPermissions[1]
@@ -151,21 +151,30 @@ public class JwtTokenService extends BaseTokenService {
      * @param userId 用户 ID
      * @return 用户权限
      */
-    public static Long[][] getUserPermissions(Long userId) {
-        String sql = "SELECT module_value, permission_value FROM per_role WHERE id IN (SELECT role_id FROM per_user_role WHERE user_id = ?)";
+    public static Map<String, Long>[] getUserPermissions(Long userId) {
+        String sql = "SELECT code, module_value, permission_value FROM per_role WHERE id IN (SELECT role_id FROM per_user_role WHERE user_id = ?)";
         List<Map<String, Object>> result = new Action(sql).query(userId).list();
-        List<Long> permissions = new ArrayList<>();
-        List<Long> modulePermissions = new ArrayList<>();
+//        List<Long> modulePermissions = new ArrayList<>();
+//        List<Long> permissions = new ArrayList<>();
+        Map<String, Long> modulePermissions = new HashMap<>();
+        Map<String, Long> permissions = new HashMap<>();
 
         if (!ObjectHelper.isEmpty(result)) {
             result.forEach(item -> {
+                Object code = item.get("code");
+
+                if (code == null)
+                    return; // ignore no code
+
+                String roleCode = code.toString();
+
                 Object _permissionValue = item.get("permissionValue");
 
                 if (_permissionValue != null) {
                     Long permissionValue = (Long) _permissionValue;
 
                     if (permissionValue != 0L)
-                        permissions.add(permissionValue);
+                        permissions.put(roleCode, permissionValue);
                 }
 
                 Object _moduleValue = item.get("moduleValue");
@@ -174,15 +183,16 @@ public class JwtTokenService extends BaseTokenService {
                     Long moduleValue = (Long) _moduleValue;
 
                     if (moduleValue != 0L)
-                        modulePermissions.add(moduleValue);
+                        modulePermissions.put(roleCode, moduleValue);
                 }
             });
         }
 
-        Long[][] _permissions = new Long[2][];
+        @SuppressWarnings("unchecked")
+        Map<String, Long>[] _permissions = new HashMap[2];
 
-        _permissions[0] = permissions.isEmpty() ? null : permissions.toArray(new Long[0]);
-        _permissions[1] = modulePermissions.isEmpty() ? null : modulePermissions.toArray(new Long[0]);
+        _permissions[0] = permissions.isEmpty() ? null : permissions;
+        _permissions[1] = modulePermissions.isEmpty() ? null : modulePermissions;
 
         return _permissions;
     }

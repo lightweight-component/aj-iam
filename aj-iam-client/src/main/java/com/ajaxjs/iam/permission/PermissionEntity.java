@@ -2,10 +2,12 @@ package com.ajaxjs.iam.permission;
 
 import lombok.Data;
 
+import java.util.Map;
+
 @Data
 public class PermissionEntity {
     /**
-     *  权限 CODE，用于关联权限实体
+     * 权限 CODE，用于关联权限实体
      */
     private String name;
 
@@ -28,11 +30,31 @@ public class PermissionEntity {
      *
      * @param permissionValues 角色的权限值的集合
      * @return 是否有权限
+     * @deprecated
      */
     public boolean check(long[] permissionValues) {
         for (long permissionValue : permissionValues)
             if (PermissionControl.check(permissionValue, index))
                 return true;
+
+        return false;
+    }
+
+    /**
+     * Role:Permisson
+     *
+     * @param mp
+     * @return
+     */
+    public boolean check(Map<String, Long> mp) {
+        for (String role : mp.keySet()) {
+            Long permissionValue = mp.get(role);
+
+            if (PermissionControl.check(permissionValue, index)) {
+                System.out.println(role + "----------------");
+                return true;
+            }
+        }
 
         return false;
     }

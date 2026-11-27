@@ -4,6 +4,9 @@ import com.ajaxjs.util.Base64Utils;
 import com.ajaxjs.util.ObjectHelper;
 import jakarta.servlet.http.HttpServletRequest;
 
+import java.util.List;
+import java.util.Map;
+
 public interface IOAuthService {
     boolean clientCredentialCheck(HttpServletRequest request);
 

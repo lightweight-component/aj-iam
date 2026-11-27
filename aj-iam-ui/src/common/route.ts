@@ -10,8 +10,10 @@ import Token from '../pages/auth/Token.vue';
 import User from '../pages/user/User.vue';
 import UserCenter from '../pages/user/profile/index.vue';
 import RoleTreeTable from '../pages/permission/RoleTreeTable.vue';
+import UserRole from '../pages/permission/UserRole.vue';
 import Permission from '../pages/permission/PermissionAuth.vue';
 import PermissionList from '../pages/permission/PermissionList.vue';
+import ModulePermission from '../pages/auth/Module.vue';
 
 const routes = [
     {
@@ -35,18 +37,28 @@ const routes = [
     },
     {
         path: '/permission/rbac',
-        meta: { breadcrumbs: ['角色授权', '角色管理'] },
+        meta: { breadcrumbs: ['角色权限', '角色管理'] },
         component: RoleTreeTable
     },
     {
+        path: '/permission/user_role',
+        meta: { breadcrumbs: ['角色权限', '用户角色'] },
+        component: UserRole
+    },
+    {
         path: '/permission/list',
-        meta: { breadcrumbs: ['角色授权', '权限管理'] },
+        meta: { breadcrumbs: ['角色权限', '权限管理'] },
         component: PermissionList
     },
     {
         path: '/permission/permission',
-        meta: { breadcrumbs: ['角色授权', '角色授权'] },
+        meta: { breadcrumbs: ['角色权限', '角色授权'] },
         component: Permission
+    },
+    {
+        path: '/permission/module',
+        meta: { breadcrumbs: ['角色权限', '模块权限'] },
+        component: ModulePermission
     },
 
     {

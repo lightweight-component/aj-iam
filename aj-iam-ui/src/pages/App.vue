@@ -9,36 +9,45 @@
               用户管理
             </template>
             <MenuItem name="2-1" to="/user/list">
-            <Icon type="ios-person"></Icon>
-            <span>用户列表</span>
+              <Icon type="ios-person"></Icon>
+              <span>用户列表</span>
             </MenuItem>
             <MenuItem name="user-org" to="/user/org">
-            <Icon type="ios-cube-outline"></Icon>
-            <span>组织机构管理</span>
+              <Icon type="ios-cube-outline"></Icon>
+              <span>组织机构管理</span>
             </MenuItem>
             <MenuItem name="2-3" to="/user/login_log">
-            <Icon type="md-key"></Icon>
-            <span>登录日志</span>
+              <Icon type="md-key"></Icon>
+              <span>登录日志</span>
             </MenuItem>
           </Submenu>
 
           <Submenu name="per">
             <template #title>
               <Icon type="ios-people" />
-              角色授权
+              角色权限
             </template>
             <MenuItem name="per-rbac" to="/permission/rbac">
-            <Icon type="ios-person"></Icon>
-            <span>角色管理</span>
+              <Icon type="ios-person"></Icon>
+              <span>角色管理</span>
+            </MenuItem>
+            <MenuItem name="per-user-role" to="/permission/user_role">
+              <Icon type="ios-people"></Icon>
+              <span>用户角色</span>
             </MenuItem>
             <MenuItem name="per-list" to="/permission/list">
-            <Icon type="ios-list"></Icon>
-            <span>权限管理</span>
+              <Icon type="ios-list"></Icon>
+              <span>权限管理</span>
+            </MenuItem>
+            <MenuItem name="per-module" to="/permission/module">
+              <Icon type="md-apps"></Icon>
+              <span>模块权限</span>
             </MenuItem>
             <MenuItem name="per-per" to="/permission/permission">
-            <Icon type="ios-cube-outline"></Icon>
-            <span>角色授权</span>
+              <Icon type="ios-cube-outline"></Icon>
+              <span>角色授权</span>
             </MenuItem>
+
           </Submenu>
 
           <Submenu name="auth">
@@ -47,16 +56,16 @@
               认证管理
             </template>
             <MenuItem name="2-4" to="/user/tenant">
-            <Icon type="ios-contact-outline"></Icon>
-            <span>租户管理</span>
+              <Icon type="ios-contact-outline"></Icon>
+              <span>租户管理</span>
             </MenuItem>
             <MenuItem name="2-5" to="/user/app">
-            <Icon type="md-apps"></Icon>
-            <span>应用管理</span>
+              <Icon type="md-apps"></Icon>
+              <span>应用管理</span>
             </MenuItem>
             <MenuItem name="2-6" to="/user/token">
-            <Icon type="md-link"></Icon>
-            <span>Token 管理</span>
+              <Icon type="md-link"></Icon>
+              <span>Token 管理</span>
             </MenuItem>
           </Submenu>
 
@@ -66,16 +75,16 @@
               系统管理
             </template>
             <MenuItem name="3-1" to="/system/list-mgr">
-            <Icon type="ios-list"></Icon>
-            <span>列表管理</span>
+              <Icon type="ios-list"></Icon>
+              <span>列表管理</span>
             </MenuItem>
             <MenuItem name="3-5" to="/system/form-mgr">
-            <Icon type="ios-paper-outline" />
-            <span>表单管理</span>
+              <Icon type="ios-paper-outline" />
+              <span>表单管理</span>
             </MenuItem>
             <MenuItem name="3-3" @click="$Message.info('TODO')">
-            <Icon type="search"></Icon>
-            <span>操作日志</span>
+              <Icon type="search"></Icon>
+              <span>操作日志</span>
             </MenuItem>
           </Submenu>
         </Menu>

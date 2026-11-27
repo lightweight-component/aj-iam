@@ -4,6 +4,7 @@ import com.ajaxjs.framework.database.DataBaseConnection;
 import com.ajaxjs.iam.UserConstants;
 import com.ajaxjs.iam.client.IOAuthService;
 import com.ajaxjs.iam.model.App;
+import com.ajaxjs.iam.server.authorizatio.PermissionService;
 import com.ajaxjs.spring.DiContextUtil;
 import com.ajaxjs.sqlman.Action;
 import com.ajaxjs.util.Base64Utils;
@@ -11,11 +12,14 @@ import com.ajaxjs.util.CommonConstant;
 import com.ajaxjs.util.ObjectHelper;
 import com.ajaxjs.util.RandomTools;
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.List;
+import java.util.Map;
 
 /**
  * OAuth 2.0 中的客户端凭证（Client Credentials）授权模式请求
@@ -58,6 +62,14 @@ public class ClientCredential implements IOAuthService {
 
         return true;
     }
+
+//    @Autowired
+//    PermissionService permissionService;
+//
+//    @Override
+//    public Map<String, Long> getIndexesByCode(List<String> permissionCodes, String type) {
+//        return permissionService.getIndexesByCode(permissionCodes, type);
+//    }
 
     public static final String CLIENT_ID = "CLIENT_ID";
 

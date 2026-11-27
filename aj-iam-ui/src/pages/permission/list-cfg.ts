@@ -15,26 +15,26 @@ export const UserRole_List = [
         align: 'center',
         key: 'content'
     },
-    {
-        title: '创建操作总值',
-        align: 'center',
-        key: 'createSum'
-    },
-    {
-        title: '修改操作总值',
-        align: 'center',
-        key: 'updateSum'
-    },
-    {
-        title: '查询操作总值',
-        align: 'center',
-        key: 'readSum'
-    },
-    {
-        title: '删除操作总值',
-        align: 'center',
-        key: 'deleteSum'
-    },
+    // {
+    //     title: '创建操作总值',
+    //     align: 'center',
+    //     key: 'createSum'
+    // },
+    // {
+    //     title: '修改操作总值',
+    //     align: 'center',
+    //     key: 'updateSum'
+    // },
+    // {
+    //     title: '查询操作总值',
+    //     align: 'center',
+    //     key: 'readSum'
+    // },
+    // {
+    //     title: '删除操作总值',
+    //     align: 'center',
+    //     key: 'deleteSum'
+    // },
 ];
 
 /**

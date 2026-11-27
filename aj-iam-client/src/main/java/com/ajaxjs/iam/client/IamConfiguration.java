@@ -119,27 +119,47 @@ public class IamConfiguration implements WebMvcConfigurer {
     void getModulePermissions(PermissionConfig config) {
         List<String> permissionCodes = new ArrayList<>();
         PermissionEntity mainModulePermission = config.getMainModulePermission();
-        permissionCodes.add(mainModulePermission.getName());
 
-        if (!ObjectHelper.isEmpty(config.getModulePermissions()))
-            config.getModulePermissions().forEach(permission -> permissionCodes.add(permission.getName()));
+        if (mainModulePermission != null)
+            permissionCodes.add(mainModulePermission.getName());
 
-        String url = iamService + "/iam_api/permission/get_index_by_code?permissionCodes=" + String.join(",", permissionCodes) + "&type=module";
-        Map<String, Object> result = Get.api(url);
+        List<PermissionEntity> modulePermissions = config.getModulePermissions();
 
-        if (Response.isOk(result)) {
-            Map<String, Object> data = (Map<String, Object>) result.get("data");
+        if (!ObjectHelper.isEmpty(modulePermissions))
+            modulePermissions.forEach(permission -> permissionCodes.add(permission.getName()));
 
-            Object index = data.get(mainModulePermission.getName());
-            mainModulePermission.setIndex((int) index);
+        if (ClassUtils.isPresent("com.ajaxjs.iam.server.IamServerApp", null)) {
+            modulePermissions.get(0).setIndex(0); // for IAM Server ONLY
 
-            if (!ObjectHelper.isEmpty(config.getModulePermissions()))
-                config.getModulePermissions().forEach(permission -> {
-                    Object index2 = data.get(permission.getName());
-                    permission.setIndex((int) index2);
-                });
+            log.info("init local permission ok.");
+        } else {
+            String url;
 
-            log.info("init permission ok.");
+            if (iamService.endsWith("/iam_api"))
+                url = iamService + "/permission/get_index_by_code?permissionCodes=";
+            else
+                url = iamService + "/iam_api/permission/get_index_by_code?permissionCodes=";
+
+            url += String.join(",", permissionCodes) + "&type=module";
+
+            Map<String, Object> result = Get.api(url);
+
+            if (Response.isOk(result)) {
+                Map<String, Object> data = (Map<String, Object>) result.get("data");
+
+                if (mainModulePermission != null) {
+                    Object index = data.get(mainModulePermission.getName());
+                    mainModulePermission.setIndex((int) index);
+                }
+
+                if (!ObjectHelper.isEmpty(modulePermissions))
+                    modulePermissions.forEach(permission -> {
+                        Object index2 = data.get(permission.getName());
+                        permission.setIndex((int) index2);
+                    });
+
+                log.info("init permission ok.");
+            }
         }
     }
 }

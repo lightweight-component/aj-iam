@@ -139,7 +139,7 @@ public class UserInterceptor implements HandlerInterceptor {
 
                             if (!permissionCheck(jwt, handler)) {
                                 returnErrorMsg(403, response, "模块权限不足");
-                                log.warn("模块权限不足");
+                                log.warn("超时：模块权限不足");
                                 return false;
                             }
                         } else {
@@ -179,9 +179,9 @@ public class UserInterceptor implements HandlerInterceptor {
             adminIam.setIndex(1);
 
             Payload payload = jwt.getPayload();
-            Long[] mp = payload.getMp();
+            Map<String, Long> mp = payload.getMrp();
 
-            return adminIam.check(toPrimitive(mp));
+            return adminIam.check(mp);
         } else
             return true;
     }
@@ -202,15 +202,14 @@ public class UserInterceptor implements HandlerInterceptor {
         }
 
         if (permissionConfig != null) {
-            Long[] mp = payload.getMp(); // 通过 code 加载 index，权限数据保存在 IAM
+            Map<String, Long> mp = payload.getMrp(); // 通过 code 加载 index，权限数据保存在 IAM
 
             /*
              * 这里采用比较”宽容“的模式，如果 token 没有 mp 字段那么是放行的。认为：如果有 Token 了但某些原因没有 mp 的话，是特殊的。
              * 健全的机制下在生成 Token 的时候，必须同时生成 mp 字段。日后如果需要更严格的校验，那么可以强制非空 mp 处理，即 mp 为空的一律作无权限
              */
-            if (!ObjectHelper.isEmpty(mp)) {
-                PermissionEntity mainModulePermission = permissionConfig.getMainModulePermission();
-                boolean globalModuleCheck = mainModulePermission.check(toPrimitive(mp));
+            if (!ObjectHelper.isEmpty(mp) && permissionConfig.getMainModulePermission() != null) {
+                boolean globalModuleCheck = permissionConfig.getMainModulePermission().check(mp);
 
                 if (!globalModuleCheck)
                     return false;
@@ -228,7 +227,7 @@ public class UserInterceptor implements HandlerInterceptor {
                 if (!ObjectHelper.isEmpty(modulePermissions))
                     for (PermissionEntity permission : modulePermissions) {
                         if (code.equals(permission.getName())) {
-                            boolean check = permission.check(toPrimitive(mp));
+                            boolean check = permission.check(mp);
 
                             if (!check)
                                 return false;

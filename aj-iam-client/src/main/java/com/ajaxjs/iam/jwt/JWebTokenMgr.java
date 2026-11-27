@@ -11,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.Map;
 
 /**
  * JWT 管理器
@@ -58,15 +59,15 @@ public class JWebTokenMgr {
      * @param modulePermissionValues 模块权限值列表
      * @return JWT Token
      */
-    public JWebToken tokenFactory(String sub, String name, String aud, long expires, Integer tenantId, Long[] permissionValues, Long[] modulePermissionValues) {
+    public JWebToken tokenFactory(String sub, String name, String aud, long expires, Integer tenantId, Map<String, Long> permissionValues, Map<String, Long> modulePermissionValues) {
         Payload payload = new Payload();
         payload.setSub(sub);
         payload.setName(name);
         payload.setAud(aud);
         payload.setExp(expires);
         payload.setT(tenantId);
-        payload.setP(permissionValues);
-        payload.setMp(modulePermissionValues);
+        payload.setRp(permissionValues);
+        payload.setMrp(modulePermissionValues);
 
         return tokenFactory(payload);
     }

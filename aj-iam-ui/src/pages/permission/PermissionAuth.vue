@@ -1,68 +1,77 @@
 <template>
     <div class="holder">
-        <h2>角色授权</h2>
+        <Tabs value="name1" :animated="false">
+            <TabPane label="权限授权" name="name1">
 
-        <div class="main">
-            <div class="left">
-                <RoleTree @select-change="onRoleSelectedFromChild" />
-            </div>
-
-            <div class="right">
-                <p style="text-indent:2em;">---你可以维护角色的权限，可以给角色分配权限，也可以给角色分配子角色。一个角色对应多个权限；角色可以继承，拥有父级的所有权限。
-                </p>
-                <fieldset class="panel">
-                    <legend>继承的父级权限：</legend>
-                    <div class="inherited-permission">
-                        <span v-for="(item, index) in permission.inheritPermissionList" :key="item.id">{{ item.roleName
-                        }}-{{ item.name }}
-                            <span v-if="index < permission.inheritPermissionList.length - 1">、</span>
-                        </span>
+                <div class="main">
+                    <h3>权限授权</h3>
+                    <div class="left">
+                        <RoleTree @select-change="onRoleSelectedFromChild" />
                     </div>
-                </fieldset>
-                <br />
-                <br />
-                <div>
-                    <h2>{{ currentRole ? '角色 ' + currentRole.name + ' 的权限' : '请选择一个角色' }}
-                        <span style="font-weight:normal;font-size:14px;"
-                            v-if="currentRole.id == null">请从左侧选择一个角色以继续操作</span>
-                    </h2>
 
-                    <div class="permission-list">
-                        <select multiple v-model="selectedPermissions">
-                            <option v-for="item in permission.permissionList" :key="item.name" :value="item.id">
-                                {{ item.name }}
-                            </option>
-                        </select>
-                        <div class="permission-bts">
-                            <Button :disabled="currentRole.id == null" type="primary" icon="ios-add"
-                                @click="addPermission">添加权限</Button>
-                            <Button :disabled="!selectedPermissions.length" type="warning" icon="ios-remove"
-                                @click="removePermission">移除权限</Button>
-                            <Button :disabled="currentRole.id == null" type="error" icon="ios-close"
-                                @click="clearPermission">清空权限</Button>
-                            <br />
-                            <Button :disabled="currentRole.id == null" type="success" icon="ios-add-circle-outline"
-                                @click="savePermission">&nbsp;&nbsp;&nbsp;保 存&nbsp;&nbsp;&nbsp;</Button>
+                    <div class="right">
+                        <p style="text-indent:2em;">你可以维护角色的权限，可以给角色分配权限，也可以给角色分配子角色。一个角色对应多个权限；角色可以继承，拥有父级的所有权限。
+                        </p>
+                        <fieldset class="panel">
+                            <legend>继承的父级权限：</legend>
+                            <div class="inherited-permission">
+                                <span v-for="(item, index) in permission.inheritPermissionList" :key="item.id">{{
+                                    item.roleName
+                                }}-{{ item.name }}
+                                    <span v-if="index < permission.inheritPermissionList.length - 1">、</span>
+                                </span>
+                            </div>
+                        </fieldset>
+                        <br />
+                        <br />
+                        <div>
+                            <h2>{{ currentRole ? '角色 ' + currentRole.name + ' 的权限' : '请选择一个角色' }}
+                                <span style="font-weight:normal;font-size:14px;"
+                                    v-if="currentRole.id == null">请从左侧选择一个角色以继续操作</span>
+                            </h2>
+
+                            <div class="permission-list">
+                                <select multiple v-model="selectedPermissions">
+                                    <option v-for="item in permission.permissionList" :key="item.name" :value="item.id">
+                                        {{ item.name }}
+                                    </option>
+                                </select>
+                                <div class="permission-bts">
+                                    <Button :disabled="currentRole.id == null" type="primary" icon="ios-add"
+                                        @click="addPermission">添加权限</Button>
+                                    <Button :disabled="!selectedPermissions.length" type="warning" icon="ios-remove"
+                                        @click="removePermission">移除权限</Button>
+                                    <Button :disabled="currentRole.id == null" type="error" icon="ios-close"
+                                        @click="clearPermission">清空权限</Button>
+                                    <Button :disabled="currentRole.id == null" type="success"
+                                        icon="ios-add-circle-outline" @click="savePermission">&nbsp;&nbsp;&nbsp;保
+                                        存&nbsp;&nbsp;&nbsp;</Button>
+                                </div>
+                                <p>增加、删除权限请到<a @click="showPermissionMgr(false)">权限管理</a>。</p>
+                            </div>
                         </div>
-                        <p>增加、删除权限请到<a @click="showPermissionMgr(false)">权限管理</a>。</p>
                     </div>
                 </div>
-            </div>
-        </div>
 
-        <Modal v-model="isShowPermissionMgr" width="1000" title="权限管理列表">
-            <PermissionMgr :is-pickup="isPermissionMgrPickup" :on-pickup="pickupPermission" />
-        </Modal>
+                <Modal v-model="isShowPermissionMgr" width="1000" title="权限管理列表">
+                    <PermissionMgr :is-pickup="isPermissionMgrPickup" :on-pickup="pickupPermission" />
+                </Modal>
+            </TabPane>
+            <TabPane label="模块授权" name="name2">
+                <PermissionAuthModule />
+            </TabPane>
+        </Tabs>
     </div>
 </template>
 
 <script lang="ts">
 import { XhrFetch } from '../../common/http.ts';
+import PermissionAuthModule from './PermissionAuthModule.vue';
 import PermissionMgr from './PermissionList.vue';
 import RoleTree from './RoleTree.vue';
 
 export default {
-    components: { RoleTree, PermissionMgr },
+    components: { RoleTree, PermissionMgr, PermissionAuthModule },
     data() {
         return {
             permissionApi: `${window.config.iamApi}/permission`,
@@ -181,7 +190,7 @@ export default {
 
 fieldset {
     border-radius: 4px;
-    margin-top: 20px;
+    margin-top: 15px;
     padding: 1%;
 
     legend {
@@ -200,7 +209,7 @@ fieldset {
         width: 55%;
         border: 1px solid lightgray;
         min-height: 200px;
-        max-height: 600px;
+        max-height: 500px;
         outline: 0;
         float: left;
     }
@@ -213,11 +222,11 @@ fieldset {
 
 .permission-bts {
     float: left;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
     width: 30%;
     margin-left: 3%;
-
-    button {
-        margin-bottom: 10px;
-    }
 }
 </style>

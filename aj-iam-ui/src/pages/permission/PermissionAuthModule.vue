@@ -1,0 +1,220 @@
+<template>
+    <div class="main">
+        <h3>模块授权</h3>
+        <div class="left">
+            <RoleTree @select-change="onRoleSelectedFromChild" />
+        </div>
+
+        <div class="right">
+            <p style="text-indent:2em;margin-bottom: 25px;"> &nbsp; </p>
+            <fieldset class="panel">
+                <legend>继承的父级模块：</legend>
+                <div class="inherited-permission">
+                    <span v-for="(item, index) in permission.inheritPermissionList" :key="item.id">{{
+                        item.roleName
+                    }}-{{ item.name }}
+                        <span v-if="index < permission.inheritPermissionList.length - 1">、</span>
+                    </span>
+                </div>
+            </fieldset>
+            <br />
+            <br />
+            <div>
+                <h2>{{ currentRole ? '角色 ' + currentRole.name + ' 的模块' : '请选择一个角色' }}
+                    <span style="font-weight:normal;font-size:14px;"
+                        v-if="currentRole.id == null">请从左侧选择一个角色以继续操作</span>
+                </h2>
+
+                <div class="permission-list">
+                    <select multiple v-model="selectedPermissions">
+                        <option v-for="item in permission.permissionList" :key="item.name" :value="item.id">
+                            {{ item.name }}
+                        </option>
+                    </select>
+                    <div class="permission-bts">
+                        <Button :disabled="currentRole.id == null" type="primary" icon="ios-add"
+                            @click="addPermission">添加模块</Button>
+                        <Button :disabled="!selectedPermissions.length" type="warning" icon="ios-remove"
+                            @click="removePermission">移除模块</Button>
+                        <Button :disabled="currentRole.id == null" type="error" icon="ios-close"
+                            @click="clearPermission">清空模块</Button>
+                        <Button :disabled="currentRole.id == null" type="success" icon="ios-add-circle-outline"
+                            @click="savePermission">&nbsp;&nbsp;&nbsp;保
+                            存&nbsp;&nbsp;&nbsp;</Button>
+                    </div>
+                    <p>增加、删除模块权限请到<RouterLink to="/permission/module">模块权限</RouterLink>。</p>
+                </div>
+            </div>
+        </div>
+
+        <Modal v-model="isShowPermissionMgr" width="1000" title="权限管理列表">
+            <PermissionMgr :is-pickup="isPermissionMgrPickup" :on-pickup="pickupPermission" />
+        </Modal>
+    </div>
+</template>
+
+<script lang="ts">
+import { XhrFetch } from '../../common/http.ts';
+import PermissionMgr from './ModulePickup.vue';
+import RoleTree from './RoleTree.vue';
+
+export default {
+    components: { RoleTree, PermissionMgr },
+    data() {
+        return {
+            permissionApi: `${window.config.iamApi}/module_permission`,
+            isShowPermissionMgr: false,
+            isPermissionMgrPickup: true,
+            // 当前角色
+            currentRole: {
+                name: ''
+            } as Role,
+            permission: {
+                inheritPermissionList: [] as PermissionEntry[],
+                permissionList: [] as PermissionEntry[]
+            },
+            selectedPermissions: [] as number[]
+        }
+    },
+    methods: {
+        onRoleSelectedFromChild(selectedNodes: Role): void {
+            console.log('父组件接收到选中的节点:', selectedNodes);
+            this.currentRole = selectedNodes;
+        },
+        addPermission(): void {
+            this.showPermissionMgr(true);
+        },
+        removePermission(): void {
+            for (const id of this.selectedPermissions) {
+                const index: number = this.permission.permissionList.findIndex(element => element.id === id);
+
+                if (index !== -1)
+                    this.permission.permissionList.splice(index, 1);
+            }
+        },
+        clearPermission(): void {
+            this.permission.permissionList = [];
+        },
+        savePermission(): void {
+            let arr: string[] = [];
+            this.permission.permissionList.forEach((item: any) => arr.push(item.id));
+
+            let data: any = {
+                roleId: this.currentRole.id,
+                permissionIds: arr.join(',')
+            };
+
+            XhrFetch.postForm(`${this.permissionApi}/add_permissions_to_role`, data, (j: ApiResponseResult) => {
+                if (j.status)
+                    this.$Message.success('保存权限成功');
+                else
+                    this.$Message.warning(j.message || '保存权限失败');
+            });
+        },
+        showPermissionMgr(isPermissionMgrPickup: boolean): void {
+            this.isShowPermissionMgr = true;
+            this.isPermissionMgrPickup = isPermissionMgrPickup;
+        },
+        pickupPermission(data: any): void {
+            // TODO add multiple selection
+            const arr: any[] = this.permission.permissionList;
+
+            for (let i = 0; i < arr.length; i++) {
+                if (arr[i].id == data.id) {
+                    this.$Message.warning('已经添加了权限' + data.name);
+                    return;
+                }
+            }
+
+            this.permission.permissionList.push({ id: data.id, name: data.name });
+            this.$Message.success(`添加权限[${data.name}]成功`);
+        },
+        handlePermissionList(data: any): void {
+            this.permission.inheritPermissionList = [];
+            this.permission.permissionList = [];
+
+            data.forEach((item: any) => {
+                if (item.isInherit)
+                    this.permission.inheritPermissionList.push(item);
+                else
+                    this.permission.permissionList.push({ id: item.id, name: item.name });
+            });
+        }
+    },
+    watch: {
+        currentRole(currentRole): void {
+            if (currentRole && currentRole.id) {
+                XhrFetch.get(`${this.permissionApi}/permission_list_by_role/${currentRole.id}`, (j: ApiResponseResult) => {
+                    if (j.status) {
+                        this.handlePermissionList(j.data);
+                    } else
+                        this.$Message.warning(j.message || '获取数据失败');
+                });
+            }
+        }
+    }
+}
+</script>
+
+<style lang="less" scoped>
+.main {
+    // padding: 2%;
+
+    &>div {
+        padding: 0 0%;
+    }
+
+    .left {
+        float: left;
+        width: 50%;
+    }
+
+    .right {
+        float: right;
+        width: 50%;
+        padding-top: 0;
+    }
+}
+
+fieldset {
+    border-radius: 4px;
+    margin-top: 15px;
+    padding: 1%;
+
+    legend {
+        margin: 0 15px;
+    }
+}
+
+.inherited-permission {
+    color: gray;
+    min-height: 150px;
+}
+
+.permission-list {
+    select {
+        padding-left: 5px;
+        width: 55%;
+        border: 1px solid lightgray;
+        min-height: 200px;
+        max-height: 500px;
+        outline: 0;
+        float: left;
+    }
+
+    p {
+        padding: 5% 0;
+        clear: both;
+    }
+}
+
+.permission-bts {
+    float: left;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    width: 30%;
+    margin-left: 3%;
+}
+</style>

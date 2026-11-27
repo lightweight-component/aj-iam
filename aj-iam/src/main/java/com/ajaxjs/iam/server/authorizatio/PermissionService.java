@@ -217,9 +217,12 @@ public class PermissionService implements PermissionController {
             Map<String, Object> iViewMap = new HashMap<>();
             iViewMap.put("id", map.get("id"));
             iViewMap.put("title", map.get("name"));
+            iViewMap.put("code", map.get("code"));
             iViewMap.put("parentId", map.get("parentId"));
             iViewMap.put("content", map.get("content"));
             iViewMap.put("updateDate", map.get("updateDate"));
+            iViewMap.put("permissionValue", Objects.toString(map.get("permissionValue"), "0"));
+            iViewMap.put("moduleValue", Objects.toString(map.get("moduleValue"), "0"));
             iViewMap.put("expand", true);
             iViewMap.put("contextmenu", true);
 

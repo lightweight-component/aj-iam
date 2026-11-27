@@ -73,7 +73,10 @@ type RoleNode = {
     id: number;
     parentId: number;
     title: string;
+    code?: string | null;
     content?: string;
+    permissionValue?: string;
+    moduleValue?: string;
     updateDate?: string | number | null;
     children?: RoleNode[];
 };
@@ -129,6 +132,9 @@ export default defineComponent({
             columns: [
                 { title: '#', width: 100, align: 'center', key: 'id' },
                 ...UserRole_List,
+                { title: '角色编码', key: 'code', minWidth: 140, align: 'center' },
+                { title: '权限总值', key: 'permissionValue', minWidth: 160, align: 'center' },
+                { title: '模块权限总值', key: 'moduleValue', minWidth: 160, align: 'center' },
                 {
                     title: '修改日期',
                     align: 'center',

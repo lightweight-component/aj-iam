@@ -2,6 +2,8 @@ package com.ajaxjs.iam.jwt;
 
 import lombok.Data;
 
+import java.util.Map;
+
 /**
  * JWT 基础载荷
  */
@@ -45,12 +47,24 @@ public class Payload {
     /**
      * 权限值列表
      */
+    @Deprecated
     private Long[] p;
+
+    /**
+     * 权限值列表
+     */
+    private Map<String, Long> rp;
 
     /**
      * 模块权限值列表
      */
+    @Deprecated
     private Long[] mp;
+
+    /**
+     * 模块权限值列表
+     */
+    private Map<String, Long> mrp;
 
 //    /**
 //     * 编号，似乎不需要

@@ -19,13 +19,13 @@ import java.util.Objects;
 @RequestMapping("/module_permission")
 public class ModulePermissionController {
     /**
-     * 根据角色 id 获取其权限列表
+     * 根据角色 id 获取其模块权限列表
      *
      * @param roleId 角色 id
      * @return 权限列表
      */
     @GetMapping("/permission_list_by_role/{roleId}")
-    @BizAction("根据角色 id 获取其权限列表")
+    @BizAction("根据角色 id 获取其模块权限列表")
     public List<Permission> getPermissionListByRole(@PathVariable Integer roleId) {
         Role role = new Action("SELECT * FROM per_role WHERE id = ?").query(roleId).one(Role.class);
         Objects.requireNonNull(role, "There is NO role, id:" + roleId);
@@ -63,14 +63,14 @@ public class ModulePermissionController {
     }
 
     /**
-     * 为角色添加权限 id 列表
+     * 为角色添加模块权限 id 列表
      *
      * @param roleId        角色 id
-     * @param permissionIds 权限列表
+     * @param permissionIds 模块权限列表
      * @return 是否成功
      */
     @PostMapping("/add_permissions_to_role")
-    @BizAction("为角色添加权限 id 列表")
+    @BizAction("为角色添加模块权限 id 列表")
     public boolean addPermissionsToRole(@RequestParam Integer roleId, @RequestParam List<Integer> permissionIds) {
         List<Integer> allPermissionIIdList = new Action("SELECT id FROM per_module WHERE stat = 0 ORDER BY id ASC").query().list(Integer.class);
         int[] indexes = PermissionService.findIndexes(permissionIds, allPermissionIIdList);

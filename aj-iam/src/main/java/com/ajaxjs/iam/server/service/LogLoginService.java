@@ -37,11 +37,11 @@ public class LogLoginService implements LogLoginController, UserConstants {
             userLoginLog.setUserId(user.getId());
             userLoginLog.setLoginType(LoginType.PASSWORD);
             userLoginLog.setUserName(user.getLoginId());
+
             if (user.getTenantId() != null)
                 userLoginLog.setTenantId(user.getTenantId().intValue());
 
-            // 请求结束后不能再访问 req，先在登录线程中提取需要的数据。
-            if (req != null) {
+            if (req != null) {// 请求结束后不能再访问 req，先在登录线程中提取需要的数据
                 userLoginLog.setIp(IpList.getClientIp(req));
                 userLoginLog.setUserAgent(req.getHeader("user-agent"));
             }
@@ -62,6 +62,7 @@ public class LogLoginService implements LogLoginController, UserConstants {
                     throw new IllegalStateException("获取登录日志数据库连接失败");
 
                 CreateResult<Long> result = new Action(bean).create().execute(true, Long.class);
+
                 if (!result.isOk())
                     log.warn("保存会员登录日志出错");
             } finally {
@@ -74,6 +75,7 @@ public class LogLoginService implements LogLoginController, UserConstants {
 
     void fillIpLocation(LogLogin bean) {
         String ip = bean.getIp();
+
         if (ip == null || ip.isEmpty())
             return;
 

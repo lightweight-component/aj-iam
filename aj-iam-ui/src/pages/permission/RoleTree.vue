@@ -34,7 +34,8 @@
                 <label><input type="radio" v-model="currentRole.stat" value="2" /> 禁用</label>
             </FormItem>
             <FormItem v-if="!roleForm.isCreate" style="color:gray;">
-                创建于 {{ currentRole.createDate }} 修改于 {{ currentRole.updateDate }}
+                <div>创建于 {{ formatRoleDate(currentRole.createDate) }}</div>
+                <div>修改于 {{ formatRoleDate(currentRole.updateDate) }}</div>
             </FormItem>
         </Form>
     </Modal>
@@ -42,7 +43,7 @@
 
 <script lang="ts">
 import { XhrFetch } from '../../common/http';
-import { copyWriteFields } from '../../common/utils';
+import { copyWriteFields, dateFormat } from '../../common/utils';
 
 type ContextData = {
     id?: number;
@@ -73,6 +74,9 @@ export default {
         this.refreshRoleList();
     },
     methods: {
+        formatRoleDate(value?: string | number | null): string {
+            return value == null ? '—' : dateFormat(value, 'yyyy-MM-dd hh:mm');
+        },
         handleContextMenu(data: ContextData): void {
             this.contextData = data;
         },
@@ -189,6 +193,6 @@ h3 {
     border-radius: 3px;
     width: 90%;
     padding: 5px;
-    min-height: 600px;
+    min-height: 550px;
 }
 </style>
